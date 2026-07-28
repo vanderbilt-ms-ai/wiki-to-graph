@@ -61,14 +61,27 @@ TEMPLATE = r"""<!DOCTYPE html>
 <script id="data" type="application/json">__DATA__</script>
 <script>
 const G = JSON.parse(document.getElementById('data').textContent);
-const KIND = {concept:'#4f7cff',schema:'#9b5cff',procedure:'#2ec27e',fact:'#f5a623'};
+const KIND = Object.assign({concept:'#4f7cff',schema:'#9b5cff',procedure:'#2ec27e',fact:'#f5a623'},
+  // Any kind the graph actually contains that we have no colour for gets one from the palette, so a
+  // custom vocabulary is legible instead of uniformly grey.
+  Object.fromEntries([...new Set(G.nodes.map(n=>n.kind).filter(k=>k &&
+      !['concept','schema','procedure','fact'].includes(k)))]
+    .map((k,i)=>[k, ['#00b3a4','#e5484d','#d4a72c','#7aa2ff','#b07aa1','#59a14f','#ff9da7','#9c755f'][i%8]])));
 const TYPEN = {source:'#8a8f9a',index:'#d4a72c',log:'#6b7280'};
-const EDGE = {mentions:'#5b6070',related:'#4f7cff',contradicts:'#e5484d',
-              cites:'#7a7f8c',indexes:'#3f466b',records:'#3f466b'};
+const EDGE = Object.assign({mentions:'#5b6070',related:'#4f7cff',contradicts:'#e5484d',
+              cites:'#7a7f8c',indexes:'#3f466b',records:'#3f466b'},
+  Object.fromEntries([...new Set(G.links.map(e=>e.type))]
+    .filter(t=>!['mentions','related','contradicts','cites','indexes','records'].includes(t))
+    .map((t,i)=>[t, ['#4f7cff','#e5484d','#2ec27e','#f5a623','#9b5cff','#00b3a4','#b07aa1','#d4a72c'][i%8]])));
 const nodeColor = n => KIND[n.kind] || TYPEN[n.type] || '#8a8f9a';
 
 // default-visible edge types (hub edges off to reduce clutter)
-const enabled = {mentions:true,related:true,contradicts:true,cites:false,indexes:false,records:false};
+// Hub edges stay off to reduce clutter; everything else the graph contains is ON by default.
+// Hardcoding this list meant a custom vocabulary rendered as unconnected dots — every edge type
+// present but none of them drawable.
+const enabled = Object.assign(
+  Object.fromEntries([...new Set(G.links.map(e=>e.type))].map(t=>[t,true])),
+  {cites:false,indexes:false,records:false});
 
 const svg = document.getElementById('svg'), NS='http://www.w3.org/2000/svg';
 const byId = Object.fromEntries(G.nodes.map(n=>[n.id,n]));

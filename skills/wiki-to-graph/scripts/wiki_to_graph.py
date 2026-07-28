@@ -58,7 +58,50 @@ def strip_links(text):
 
 # knowledge-node taxonomy (the `kind` property). Structural `type` stays concept/
 # source/index/log; `kind` classifies the knowledge a concept node holds.
+#
+# These five names are this tool's DEFAULT vocabulary, not a fixed one. A wiki built on a different
+# ontology (more primitives, different relation names) can supply its own with `--vocab v.json`;
+# see load_vocab(). Everything downstream reads these module globals, so overriding them is the
+# single switch — but that only works if you override ALL of them, which is what --vocab is for:
+# leaving CONCEPT_EDGE_TYPES on the defaults while using custom section names produces a graph
+# that builds cleanly and reports every node as an orphan, because degree is computed over edge
+# types that no longer exist.
 KINDS = {"concept", "fact", "schema", "procedure"}
+
+
+DEFAULT_VOCAB = {
+    "kinds": sorted(KINDS),
+    "concept_edges": sorted(CONCEPT_EDGE_TYPES),
+    "symmetric": sorted(SYMMETRIC),
+    "hub_edges": sorted(META_EDGE.values()),
+}
+
+
+def load_vocab(path):
+    """Replace the built-in kind/edge vocabulary from a JSON file.
+
+    Shape (every key optional; omitted keys keep the default):
+
+        {"kinds":         ["object", "concept", "fact", "experience", …],
+         "concept_edges": ["part-of", "uses", "derived-from", …],
+         "symmetric":     ["contradicts", "co-occurred-with"],
+         "hub_edges":     ["indexes", "records"]}
+
+    `concept_edges` is the one people miss. It drives in/out degree at build time AND the analysis
+    graph, so a custom section->edge map without a matching vocabulary yields a graph where every
+    node looks like an orphan and `analyze` considers zero edges.
+    """
+    global KINDS, CONCEPT_EDGE_TYPES, CONCEPT_EDGE, ALL_EDGE_TYPES, SYMMETRIC
+    v = dict(DEFAULT_VOCAB)
+    if path:
+        with open(path, encoding="utf-8") as fh:
+            v.update(json.load(fh))
+    KINDS = set(v["kinds"])
+    CONCEPT_EDGE_TYPES = set(v["concept_edges"])
+    CONCEPT_EDGE = set(v["concept_edges"])
+    SYMMETRIC = set(v["symmetric"])
+    ALL_EDGE_TYPES = list(v["concept_edges"]) + list(v["hub_edges"])
+    return v
 
 
 def edge_type_for(section, mapping):
@@ -557,7 +600,8 @@ def cmd_analyze(args):
     from collections import Counter
     g, nodes, edges = load_graph(args.graph)
     cids = [n for n, nd in nodes.items() if nd.get("type") == "concept"]
-    types = {x.strip() for x in args.edges.split(",") if x.strip()}
+    types = ({x.strip() for x in args.edges.split(",") if x.strip()} if args.edges
+             else set(CONCEPT_EDGE))
     adj = _adj(cids, edges, types)
     adjU = _adj(cids, edges, types, undirected=True)
     N = args.top
@@ -808,19 +852,26 @@ def main():
     b.add_argument("--dag-edges", default="mentions", help="edge types to check for acyclicity")
     b.add_argument("--kst", action="store_true", help="also emit domain.json (KST candidate)")
     b.add_argument("--map", default=None, help="JSON file overriding section->edge map")
+    b.add_argument("--vocab", default=None,
+                   help="JSON file overriding the kind/edge vocabulary")
     b.set_defaults(func=cmd_build)
 
     v = sub.add_parser("validate", help="check an existing graph.json (exit 1 on issues)")
     v.add_argument("graph")
     v.add_argument("--dag-edges", default="mentions")
+    v.add_argument("--vocab", default=None,
+                   help="JSON file overriding the kind/edge vocabulary")
     v.set_defaults(func=cmd_validate)
 
     a = sub.add_parser("analyze", help="graph metrics over an existing graph.json")
     a.add_argument("graph")
-    a.add_argument("--edges", default="mentions,related,contradicts",
-                   help="edge types to include in the analysis graph")
+    a.add_argument("--edges", default=None,
+                   help="edge types to include in the analysis graph "
+                        "(default: every concept edge type in the active vocabulary)")
     a.add_argument("--top", type=int, default=5)
     a.add_argument("--path", nargs=2, metavar=("A", "B"), help="shortest path between two nodes")
+    a.add_argument("--vocab", default=None,
+                   help="JSON file overriding the kind/edge vocabulary")
     a.set_defaults(func=cmd_analyze)
 
     q = sub.add_parser("query", help="ask common questions about a graph.json (no SQL needed)")
@@ -837,6 +888,8 @@ def main():
     q.add_argument("--node-type", default=None, help="ONLY visit these structural types (concept,source,index,log)")
     q.add_argument("--ignore-node-type", default=None, help="visit all node types EXCEPT these")
     q.add_argument("--undirected", action="store_true", help="treat edges as undirected in bfs/dfs")
+    q.add_argument("--vocab", default=None,
+                   help="JSON file overriding the kind/edge vocabulary")
     q.set_defaults(func=cmd_query)
 
     u = sub.add_parser("update", help="edit the source wiki markdown, then re-run build")
@@ -851,6 +904,8 @@ def main():
     args = ap.parse_args()
     if not getattr(args, "cmd", None):
         ap.print_help(); sys.exit(1)
+    # applied before dispatch so every stage sees the same vocabulary
+    load_vocab(getattr(args, "vocab", None))
     args.func(args)
 
 
