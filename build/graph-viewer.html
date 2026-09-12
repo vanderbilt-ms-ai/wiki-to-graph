@@ -23,8 +23,8 @@
   #side h2{font-size:16px;margin:0 0 2px}
   #side .k{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.6px;
         padding:2px 7px;border-radius:10px;color:#fff;margin-bottom:10px}
-  #side .deg{color:var(--muted);font-size:12px;margin:2px 0 10px;word-break:break-all}
-  #side .deg code{font-size:11px;background:#0e1226;padding:1px 4px;border-radius:4px}
+  #side .deg{color:var(--muted);font-size:12px;margin:2px 0 10px}
+  #side .deg code{font-size:11px;background:#0e1226;padding:1px 4px;border-radius:4px;overflow-wrap:anywhere}
   #side p{font-size:13px;line-height:1.5}
   #side h3{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 6px}
   #side .e{font-size:12px;padding:6px 0;border-bottom:1px solid #232842;cursor:pointer}
@@ -8793,9 +8793,17 @@ document.getElementById('search').oninput=e=>{
 function fit(){
   if(!nodes.length)return;
   const W=svg.clientWidth||900,H=svg.clientHeight||650,pad=70;
-  const xs=nodes.map(n=>n.x),ys=nodes.map(n=>n.y);
-  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
-  const k=Math.min((W-pad*2)/Math.max(1,x1-x0),(H-pad*2)/Math.max(1,y1-y0),2.5);
+  // Frame the nodes that have a visible edge. A hub whose edge type is hidden is
+  // pushed to the far edge by repulsion, and framing it shrinks everything else.
+  const E=visibleEdges(), linked=new Set();
+  E.forEach(e=>{linked.add(e.source);linked.add(e.target);});
+  const framed=nodes.filter(n=>linked.has(n.id)); const F=framed.length?framed:nodes;
+  // Include each label's extent, or right-hand labels are cut off; cap the zoom so text
+  // stays a readable size instead of being magnified along with the layout.
+  const lab=n=>4+Math.min(9,(n.in_degree||0)*0.5)+3+Math.min(26,n.title.length)*5.2;
+  const x0=Math.min(...F.map(n=>n.x-14)),x1=Math.max(...F.map(n=>n.x+lab(n)));
+  const y0=Math.min(...F.map(n=>n.y-14)),y1=Math.max(...F.map(n=>n.y+14));
+  const k=Math.min((W-pad*2)/Math.max(1,x1-x0),(H-pad*2)/Math.max(1,y1-y0),1.6);
   view.k=Math.max(0.15,Math.min(6,k));
   view.x=(W-(x0+x1)*view.k)/2; view.y=(H-(y0+y1)*view.k)/2;
   applyView();
@@ -8836,4 +8844,14 @@ document.getElementById('zfit').onclick=fit;
 
 window.addEventListener('resize',()=>{sim();draw();fit();});
 sim();draw();fit();
+
+// Deep link: graph-viewer.html#Transformer (a node title or id) opens with that node selected.
+function openFromHash(){
+  const want=decodeURIComponent((location.hash||'').slice(1)).trim().toLowerCase();
+  if(!want) return;
+  const hit=nodes.find(n=>n.id.toLowerCase()===want||n.title.toLowerCase()===want);
+  if(hit) select(hit.id);
+}
+window.addEventListener('hashchange',openFromHash);
+openFromHash();
 </script></body></html>
