@@ -22,6 +22,11 @@ The insight: an LLM wiki is *already* a graph — pages are nodes, `[[wiki-links
 page's consistent sections tell you what *kind* of edge each link is (a link under `## Related` is a
 `related` edge; one under `## Contradictions` is `contradicts`). This tool makes that graph explicit.
 
+**It works on a wiki in whatever shape it is in.** A README standing in for the index, `**Type:**`
+lines instead of frontmatter, papers written up as pages, every disagreement on one hub page, no
+Sources sections — `build` normalizes a copy before parsing, so the same content produces the same
+graph however it was written. Your files are never modified.
+
 ![The interactive graph viewer, with the Transformer node selected](assets/graph-viewer.png)
 
 *The included graph viewer (`graph-viewer.html`): nodes colored by kind, edges by type; click any
@@ -42,6 +47,7 @@ wiki-to-graph/                      ← plugin root (also a one-plugin marketpla
 │   │   ├── references/spec.md      ← full ontology + format spec
 │   │   └── scripts/
 │   │       ├── wiki_to_graph.py        ← the toolkit
+│   │       ├── wiki_normalize.py       ← adapts any wiki shape to the page contract
 │   │       └── build_graph_viewer.py   ← HTML graph viewer generator
 │   ├── wiki-graph-maintain/
 │   │   └── SKILL.md                ← keeping a graph correct as it grows
@@ -49,9 +55,10 @@ wiki-to-graph/                      ← plugin root (also a one-plugin marketpla
 │       └── SKILL.md                ← writing a wiki that graphs cleanly
 ├── examples/
 │   ├── llm-wiki/                   ← the runnable example wiki (source of build/)
-│   │   ├── wiki/                   ← 28 markdown pages (the LLM wiki)
+│   │   ├── wiki/                   ← 34 pages: 26 concepts, 6 sources, index, log
 │   │   └── raw/                    ← 6 source papers the pages cite
 │   └── vocab.custom.json           ← a custom kind/edge vocabulary for --vocab
+├── tests/                          ← proves any wiki shape builds the same graph
 ├── build/                          ← sample outputs, regenerated from examples/llm-wiki/wiki
 ├── docs/
 │   ├── outputs-and-workflows.md    ← what each build object is + example workflows
@@ -95,18 +102,6 @@ heavier analysis. Distribution details and release steps: [`docs/publishing.md`]
 
 Paths below are from the plugin root. (`SCR=skills/wiki-to-graph/scripts`)
 
-### 0 · Lint the wiki (before building)
-
-```bash
-python3 $SCR lint examples/llm-wiki/wiki [--strict]
-```
-
-Reads the **markdown**, not the graph. `validate` only sees structural defects in a
-built graph; most damage is done at authoring time and builds perfectly cleanly:
-links with no stated reason, bullets whose subject is ambiguous so every link gets
-typed as the relation, missing `kind:`, missing `## Sources`, a `README.md` standing
-in for `index.md`, disagreements piled onto one hub page.
-
 ### 1 · Build the graph
 
 ```bash
@@ -117,6 +112,10 @@ python3 skills/wiki-to-graph/scripts/wiki_to_graph.py build examples/llm-wiki/wi
 Writes **`build/graph.json`** (canonical), plus `graph.db` (SQLite) and `graph.graphml` (Gephi/yEd).
 Add `--kst` for a `domain.json` KST projection.
 
+`build` first normalizes a copy of the wiki and prints what it adapted on a `normalized:` line —
+for this example, nothing, because it is already in the page contract. `--emit-normalized DIR`
+keeps the normalized copy; `--no-normalize` parses the wiki exactly as written.
+
 ### 2 · Validate
 
 ```bash
@@ -124,6 +123,9 @@ python3 skills/wiki-to-graph/scripts/wiki_to_graph.py validate build/graph.json
 ```
 
 Broken links / orphans / self-loops fail (exit 1). Cross-reference cycles are informational.
+
+Optional: `wiki_to_graph.py lint <wiki>` lists what build will normalize plus content notes only an
+author can supply, such as a link given no reason. It never blocks a build.
 
 ### 3 · Analyze
 
@@ -230,30 +232,40 @@ Full details: `skills/wiki-to-graph/references/spec.md`.
 
 ## Use on your own wiki
 
-One concept per page, consistent `##` sections, `[[Page Title]]` links, optional `kind:`
-frontmatter.
+Point `build` at it. No reformatting first:
 
-Ingesting something that is not a paper? Author it as a source page:
-
-```
----
-type: source
-medium: slides          # inferred from the locator when omitted
-locator: decks/q3-review.pptx
-author: …
-date: 2026-03
----
+```bash
+python3 skills/wiki-to-graph/scripts/wiki_to_graph.py build path/to/your/wiki -o build/graph.json
+python3 skills/wiki-to-graph/scripts/build_graph_viewer.py build/graph.json -o build/graph-viewer.html
 ```
 
-`## Sources` bullets resolve onto that page by `[[link]]` or by matching locator, so one artifact
-is always one node however it is cited.
+What `build` adapts automatically:
 
-**Different section names?** Pass `--map map.json`. **Different ontology?** Pass
-`--vocab vocab.json` to supply your own `kinds` / `concept_edges` / `symmetric` / `hub_edges` —
-see [`docs/custom-vocabulary.md`](docs/custom-vocabulary.md) and
-[`examples/vocab.custom.json`](examples/vocab.custom.json). Use both together: a custom `--map`
-without a matching `--vocab` builds a graph in which **every node reports as an orphan**, because
-degree is computed over edge types the vocabulary has never heard of.
+| Your wiki has | `build` does |
+|---|---|
+| `README.md` and no `index.md` | treats it as the index |
+| `**Type:** X` lines instead of frontmatter | derives each page's `kind` from them |
+| pages describing papers, books, videos, sites or decks | makes them `source` nodes, locator included |
+| no `## Sources` sections | lists the source pages each concept links to |
+| one contradictions page of `### item` / `- [[side]]: claim` | records each disagreement on the pages that disagree |
+| `## See also`, `## Tensions`, `## References` | reads them as Related, Contradictions, Sources |
+| `- [[A]] — because [[P]] found X` | a relation to A, with P as evidence rather than a second relation |
+| `None across the sources — see [[A]]` | no disagreement |
+
+**Different ontology?** `--vocab vocab.json` supplies your own `kinds` / `concept_edges` /
+`symmetric` / `hub_edges` — see [`docs/custom-vocabulary.md`](docs/custom-vocabulary.md). Unusual
+section names beyond the built-in synonyms: `--map map.json`. Use the two together: a custom
+`--map` without a matching `--vocab` builds a graph in which every node reports as an orphan.
+
+## Tests
+
+```bash
+python3 -m unittest discover tests
+```
+
+The suite renders the bundled example in other common wiki shapes — kebab-case files with a
+README hub and `**Type:**` lines, an Obsidian-style vault, and a single contradictions hub — and
+asserts every one builds the same nodes and typed edges as the original.
 
 ## License
 

@@ -8,23 +8,17 @@ description: >-
   from this folder", "read these papers and make a knowledge base", "turn this
   course material / these transcripts / this documentation into a wiki". Covers
   what earns a page, the exact page contract, how to write links so the reason
-  survives into the graph, and the lint/build/validate gate to pass before
-  claiming the wiki is done. Once the wiki exists, wiki-to-graph builds and
+  survives into the graph, and how to build and check the result. Once the wiki exists, wiki-to-graph builds and
   analyses the graph and wiki-graph-maintain keeps it healthy as it grows.
 ---
 
 # Authoring a wiki that graphs cleanly
 
-A wiki can be well written and still produce a graph that is useless to query. The
-defects are invisible in the markdown and irreversible-looking once built:
-
-| Written like this | Produces |
-|---|---|
-| `- [[a]] · [[b]] · [[c]]` under `## Related` | valid edges that explain nothing |
-| a paper as a concept page | an artifact misfiled as a unit of knowledge |
-| all disagreements on one `contradictions.md` | a hub joined to everything, and concepts joined to nothing |
-| `README.md` as the index | no hub node at all — README is excluded by default |
-| no `## Sources` | claims the graph cannot trace |
+`build` normalizes structure automatically — a README for an index, `**Type:**`
+lines, papers written as pages, one hub of contradictions, missing Sources — so none
+of that has to be right for the graph to come out right. What no builder can supply
+is content: a reason for a link, the right kind for a page, a disagreement stated on
+the pages that actually disagree. This skill is about writing those well.
 
 `SCRIPT=skills/wiki-to-graph/scripts/wiki_to_graph.py` throughout.
 
@@ -122,18 +116,14 @@ concepts that actually disagree are not connected to each other.
 true.** Different benchmark, different model generation or different scope is a
 scope dispute: record it as `related` and explain the difference.
 
-## 5. Gate before you build
+## 5. Optional: see what build will adapt
 
 ```bash
 python3 $SCRIPT lint <wiki>
 ```
 
-`lint` reads the markdown, not the graph, and catches what `validate` structurally
-cannot: unexplained links, ambiguous bullets, missing `kind:`, missing `## Sources`,
-a missing `index.md`, sources with no locator, and disagreements piled on one hub.
-
-Fix every `error`. Work the `warn` list down — do not explain it away. `--strict`
-makes warnings fail, which is the right setting for a wiki you will hand to someone.
+`lint` lists what `build` will normalize and any content notes, such as a link given
+no reason. It never blocks a build; use it to improve the writing, not as a gate.
 
 ## 6. Build, validate, look
 
@@ -150,7 +140,7 @@ of them is the only step that catches it.
 
 ## Before telling the user it is done
 
-- `lint` shows zero errors, and you have reported the remaining warning count.
+- `build` printed its `normalized:` line, and you have reported it.
 - `validate` prints `RESULT: PASS`.
 - Every page has at least one inbound link.
 - Every concept page cites at least one source.

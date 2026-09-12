@@ -5,11 +5,12 @@ This repo ships a complete, runnable example: the wiki in
 `build/` artifacts were generated from. Everything below runs from the repo
 root against that example — no external files needed.
 
-`examples/llm-wiki/` is a 28-page LLM wiki (the ["LLM wiki" pattern by Andrej
+`examples/llm-wiki/` is a 34-page LLM wiki (the ["LLM wiki" pattern by Andrej
 Karpathy](https://datasciencedojo.com/blog/llm-wiki-tutorial/)) compiled from 6
 foundational AI papers:
 
-- `wiki/` — 26 single-concept entity pages + `index.md` and `log.md` hub pages,
+- `wiki/` — 26 single-concept entity pages, 6 source pages (one per paper), and
+  `index.md` / `log.md` hub pages,
   linked with `[[wiki-links]]`.
 - `raw/` — the 6 source-paper markdowns the entity pages cite in their
   `## Sources` sections (Attention Is All You Need, BERT, GPT-3, Foundation
@@ -106,6 +107,18 @@ print(nx.pagerank(G.subgraph(concepts)))
 ```bash
 sqlite3 build/graph.db "SELECT id, kind FROM nodes WHERE type='concept' ORDER BY id LIMIT 10;"
 ```
+
+### G · Build a wiki written in a different shape
+
+Nothing needs converting first. `build` normalizes a copy and reports what it adapted:
+
+```bash
+python3 $SCR/wiki_to_graph.py build path/to/any/wiki -o build/graph.json \
+        --emit-normalized build/normalized-wiki     # optional: keep the normalized copy
+```
+
+`python3 -m unittest discover tests` checks that the example, rewritten in three other common
+shapes, builds the same nodes and typed edges every time.
 
 ---
 

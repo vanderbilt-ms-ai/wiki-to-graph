@@ -156,24 +156,52 @@ carried as the edge's target, so it is dropped. And a block that is only links
 sibling names. An empty `context` is therefore a real signal: **that link was never given a
 reason.** When merging duplicate edges, the longest context wins.
 
-### The subject rule in typed sections
+### Which links carry a section's relation
 
-In a typed-relation section, a bullet's **leading link is what the bullet is about**; links
-inside its prose are evidence cited in passing.
+A block (a bullet with its continuation lines, or a paragraph) states one relation;
+links inside its prose are evidence and become `mentions`.
 
-```
-- [[Zero-Shot Prompting]] — [[GPT-3]] makes demonstrations the flagship capability;
-  [[DeepSeek-R1]] reports they degrade performance.
-```
+| Block | Carries the relation | Mentioned |
+|---|---|---|
+| a bare list, `- [[a]] · [[b]]` | every link | — |
+| `- [[A]] — because [[P]] found X` | A | P |
+| (disagreement sections) `- **vs [[A]]:** … [[P]]` | A | P |
+| (disagreement sections) `A contrasts with [[B]], unlike [[C]]` | B, the first link | C |
+| (disagreement sections) `None across the sources — see [[A]]` | nothing | A |
+| (other typed sections) a prose paragraph | every link | — |
 
-That is one `contradicts` edge to Zero-Shot Prompting, plus `mentions` to GPT-3 and
-DeepSeek-R1. Typing all three as `contradicts` would assert that this page disagrees with two
-papers it is merely citing — and would give all three an identical context, since they share a
-sentence. On one corpus this rule removed 60 of 104 `contradicts` edges as spurious.
+Typing every link in a disagreement sentence asserts disagreements it never makes — the
+page appears to contradict the papers it cites. On one corpus that removed 60 of 104
+`contradicts` edges as spurious.
 
-The demotion requires the bullet to have *both* a leading link *and* prose after it. A bare
-list (`- [[a]] · [[b]] · [[c]]`) and a prose paragraph both stay fully typed, so the older
-paragraph-style convention is unchanged.
+## Normalization
+
+`build` runs `wiki_normalize.normalize_wiki` on a copy of the wiki before parsing (skip with
+`--no-normalize`; keep the copy with `--emit-normalized DIR`). Every rule is deterministic,
+reported on the `normalized:` line, and idempotent. A page already in the contract passes
+through byte-for-byte.
+
+| Rule | Input | Output |
+|---|---|---|
+| hub | `README.md`, no `index.md` | `index.md` |
+| type/kind | a `**Type:** X` line | frontmatter `kind`, or `type: source` for artifact words (paper, book, video, website, slides, transcript, dataset, …) |
+| locator | a `**File:**` / `**URL:**` / `**Locator:**` field, or a locator on the Type line | `locator:` |
+| title | no `# H1` | a title from the filename |
+| sources | a concept page with no Sources section | `## Sources` listing the source pages it links |
+| disputes | a page named for contradictions/tensions/disputes with `### item` headings holding `- [[side]]: claim` bullets | every opposing pair added to both side pages; each topic linked in the item's prose gets `## Disputed claims` listing each side's claim; the hub becomes `type: index` |
+
+In a dispute item, the text before the first colon outside `[[…]]` names who holds a
+position (`- [[a]], [[b]]: claim` is one position held by two sides); only an indented
+line continues a bullet.
+
+Section names are matched by `section_kind`: *contradict / tension / disagreement /
+conflict* → `contradicts`; *related / see also / links / connections* → `related`;
+*source / reference / citation / bibliography* → `cites`.
+
+The guarantee this buys is tested in `tests/test_convergence.py`: the bundled example rendered
+as a flat notes-app wiki, an Obsidian-style vault and a single contradictions hub builds the
+same node set and typed edge set as the original.
+
 Symmetric edges are stored once with `directed: false`; consumers may add the reverse.
 
 **`weight` — meaning, determination, use, update.**
