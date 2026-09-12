@@ -36,7 +36,55 @@ META_EDGE = {"index": "indexes", "log": "records"}
 CONCEPT_EDGE_TYPES = {"mentions", "related", "contradicts", "cites"}
 
 
-def node_type_for(stem):
+NODE_TYPES = {"concept", "source", "index", "log"}
+
+# A locator identifies the artifact a source node stands for. It is deliberately
+# format-agnostic: a repo-relative file, a URL, or a registered identifier. Nothing
+# here assumes academic papers or a `raw/` directory.
+LOCATOR_RE = re.compile(
+    r"(https?://\S+"
+    r"|(?:doi|arxiv|isbn|issn|urn|hdl):\S+"
+    r"|[\w./~@\-]+\.(?:pdf|md|txt|html?|epub|mobi|docx?|pptx?|xlsx?|csv|tsv|json|ya?ml"
+    r"|mp4|mov|webm|mp3|wav|m4a|vtt|srt|ipynb|py|ts|js|rs|go)\b)", re.I)
+
+MEDIUM_BY_EXT = {
+    "pdf": "paper", "md": "note", "txt": "note", "html": "web", "htm": "web",
+    "epub": "book", "mobi": "book", "doc": "document", "docx": "document",
+    "ppt": "slides", "pptx": "slides", "xls": "data", "xlsx": "data",
+    "csv": "data", "tsv": "data", "json": "data", "yaml": "data", "yml": "data",
+    "mp4": "video", "mov": "video", "webm": "video", "mp3": "audio", "wav": "audio",
+    "m4a": "audio", "vtt": "transcript", "srt": "transcript",
+    "ipynb": "notebook", "py": "code", "ts": "code", "js": "code", "rs": "code", "go": "code",
+}
+MEDIUM_BY_SCHEME = {"doi": "paper", "arxiv": "paper", "isbn": "book",
+                    "issn": "periodical", "urn": "document", "hdl": "document"}
+
+
+def locator_in(text):
+    """First locator in a string, or None."""
+    m = LOCATOR_RE.search(text or "")
+    return m.group(1).rstrip(".,;)") if m else None
+
+
+def medium_for(loc):
+    """Best-effort medium from a locator. None when it cannot be inferred."""
+    if not loc:
+        return None
+    l = loc.strip().lower()
+    if l.startswith(("http://", "https://")):
+        return "web"
+    scheme = l.split(":", 1)[0]
+    if scheme in MEDIUM_BY_SCHEME:
+        return MEDIUM_BY_SCHEME[scheme]
+    ext = l.rsplit(".", 1)[-1] if "." in l else ""
+    return MEDIUM_BY_EXT.get(ext)
+
+
+def node_type_for(stem, meta=None):
+    """Declared `type:` in frontmatter wins; filename stem is the legacy fallback."""
+    declared = (meta or {}).get("type", "").strip().lower()
+    if declared in NODE_TYPES:
+        return declared
     s = stem.lower()
     if s == "index":
         return "index"
@@ -70,17 +118,20 @@ def edge_type_for(section, mapping):
 
 
 def parse_page(path):
-    """Return (title, {section_name: [lines]}, meta). meta may carry a `kind`
-    read from optional YAML-ish frontmatter (--- ... --- with a `kind:` line)."""
+    """Return (title, {section_name: [lines]}, meta). meta carries any simple
+    `key: value` pairs from optional YAML-ish frontmatter (--- ... ---), notably
+    `kind`, `type`, `medium`, `locator`, `author`, `date`."""
     title, sections, cur, meta = None, {}, None, {}
     lines = open(path, encoding="utf-8").read().split("\n")
     i = 0
     if lines and lines[0].strip() == "---":            # optional frontmatter
         j = 1
         while j < len(lines) and lines[j].strip() != "---":
-            m = re.match(r"\s*kind\s*:\s*(\w+)", lines[j])
+            m = re.match(r"\s*([A-Za-z_][\w-]*)\s*:\s*(.*?)\s*$", lines[j])
             if m:
-                meta["kind"] = m.group(1).strip().lower()
+                k, v = m.group(1).strip().lower(), m.group(2).strip().strip('"\'')
+                if v:
+                    meta[k] = v.lower() if k in ("kind", "type", "medium") else v
             j += 1
         i = j + 1
     for raw in lines[i:]:
@@ -120,10 +171,13 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
     for f in files:
         title, sections, meta = parse_page(f)
         stem = os.path.splitext(os.path.basename(f))[0]
-        ntype = node_type_for(stem)
+        ntype = node_type_for(stem, meta)
         cid = slug(title)
-        kind = meta.get("kind") if meta.get("kind") in KINDS else "concept"
-        pages[cid] = {"file": os.path.basename(f), "title": title,
+        # `kind` classifies KNOWLEDGE, so it applies only to concept nodes. A source
+        # is an artifact, not an atom of knowledge — it CONTAINS facts, it is not one.
+        kind = (meta.get("kind") if meta.get("kind") in KINDS else "concept") \
+            if ntype == "concept" else None
+        pages[cid] = {"file": os.path.basename(f), "title": title, "meta": meta,
                       "sections": sections, "ntype": ntype, "kind": kind}
         alias[title.lower()] = cid
         alias[stem.lower()] = cid
@@ -132,6 +186,34 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
     warnings = {"dangling": [], "orphans": [], "self_loops": [], "dup_ids": []}
     seen_ids = {}
     src_nodes = {}
+
+    # locator -> id of an AUTHORED source page, so `## Sources` bullets attach to a
+    # real page when one exists instead of minting a parallel stub for the same artifact.
+    loc_index = {}
+    for _cid, _p in pages.items():
+        if _p["ntype"] == "source":
+            _loc = (_p["meta"].get("locator") or "").strip().lower()
+            if _loc:
+                loc_index[_loc] = _cid
+
+    def resolve_source(bullet):
+        """A `## Sources` bullet -> node id. Prefers an authored source page
+        (by [[link]] or by declared locator); falls back to a generated stub."""
+        for _t, _a in LINK_RE.findall(CODE_RE.sub("", bullet)):
+            tid = alias.get(_t.strip().lower())
+            if tid and pages.get(tid, {}).get("ntype") == "source":
+                return tid
+        loc = locator_in(bullet)
+        if loc and loc.strip().lower() in loc_index:
+            return loc_index[loc.strip().lower()]
+        key = loc or re.split(r"[ (]", bullet)[0][:60]
+        sid = "src:" + slug(key)
+        if sid not in src_nodes:
+            src_nodes[sid] = {"id": sid, "type": "source", "kind": None,
+                              "ref": bullet, "title": bullet,
+                              "locator": loc, "path": loc, "medium": medium_for(loc),
+                              "in_degree": 0, "out_degree": 0, "edges": []}
+        return sid
 
     def add_edge(s, t, et, via, w=1):
         directed = et not in SYMMETRIC
@@ -166,13 +248,41 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
 
         # link markup is stripped to plain text — the relationship is encoded as an
         # edge (below), not reproduced as [[markup]] in the prose.
-        summary = strip_links("\n".join(p["sections"].get("Summary", [])).strip())
-        expl = strip_links("\n".join(p["sections"].get("Explanation", [])).strip())
+        # `## Summary` / `## Explanation` are a convention, not a guarantee: pages
+        # derived from a web page, a deck or a transcript often use their own headings.
+        # Fall back to the substantive (mentions-typed) sections so no node is blank.
+        prose = [(sec, strip_links("\n".join(ln).strip()))
+                 for sec, ln in p["sections"].items()
+                 if edge_type_for(sec, mapping) == "mentions"]
+        prose = [(sec, t) for sec, t in prose if t]
+        named = dict(prose)
+        summary = named.get("Summary", "")
+        expl = named.get("Explanation", "")
+        if not summary:
+            rest = [(sec, t) for sec, t in prose if sec != "Explanation"]
+            if rest:
+                summary = rest[0][1][:400]
+                used = rest[0][0]
+            else:
+                used = None
+        else:
+            used = "Summary"
+        if not expl:
+            expl = "\n\n".join(t for sec, t in prose if sec not in (used, "Summary"))
         source_strings = []
-        nodes[cid] = {"id": cid, "type": "concept", "kind": p["kind"], "title": p["title"],
-                      "summary": summary, "explanation": expl,
-                      "sources": source_strings, "file": p["file"],
-                      "in_degree": 0, "out_degree": 0, "edges": []}
+        node = {"id": cid, "type": p["ntype"], "kind": p["kind"], "title": p["title"],
+                "summary": summary, "explanation": expl,
+                "sources": source_strings, "file": p["file"],
+                "in_degree": 0, "out_degree": 0, "edges": []}
+        if p["ntype"] == "source":
+            loc = p["meta"].get("locator")
+            node["locator"] = loc
+            node["path"] = loc                       # back-compat alias
+            node["medium"] = p["meta"].get("medium") or medium_for(loc)
+            for _k in ("author", "date", "publisher", "accessed"):
+                if p["meta"].get(_k):
+                    node[_k] = p["meta"][_k]
+        nodes[cid] = node
 
         for sec, lines in p["sections"].items():
             et = edge_type_for(sec, mapping)
@@ -183,16 +293,9 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
                     if not b:
                         continue
                     source_strings.append(b)
-                    sid = "src:" + slug(re.split(r"[ (]", b)[0][:60])
-                    if sid not in src_nodes:
-                        path = None
-                        mpath = re.search(r"(raw/[^\s)]+)", b)
-                        if mpath:
-                            path = mpath.group(1)
-                        src_nodes[sid] = {"id": sid, "type": "source", "kind": None,
-                                          "ref": b, "path": path, "title": b,
-                                          "in_degree": 0, "out_degree": 0, "edges": []}
-                    add_edge(cid, sid, "cites", sec)
+                    sid = resolve_source(b)
+                    if sid != cid:
+                        add_edge(cid, sid, "cites", sec)
                 continue
             for tgt, cnt in links_in(text).items():
                 tid = alias.get(tgt.lower())
@@ -241,7 +344,7 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
 
     # extra per-node metadata
     for n in nodes.values():
-        if n["type"] == "concept":
+        if n["type"] in ("concept", "source"):
             n["n_sources"] = len(n.get("sources", []))
             n["word_count"] = len((n.get("summary", "") + " " + n.get("explanation", "")).split())
             stem = os.path.splitext(n["file"])[0] if n.get("file") else n["title"]

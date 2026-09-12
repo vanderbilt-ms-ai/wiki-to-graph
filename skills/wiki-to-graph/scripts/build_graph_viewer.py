@@ -33,7 +33,8 @@ TEMPLATE = r"""<!DOCTYPE html>
   #side h2{font-size:16px;margin:0 0 2px}
   #side .k{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.6px;
         padding:2px 7px;border-radius:10px;color:#fff;margin-bottom:10px}
-  #side .deg{color:var(--muted);font-size:12px;margin:2px 0 10px}
+  #side .deg{color:var(--muted);font-size:12px;margin:2px 0 10px;word-break:break-all}
+  #side .deg code{font-size:11px;background:#0e1226;padding:1px 4px;border-radius:4px}
   #side p{font-size:13px;line-height:1.5}
   #side h3{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 6px}
   #side .e{font-size:12px;padding:3px 0;border-bottom:1px solid #232842;cursor:pointer}
@@ -181,6 +182,9 @@ function select(id){
     (n.kind?`<span class="k" style="background:${col}">${n.kind}</span>`:`<span class="k" style="background:${col}">${n.type}</span>`)+
     `<div class="deg">in-degree ${n.in_degree||0} · out-degree ${n.out_degree||0}`+
       (n.n_sources!=null?` · ${n.n_sources} source(s)`:'')+`</div>`+
+    (n.type==='source'&&(n.medium||n.locator)
+      ? `<div class="deg">${n.medium?`<b style="color:var(--ink)">${n.medium}</b>`:''}`+
+        `${n.medium&&n.locator?' · ':''}${n.locator?`<code>${n.locator}</code>`:''}</div>` : '')+
     (n.summary?`<p>${n.summary}</p>`:'')+
     `<h3>Outgoing edges (${outs.length})</h3>`+
     outs.map(e=>{const tg=byId[e.target];return `<div class="e" data-go="${e.target}">`+
