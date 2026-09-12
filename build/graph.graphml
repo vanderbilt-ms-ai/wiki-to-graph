@@ -11,19 +11,24 @@
 <node id="attention-mechanism"><data key="d_type">concept</data><data key="d_kind">concept</data><data key="d_title">Attention Mechanism</data></node>
 <node id="autoregressive-language-model"><data key="d_type">concept</data><data key="d_kind">concept</data><data key="d_title">Autoregressive Language Model</data></node>
 <node id="bert"><data key="d_type">concept</data><data key="d_kind">schema</data><data key="d_title">BERT</data></node>
+<node id="on-the-opportunities-and-risks-of-foundation-models"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">On the Opportunities and Risks of Foundation Models</data></node>
+<node id="language-models-are-few-shot-learners"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">Language Models are Few-Shot Learners</data></node>
 <node id="chinchilla"><data key="d_type">concept</data><data key="d_kind">schema</data><data key="d_title">Chinchilla</data></node>
 <node id="compute-optimal-scaling"><data key="d_type">concept</data><data key="d_kind">fact</data><data key="d_title">Compute-Optimal Scaling</data></node>
+<node id="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding</data></node>
 <node id="emergent-capabilities"><data key="d_type">concept</data><data key="d_kind">concept</data><data key="d_title">Emergent Capabilities</data></node>
 <node id="encoder-decoder-architecture"><data key="d_type">concept</data><data key="d_kind">schema</data><data key="d_title">Encoder-Decoder Architecture</data></node>
 <node id="few-shot-learning"><data key="d_type">concept</data><data key="d_kind">concept</data><data key="d_title">Few-Shot Learning</data></node>
 <node id="foundation-models"><data key="d_type">concept</data><data key="d_kind">concept</data><data key="d_title">Foundation Models</data></node>
 <node id="gpt-3"><data key="d_type">concept</data><data key="d_kind">schema</data><data key="d_title">GPT-3</data></node>
+<node id="training-compute-optimal-large-language-models"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">Training Compute-Optimal Large Language Models</data></node>
 <node id="homogenization"><data key="d_type">concept</data><data key="d_kind">concept</data><data key="d_title">Homogenization</data></node>
 <node id="in-context-learning"><data key="d_type">concept</data><data key="d_kind">concept</data><data key="d_title">In-Context Learning</data></node>
 <node id="layer-normalization"><data key="d_type">concept</data><data key="d_kind">schema</data><data key="d_title">Layer Normalization</data></node>
 <node id="masked-language-modeling"><data key="d_type">concept</data><data key="d_kind">procedure</data><data key="d_title">Masked Language Modeling</data></node>
 <node id="multi-head-attention"><data key="d_type">concept</data><data key="d_kind">schema</data><data key="d_title">Multi-Head Attention</data></node>
 <node id="next-sentence-prediction"><data key="d_type">concept</data><data key="d_kind">procedure</data><data key="d_title">Next Sentence Prediction</data></node>
+<node id="training-language-models-to-follow-instructions-with-human-feedback"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">Training Language Models to Follow Instructions with Human Feedback</data></node>
 <node id="positional-encoding"><data key="d_type">concept</data><data key="d_kind">schema</data><data key="d_title">Positional Encoding</data></node>
 <node id="pre-training-and-fine-tuning"><data key="d_type">concept</data><data key="d_kind">procedure</data><data key="d_title">Pre-training and Fine-tuning</data></node>
 <node id="proximal-policy-optimization"><data key="d_type">concept</data><data key="d_kind">procedure</data><data key="d_title">Proximal Policy Optimization</data></node>
@@ -31,424 +36,462 @@
 <node id="reward-modeling"><data key="d_type">concept</data><data key="d_kind">procedure</data><data key="d_title">Reward Modeling</data></node>
 <node id="scale-and-scaling"><data key="d_type">concept</data><data key="d_kind">concept</data><data key="d_title">Scale and Scaling</data></node>
 <node id="scaled-dot-product-attention"><data key="d_type">concept</data><data key="d_kind">schema</data><data key="d_title">Scaled Dot-Product Attention</data></node>
-<node id="self-attention"><data key="d_type">concept</data><data key="d_kind">concept</data><data key="d_title">Self-Attention</data></node>
+<node id="self-attention"><data key="d_type">concept</data><data key="d_kind">schema</data><data key="d_title">Self-Attention</data></node>
 <node id="transformer"><data key="d_type">concept</data><data key="d_kind">schema</data><data key="d_title">Transformer</data></node>
+<node id="attention-is-all-you-need"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">Attention Is All You Need</data></node>
 <node id="wiki-index"><data key="d_type">index</data><data key="d_kind"></data><data key="d_title">Wiki Index</data></node>
 <node id="compilation-log"><data key="d_type">log</data><data key="d_kind"></data><data key="d_title">Compilation Log</data></node>
-<node id="src:raw-05-rlhf-instructgpt-md"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">raw/05_rlhf_instructgpt.md (Ouyang et al., 2022)</data></node>
-<node id="src:raw-01-attention-is-all-you-need-md"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">raw/01_attention_is_all_you_need.md (Vaswani et al., 2017)</data></node>
-<node id="src:raw-02-bert-md"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">raw/02_bert.md (Devlin et al., 2018)</data></node>
-<node id="src:raw-06-chinchilla-md"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">raw/06_chinchilla.md (Hoffmann et al., 2022)</data></node>
-<node id="src:raw-03-gpt3-md"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">raw/03_gpt3.md (Brown et al., 2020); raw/04_foundation_models.md (Bommasani et al., 2021)</data></node>
-<node id="src:raw-04-foundation-models-md"><data key="d_type">source</data><data key="d_kind"></data><data key="d_title">raw/04_foundation_models.md (Bommasani et al., 2021)</data></node>
-<edge id="e0" source="alignment" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e1" source="alignment" target="reward-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e2" source="alignment" target="proximal-policy-optimization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e3" source="alignment" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e4" source="alignment" target="homogenization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e5" source="alignment" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e6" source="alignment" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e7" source="alignment" target="reward-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e8" source="alignment" target="proximal-policy-optimization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e9" source="alignment" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e10" source="alignment" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e11" source="alignment" target="homogenization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e12" source="alignment" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e13" source="alignment" target="scale-and-scaling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e14" source="alignment" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e15" source="alignment" target="src:raw-05-rlhf-instructgpt-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e0" source="alignment" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e1" source="alignment" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e2" source="alignment" target="reward-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e3" source="alignment" target="proximal-policy-optimization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e4" source="alignment" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e5" source="alignment" target="homogenization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e6" source="alignment" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e7" source="alignment" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e8" source="alignment" target="reward-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e9" source="alignment" target="proximal-policy-optimization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e10" source="alignment" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e11" source="alignment" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e12" source="alignment" target="homogenization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e13" source="alignment" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e14" source="alignment" target="scale-and-scaling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e15" source="alignment" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
 <edge id="e16" source="attention-mechanism" target="transformer"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">2</data></edge>
-<edge id="e17" source="attention-mechanism" target="scaled-dot-product-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e18" source="attention-mechanism" target="multi-head-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e19" source="attention-mechanism" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e20" source="attention-mechanism" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e21" source="attention-mechanism" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e22" source="attention-mechanism" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e23" source="attention-mechanism" target="scaled-dot-product-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e24" source="attention-mechanism" target="multi-head-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e25" source="attention-mechanism" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e26" source="attention-mechanism" target="src:raw-01-attention-is-all-you-need-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e27" source="autoregressive-language-model" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e28" source="autoregressive-language-model" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e29" source="autoregressive-language-model" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e30" source="autoregressive-language-model" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e31" source="autoregressive-language-model" target="masked-language-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e32" source="autoregressive-language-model" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e33" source="autoregressive-language-model" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e34" source="autoregressive-language-model" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e35" source="autoregressive-language-model" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e36" source="autoregressive-language-model" target="masked-language-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e37" source="autoregressive-language-model" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e38" source="autoregressive-language-model" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e39" source="autoregressive-language-model" target="bert"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e40" source="autoregressive-language-model" target="masked-language-modeling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e41" source="autoregressive-language-model" target="src:raw-01-attention-is-all-you-need-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e42" source="bert" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e43" source="bert" target="encoder-decoder-architecture"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e44" source="bert" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e45" source="bert" target="masked-language-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e46" source="bert" target="next-sentence-prediction"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e47" source="bert" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e48" source="bert" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e49" source="bert" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e50" source="bert" target="encoder-decoder-architecture"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e51" source="bert" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e52" source="bert" target="masked-language-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e53" source="bert" target="next-sentence-prediction"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e54" source="bert" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e55" source="bert" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e56" source="bert" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e57" source="bert" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">3</data></edge>
-<edge id="e58" source="bert" target="masked-language-modeling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e59" source="bert" target="pre-training-and-fine-tuning"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e60" source="bert" target="in-context-learning"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e61" source="bert" target="src:raw-02-bert-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e62" source="chinchilla" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e63" source="chinchilla" target="compute-optimal-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e64" source="chinchilla" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e65" source="chinchilla" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e66" source="chinchilla" target="compute-optimal-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e67" source="chinchilla" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e68" source="chinchilla" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e69" source="chinchilla" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e70" source="chinchilla" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e71" source="chinchilla" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e72" source="chinchilla" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e73" source="chinchilla" target="scale-and-scaling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e74" source="chinchilla" target="rlhf"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e75" source="chinchilla" target="src:raw-06-chinchilla-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e76" source="compute-optimal-scaling" target="chinchilla"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e77" source="compute-optimal-scaling" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">2</data></edge>
-<edge id="e78" source="compute-optimal-scaling" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e79" source="compute-optimal-scaling" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e80" source="compute-optimal-scaling" target="chinchilla"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e81" source="compute-optimal-scaling" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e82" source="compute-optimal-scaling" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e83" source="compute-optimal-scaling" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e84" source="compute-optimal-scaling" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e85" source="compute-optimal-scaling" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e86" source="compute-optimal-scaling" target="src:raw-06-chinchilla-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e87" source="emergent-capabilities" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e88" source="emergent-capabilities" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e89" source="emergent-capabilities" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e90" source="emergent-capabilities" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e91" source="emergent-capabilities" target="homogenization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e92" source="emergent-capabilities" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e93" source="emergent-capabilities" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e94" source="emergent-capabilities" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e95" source="emergent-capabilities" target="few-shot-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e96" source="emergent-capabilities" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e97" source="emergent-capabilities" target="homogenization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e98" source="emergent-capabilities" target="compute-optimal-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e99" source="emergent-capabilities" target="chinchilla"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e100" source="emergent-capabilities" target="foundation-models"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e101" source="emergent-capabilities" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e102" source="emergent-capabilities" target="compute-optimal-scaling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e103" source="emergent-capabilities" target="chinchilla"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e104" source="emergent-capabilities" target="src:raw-03-gpt3-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e105" source="encoder-decoder-architecture" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e106" source="encoder-decoder-architecture" target="autoregressive-language-model"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e107" source="encoder-decoder-architecture" target="layer-normalization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e108" source="encoder-decoder-architecture" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e109" source="encoder-decoder-architecture" target="masked-language-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e110" source="encoder-decoder-architecture" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e111" source="encoder-decoder-architecture" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e112" source="encoder-decoder-architecture" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e113" source="encoder-decoder-architecture" target="layer-normalization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e114" source="encoder-decoder-architecture" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e115" source="encoder-decoder-architecture" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e116" source="encoder-decoder-architecture" target="autoregressive-language-model"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e117" source="encoder-decoder-architecture" target="bert"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e118" source="encoder-decoder-architecture" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e119" source="encoder-decoder-architecture" target="src:raw-01-attention-is-all-you-need-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e120" source="few-shot-learning" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e121" source="few-shot-learning" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e122" source="few-shot-learning" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e123" source="few-shot-learning" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e124" source="few-shot-learning" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e125" source="few-shot-learning" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e126" source="few-shot-learning" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e127" source="few-shot-learning" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e128" source="few-shot-learning" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e129" source="few-shot-learning" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e130" source="few-shot-learning" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e131" source="few-shot-learning" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e132" source="few-shot-learning" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e133" source="few-shot-learning" target="alignment"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e134" source="few-shot-learning" target="rlhf"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e135" source="few-shot-learning" target="src:raw-03-gpt3-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e136" source="foundation-models" target="bert"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e137" source="foundation-models" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e138" source="foundation-models" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e139" source="foundation-models" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e140" source="foundation-models" target="homogenization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e141" source="foundation-models" target="transformer"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e142" source="foundation-models" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e143" source="foundation-models" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e144" source="foundation-models" target="alignment"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e145" source="foundation-models" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e146" source="foundation-models" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e147" source="foundation-models" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e148" source="foundation-models" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e149" source="foundation-models" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e150" source="foundation-models" target="homogenization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e151" source="foundation-models" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e152" source="foundation-models" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e153" source="foundation-models" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e154" source="foundation-models" target="homogenization"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e155" source="foundation-models" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e156" source="foundation-models" target="src:raw-04-foundation-models-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e157" source="gpt-3" target="autoregressive-language-model"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e158" source="gpt-3" target="few-shot-learning"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e159" source="gpt-3" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e160" source="gpt-3" target="encoder-decoder-architecture"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e161" source="gpt-3" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e162" source="gpt-3" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e163" source="gpt-3" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e164" source="gpt-3" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e165" source="gpt-3" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e166" source="gpt-3" target="autoregressive-language-model"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e167" source="gpt-3" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e168" source="gpt-3" target="few-shot-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e169" source="gpt-3" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e170" source="gpt-3" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e171" source="gpt-3" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e172" source="gpt-3" target="encoder-decoder-architecture"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e173" source="gpt-3" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e174" source="gpt-3" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e175" source="gpt-3" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e176" source="gpt-3" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e177" source="gpt-3" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e178" source="gpt-3" target="chinchilla"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e179" source="gpt-3" target="compute-optimal-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e180" source="gpt-3" target="bert"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e181" source="gpt-3" target="masked-language-modeling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e182" source="gpt-3" target="rlhf"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">2</data></edge>
-<edge id="e183" source="gpt-3" target="alignment"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e184" source="gpt-3" target="chinchilla"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e185" source="gpt-3" target="compute-optimal-scaling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e186" source="gpt-3" target="src:raw-03-gpt3-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e187" source="homogenization" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e188" source="homogenization" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e189" source="homogenization" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e190" source="homogenization" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e191" source="homogenization" target="alignment"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e192" source="homogenization" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e193" source="homogenization" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e194" source="homogenization" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e195" source="homogenization" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e196" source="homogenization" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e197" source="homogenization" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e198" source="homogenization" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e199" source="homogenization" target="src:raw-04-foundation-models-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e200" source="in-context-learning" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e201" source="in-context-learning" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e202" source="in-context-learning" target="few-shot-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e203" source="in-context-learning" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e204" source="in-context-learning" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e205" source="in-context-learning" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e206" source="in-context-learning" target="few-shot-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e207" source="in-context-learning" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e208" source="in-context-learning" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e209" source="in-context-learning" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e210" source="in-context-learning" target="bert"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e211" source="in-context-learning" target="rlhf"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e212" source="in-context-learning" target="src:raw-03-gpt3-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e213" source="layer-normalization" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e214" source="layer-normalization" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e215" source="layer-normalization" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e216" source="layer-normalization" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e217" source="layer-normalization" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e218" source="layer-normalization" target="encoder-decoder-architecture"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e219" source="layer-normalization" target="src:raw-01-attention-is-all-you-need-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e220" source="masked-language-modeling" target="bert"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e221" source="masked-language-modeling" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e222" source="masked-language-modeling" target="autoregressive-language-model"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e223" source="masked-language-modeling" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e224" source="masked-language-modeling" target="next-sentence-prediction"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e225" source="masked-language-modeling" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e226" source="masked-language-modeling" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e227" source="masked-language-modeling" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e228" source="masked-language-modeling" target="next-sentence-prediction"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e229" source="masked-language-modeling" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e230" source="masked-language-modeling" target="autoregressive-language-model"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e231" source="masked-language-modeling" target="autoregressive-language-model"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e232" source="masked-language-modeling" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e233" source="masked-language-modeling" target="src:raw-02-bert-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e234" source="multi-head-attention" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e235" source="multi-head-attention" target="scaled-dot-product-attention"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e236" source="multi-head-attention" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e237" source="multi-head-attention" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e238" source="multi-head-attention" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e239" source="multi-head-attention" target="scaled-dot-product-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e240" source="multi-head-attention" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e241" source="multi-head-attention" target="attention-mechanism"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e242" source="multi-head-attention" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e243" source="multi-head-attention" target="src:raw-01-attention-is-all-you-need-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e244" source="next-sentence-prediction" target="bert"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e245" source="next-sentence-prediction" target="masked-language-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e246" source="next-sentence-prediction" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e247" source="next-sentence-prediction" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e248" source="next-sentence-prediction" target="masked-language-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e249" source="next-sentence-prediction" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e250" source="next-sentence-prediction" target="src:raw-02-bert-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e251" source="positional-encoding" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e252" source="positional-encoding" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e253" source="positional-encoding" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e254" source="positional-encoding" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e255" source="positional-encoding" target="src:raw-01-attention-is-all-you-need-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e256" source="pre-training-and-fine-tuning" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e257" source="pre-training-and-fine-tuning" target="masked-language-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e258" source="pre-training-and-fine-tuning" target="next-sentence-prediction"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e259" source="pre-training-and-fine-tuning" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e260" source="pre-training-and-fine-tuning" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e261" source="pre-training-and-fine-tuning" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e262" source="pre-training-and-fine-tuning" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e263" source="pre-training-and-fine-tuning" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e264" source="pre-training-and-fine-tuning" target="masked-language-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e265" source="pre-training-and-fine-tuning" target="next-sentence-prediction"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e266" source="pre-training-and-fine-tuning" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e267" source="pre-training-and-fine-tuning" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e268" source="pre-training-and-fine-tuning" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e269" source="pre-training-and-fine-tuning" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e270" source="pre-training-and-fine-tuning" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e271" source="pre-training-and-fine-tuning" target="in-context-learning"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e272" source="pre-training-and-fine-tuning" target="bert"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e273" source="pre-training-and-fine-tuning" target="rlhf"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e274" source="pre-training-and-fine-tuning" target="alignment"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e275" source="pre-training-and-fine-tuning" target="src:raw-02-bert-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e276" source="proximal-policy-optimization" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e277" source="proximal-policy-optimization" target="reward-modeling"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e278" source="proximal-policy-optimization" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e279" source="proximal-policy-optimization" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e280" source="proximal-policy-optimization" target="reward-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e281" source="proximal-policy-optimization" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e282" source="proximal-policy-optimization" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e283" source="proximal-policy-optimization" target="src:raw-05-rlhf-instructgpt-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e284" source="rlhf" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e285" source="rlhf" target="reward-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e286" source="rlhf" target="proximal-policy-optimization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e287" source="rlhf" target="alignment"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e288" source="rlhf" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e289" source="rlhf" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e290" source="rlhf" target="reward-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e291" source="rlhf" target="proximal-policy-optimization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e292" source="rlhf" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e293" source="rlhf" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e294" source="rlhf" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e295" source="rlhf" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e296" source="rlhf" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e297" source="rlhf" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">3</data></edge>
-<edge id="e298" source="rlhf" target="in-context-learning"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e299" source="rlhf" target="src:raw-05-rlhf-instructgpt-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e300" source="reward-modeling" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e301" source="reward-modeling" target="proximal-policy-optimization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e302" source="reward-modeling" target="alignment"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e303" source="reward-modeling" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e304" source="reward-modeling" target="proximal-policy-optimization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e305" source="reward-modeling" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e306" source="reward-modeling" target="proximal-policy-optimization"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e307" source="reward-modeling" target="src:raw-05-rlhf-instructgpt-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e308" source="scale-and-scaling" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e309" source="scale-and-scaling" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
-<edge id="e310" source="scale-and-scaling" target="few-shot-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e311" source="scale-and-scaling" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e312" source="scale-and-scaling" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e313" source="scale-and-scaling" target="homogenization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e314" source="scale-and-scaling" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e315" source="scale-and-scaling" target="alignment"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e316" source="scale-and-scaling" target="chinchilla"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e317" source="scale-and-scaling" target="compute-optimal-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e318" source="scale-and-scaling" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e319" source="scale-and-scaling" target="few-shot-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e320" source="scale-and-scaling" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e321" source="scale-and-scaling" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e322" source="scale-and-scaling" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e323" source="scale-and-scaling" target="homogenization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e324" source="scale-and-scaling" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e325" source="scale-and-scaling" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e326" source="scale-and-scaling" target="chinchilla"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e327" source="scale-and-scaling" target="compute-optimal-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e328" source="scale-and-scaling" target="rlhf"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e329" source="scale-and-scaling" target="alignment"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e330" source="scale-and-scaling" target="chinchilla"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e331" source="scale-and-scaling" target="compute-optimal-scaling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e332" source="scale-and-scaling" target="src:raw-03-gpt3-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e333" source="scaled-dot-product-attention" target="attention-mechanism"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e334" source="scaled-dot-product-attention" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e335" source="scaled-dot-product-attention" target="multi-head-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e336" source="scaled-dot-product-attention" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e337" source="scaled-dot-product-attention" target="attention-mechanism"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e338" source="scaled-dot-product-attention" target="multi-head-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e339" source="scaled-dot-product-attention" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e340" source="scaled-dot-product-attention" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e341" source="scaled-dot-product-attention" target="src:raw-01-attention-is-all-you-need-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e342" source="self-attention" target="attention-mechanism"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e343" source="self-attention" target="transformer"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e344" source="self-attention" target="autoregressive-language-model"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e345" source="self-attention" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e346" source="self-attention" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e347" source="self-attention" target="multi-head-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e348" source="self-attention" target="scaled-dot-product-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e349" source="self-attention" target="attention-mechanism"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e350" source="self-attention" target="multi-head-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e351" source="self-attention" target="scaled-dot-product-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e352" source="self-attention" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e353" source="self-attention" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e354" source="self-attention" target="autoregressive-language-model"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e355" source="self-attention" target="bert"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e356" source="self-attention" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e357" source="self-attention" target="masked-language-modeling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e358" source="self-attention" target="src:raw-01-attention-is-all-you-need-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e359" source="transformer" target="attention-mechanism"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
-<edge id="e360" source="transformer" target="encoder-decoder-architecture"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e361" source="transformer" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">2</data></edge>
-<edge id="e362" source="transformer" target="layer-normalization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e363" source="transformer" target="positional-encoding"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e364" source="transformer" target="scaled-dot-product-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e365" source="transformer" target="multi-head-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e366" source="transformer" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e367" source="transformer" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e368" source="transformer" target="autoregressive-language-model"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e369" source="transformer" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
-<edge id="e370" source="transformer" target="attention-mechanism"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e371" source="transformer" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e372" source="transformer" target="multi-head-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e373" source="transformer" target="scaled-dot-product-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e374" source="transformer" target="positional-encoding"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e375" source="transformer" target="encoder-decoder-architecture"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e376" source="transformer" target="layer-normalization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e377" source="transformer" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e378" source="transformer" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
-<edge id="e379" source="transformer" target="bert"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e380" source="transformer" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
-<edge id="e381" source="transformer" target="src:raw-01-attention-is-all-you-need-md"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
-<edge id="e382" source="wiki-index" target="transformer"><data key="e_type">indexes</data><data key="e_via">Transformer architecture (Vaswani et al., 2017)</data><data key="e_w">1</data></edge>
-<edge id="e383" source="wiki-index" target="attention-mechanism"><data key="e_type">indexes</data><data key="e_via">Transformer architecture (Vaswani et al., 2017)</data><data key="e_w">1</data></edge>
-<edge id="e384" source="wiki-index" target="scaled-dot-product-attention"><data key="e_type">indexes</data><data key="e_via">Transformer architecture (Vaswani et al., 2017)</data><data key="e_w">1</data></edge>
-<edge id="e385" source="wiki-index" target="multi-head-attention"><data key="e_type">indexes</data><data key="e_via">Transformer architecture (Vaswani et al., 2017)</data><data key="e_w">1</data></edge>
-<edge id="e386" source="wiki-index" target="self-attention"><data key="e_type">indexes</data><data key="e_via">Transformer architecture (Vaswani et al., 2017)</data><data key="e_w">1</data></edge>
-<edge id="e387" source="wiki-index" target="positional-encoding"><data key="e_type">indexes</data><data key="e_via">Transformer architecture (Vaswani et al., 2017)</data><data key="e_w">1</data></edge>
-<edge id="e388" source="wiki-index" target="encoder-decoder-architecture"><data key="e_type">indexes</data><data key="e_via">Transformer architecture (Vaswani et al., 2017)</data><data key="e_w">1</data></edge>
-<edge id="e389" source="wiki-index" target="layer-normalization"><data key="e_type">indexes</data><data key="e_via">Transformer architecture (Vaswani et al., 2017)</data><data key="e_w">1</data></edge>
-<edge id="e390" source="wiki-index" target="bert"><data key="e_type">indexes</data><data key="e_via">Understanding &amp; pretraining (Devlin et al., 2018)</data><data key="e_w">2</data></edge>
-<edge id="e391" source="wiki-index" target="masked-language-modeling"><data key="e_type">indexes</data><data key="e_via">Understanding &amp; pretraining (Devlin et al., 2018)</data><data key="e_w">2</data></edge>
-<edge id="e392" source="wiki-index" target="next-sentence-prediction"><data key="e_type">indexes</data><data key="e_via">Understanding &amp; pretraining (Devlin et al., 2018)</data><data key="e_w">1</data></edge>
-<edge id="e393" source="wiki-index" target="pre-training-and-fine-tuning"><data key="e_type">indexes</data><data key="e_via">Understanding &amp; pretraining (Devlin et al., 2018)</data><data key="e_w">2</data></edge>
-<edge id="e394" source="wiki-index" target="gpt-3"><data key="e_type">indexes</data><data key="e_via">Scale &amp; few-shot learning (Brown et al., 2020)</data><data key="e_w">5</data></edge>
-<edge id="e395" source="wiki-index" target="autoregressive-language-model"><data key="e_type">indexes</data><data key="e_via">Scale &amp; few-shot learning (Brown et al., 2020)</data><data key="e_w">2</data></edge>
-<edge id="e396" source="wiki-index" target="in-context-learning"><data key="e_type">indexes</data><data key="e_via">Scale &amp; few-shot learning (Brown et al., 2020)</data><data key="e_w">2</data></edge>
-<edge id="e397" source="wiki-index" target="few-shot-learning"><data key="e_type">indexes</data><data key="e_via">Scale &amp; few-shot learning (Brown et al., 2020)</data><data key="e_w">1</data></edge>
-<edge id="e398" source="wiki-index" target="scale-and-scaling"><data key="e_type">indexes</data><data key="e_via">Scale &amp; few-shot learning (Brown et al., 2020)</data><data key="e_w">1</data></edge>
-<edge id="e399" source="wiki-index" target="emergent-capabilities"><data key="e_type">indexes</data><data key="e_via">Scale &amp; few-shot learning (Brown et al., 2020)</data><data key="e_w">1</data></edge>
-<edge id="e400" source="wiki-index" target="chinchilla"><data key="e_type">indexes</data><data key="e_via">Compute-optimal scaling (Hoffmann et al., 2022)</data><data key="e_w">3</data></edge>
-<edge id="e401" source="wiki-index" target="compute-optimal-scaling"><data key="e_type">indexes</data><data key="e_via">Compute-optimal scaling (Hoffmann et al., 2022)</data><data key="e_w">2</data></edge>
-<edge id="e402" source="wiki-index" target="foundation-models"><data key="e_type">indexes</data><data key="e_via">The paradigm (Bommasani et al., 2021)</data><data key="e_w">2</data></edge>
-<edge id="e403" source="wiki-index" target="homogenization"><data key="e_type">indexes</data><data key="e_via">The paradigm (Bommasani et al., 2021)</data><data key="e_w">1</data></edge>
-<edge id="e404" source="wiki-index" target="rlhf"><data key="e_type">indexes</data><data key="e_via">Alignment (Ouyang et al., 2022)</data><data key="e_w">2</data></edge>
-<edge id="e405" source="wiki-index" target="reward-modeling"><data key="e_type">indexes</data><data key="e_via">Alignment (Ouyang et al., 2022)</data><data key="e_w">1</data></edge>
-<edge id="e406" source="wiki-index" target="proximal-policy-optimization"><data key="e_type">indexes</data><data key="e_via">Alignment (Ouyang et al., 2022)</data><data key="e_w">1</data></edge>
-<edge id="e407" source="wiki-index" target="alignment"><data key="e_type">indexes</data><data key="e_via">Alignment (Ouyang et al., 2022)</data><data key="e_w">1</data></edge>
-<edge id="e408" source="compilation-log" target="compute-optimal-scaling"><data key="e_type">records</data><data key="e_via">2026-07-23 — Linting/audit pass (Step 6)</data><data key="e_w">1</data></edge>
+<edge id="e17" source="attention-mechanism" target="attention-is-all-you-need"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e18" source="attention-mechanism" target="scaled-dot-product-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e19" source="attention-mechanism" target="multi-head-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e20" source="attention-mechanism" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e21" source="attention-mechanism" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e22" source="attention-mechanism" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e23" source="attention-mechanism" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e24" source="attention-mechanism" target="scaled-dot-product-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e25" source="attention-mechanism" target="multi-head-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e26" source="attention-mechanism" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e27" source="attention-mechanism" target="attention-is-all-you-need"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e28" source="autoregressive-language-model" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
+<edge id="e29" source="autoregressive-language-model" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
+<edge id="e30" source="autoregressive-language-model" target="attention-is-all-you-need"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e31" source="autoregressive-language-model" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e32" source="autoregressive-language-model" target="language-models-are-few-shot-learners"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e33" source="autoregressive-language-model" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e34" source="autoregressive-language-model" target="masked-language-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e35" source="autoregressive-language-model" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e36" source="autoregressive-language-model" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e37" source="autoregressive-language-model" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e38" source="autoregressive-language-model" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e39" source="autoregressive-language-model" target="masked-language-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e40" source="autoregressive-language-model" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e41" source="autoregressive-language-model" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e42" source="autoregressive-language-model" target="masked-language-modeling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e43" source="autoregressive-language-model" target="attention-is-all-you-need"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e44" source="autoregressive-language-model" target="language-models-are-few-shot-learners"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e45" source="bert" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e46" source="bert" target="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e47" source="bert" target="encoder-decoder-architecture"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e48" source="bert" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e49" source="bert" target="masked-language-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e50" source="bert" target="next-sentence-prediction"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e51" source="bert" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e52" source="bert" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e53" source="bert" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e54" source="bert" target="encoder-decoder-architecture"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e55" source="bert" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e56" source="bert" target="masked-language-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e57" source="bert" target="next-sentence-prediction"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e58" source="bert" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e59" source="bert" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e60" source="bert" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e61" source="bert" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e62" source="bert" target="in-context-learning"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e63" source="bert" target="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e64" source="on-the-opportunities-and-risks-of-foundation-models" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e65" source="on-the-opportunities-and-risks-of-foundation-models" target="homogenization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e66" source="on-the-opportunities-and-risks-of-foundation-models" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e67" source="language-models-are-few-shot-learners" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e68" source="language-models-are-few-shot-learners" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e69" source="language-models-are-few-shot-learners" target="few-shot-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e70" source="language-models-are-few-shot-learners" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e71" source="language-models-are-few-shot-learners" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e72" source="language-models-are-few-shot-learners" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e73" source="language-models-are-few-shot-learners" target="training-compute-optimal-large-language-models"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e74" source="chinchilla" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
+<edge id="e75" source="chinchilla" target="training-compute-optimal-large-language-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e76" source="chinchilla" target="compute-optimal-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e77" source="chinchilla" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e78" source="chinchilla" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e79" source="chinchilla" target="compute-optimal-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e80" source="chinchilla" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e81" source="chinchilla" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e82" source="chinchilla" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e83" source="chinchilla" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e84" source="chinchilla" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e85" source="chinchilla" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e86" source="chinchilla" target="scale-and-scaling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e87" source="chinchilla" target="training-compute-optimal-large-language-models"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e88" source="compute-optimal-scaling" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">2</data></edge>
+<edge id="e89" source="compute-optimal-scaling" target="training-compute-optimal-large-language-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e90" source="compute-optimal-scaling" target="chinchilla"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e91" source="compute-optimal-scaling" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e92" source="compute-optimal-scaling" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e93" source="compute-optimal-scaling" target="chinchilla"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e94" source="compute-optimal-scaling" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e95" source="compute-optimal-scaling" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e96" source="compute-optimal-scaling" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e97" source="compute-optimal-scaling" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e98" source="compute-optimal-scaling" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e99" source="compute-optimal-scaling" target="training-compute-optimal-large-language-models"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e100" source="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e101" source="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding" target="masked-language-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e102" source="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding" target="next-sentence-prediction"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e103" source="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e104" source="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding" target="language-models-are-few-shot-learners"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e105" source="emergent-capabilities" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e106" source="emergent-capabilities" target="language-models-are-few-shot-learners"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e107" source="emergent-capabilities" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e108" source="emergent-capabilities" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e109" source="emergent-capabilities" target="on-the-opportunities-and-risks-of-foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e110" source="emergent-capabilities" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e111" source="emergent-capabilities" target="homogenization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e112" source="emergent-capabilities" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e113" source="emergent-capabilities" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e114" source="emergent-capabilities" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e115" source="emergent-capabilities" target="few-shot-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e116" source="emergent-capabilities" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e117" source="emergent-capabilities" target="homogenization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e118" source="emergent-capabilities" target="compute-optimal-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e119" source="emergent-capabilities" target="chinchilla"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e120" source="emergent-capabilities" target="foundation-models"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e121" source="emergent-capabilities" target="compute-optimal-scaling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e122" source="emergent-capabilities" target="language-models-are-few-shot-learners"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e123" source="emergent-capabilities" target="on-the-opportunities-and-risks-of-foundation-models"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e124" source="encoder-decoder-architecture" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e125" source="encoder-decoder-architecture" target="autoregressive-language-model"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
+<edge id="e126" source="encoder-decoder-architecture" target="attention-is-all-you-need"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e127" source="encoder-decoder-architecture" target="layer-normalization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e128" source="encoder-decoder-architecture" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e129" source="encoder-decoder-architecture" target="masked-language-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e130" source="encoder-decoder-architecture" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e131" source="encoder-decoder-architecture" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e132" source="encoder-decoder-architecture" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e133" source="encoder-decoder-architecture" target="layer-normalization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e134" source="encoder-decoder-architecture" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e135" source="encoder-decoder-architecture" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e136" source="encoder-decoder-architecture" target="autoregressive-language-model"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e137" source="encoder-decoder-architecture" target="attention-is-all-you-need"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e138" source="few-shot-learning" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
+<edge id="e139" source="few-shot-learning" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e140" source="few-shot-learning" target="language-models-are-few-shot-learners"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e141" source="few-shot-learning" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e142" source="few-shot-learning" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e143" source="few-shot-learning" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e144" source="few-shot-learning" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e145" source="few-shot-learning" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e146" source="few-shot-learning" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e147" source="few-shot-learning" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e148" source="few-shot-learning" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e149" source="few-shot-learning" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e150" source="few-shot-learning" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e151" source="few-shot-learning" target="rlhf"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e152" source="few-shot-learning" target="language-models-are-few-shot-learners"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e153" source="foundation-models" target="bert"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e154" source="foundation-models" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e155" source="foundation-models" target="on-the-opportunities-and-risks-of-foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e156" source="foundation-models" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e157" source="foundation-models" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e158" source="foundation-models" target="homogenization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e159" source="foundation-models" target="transformer"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e160" source="foundation-models" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e161" source="foundation-models" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e162" source="foundation-models" target="alignment"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e163" source="foundation-models" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e164" source="foundation-models" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e165" source="foundation-models" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e166" source="foundation-models" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e167" source="foundation-models" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e168" source="foundation-models" target="homogenization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e169" source="foundation-models" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e170" source="foundation-models" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e171" source="foundation-models" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e172" source="foundation-models" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e173" source="foundation-models" target="on-the-opportunities-and-risks-of-foundation-models"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e174" source="gpt-3" target="autoregressive-language-model"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e175" source="gpt-3" target="few-shot-learning"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e176" source="gpt-3" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e177" source="gpt-3" target="language-models-are-few-shot-learners"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e178" source="gpt-3" target="encoder-decoder-architecture"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e179" source="gpt-3" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e180" source="gpt-3" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e181" source="gpt-3" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e182" source="gpt-3" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e183" source="gpt-3" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e184" source="gpt-3" target="autoregressive-language-model"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e185" source="gpt-3" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e186" source="gpt-3" target="few-shot-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e187" source="gpt-3" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e188" source="gpt-3" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e189" source="gpt-3" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e190" source="gpt-3" target="encoder-decoder-architecture"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e191" source="gpt-3" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e192" source="gpt-3" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e193" source="gpt-3" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e194" source="gpt-3" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e195" source="gpt-3" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e196" source="gpt-3" target="chinchilla"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e197" source="gpt-3" target="compute-optimal-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e198" source="gpt-3" target="bert"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e199" source="gpt-3" target="rlhf"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e200" source="gpt-3" target="chinchilla"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e201" source="gpt-3" target="language-models-are-few-shot-learners"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e202" source="training-compute-optimal-large-language-models" target="chinchilla"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e203" source="training-compute-optimal-large-language-models" target="compute-optimal-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e204" source="homogenization" target="on-the-opportunities-and-risks-of-foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e205" source="homogenization" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e206" source="homogenization" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e207" source="homogenization" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e208" source="homogenization" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e209" source="homogenization" target="alignment"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e210" source="homogenization" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e211" source="homogenization" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e212" source="homogenization" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e213" source="homogenization" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e214" source="homogenization" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e215" source="homogenization" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e216" source="homogenization" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e217" source="homogenization" target="on-the-opportunities-and-risks-of-foundation-models"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e218" source="in-context-learning" target="language-models-are-few-shot-learners"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e219" source="in-context-learning" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e220" source="in-context-learning" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e221" source="in-context-learning" target="few-shot-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e222" source="in-context-learning" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e223" source="in-context-learning" target="scale-and-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e224" source="in-context-learning" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e225" source="in-context-learning" target="few-shot-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e226" source="in-context-learning" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e227" source="in-context-learning" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e228" source="in-context-learning" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e229" source="in-context-learning" target="pre-training-and-fine-tuning"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e230" source="in-context-learning" target="rlhf"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e231" source="in-context-learning" target="language-models-are-few-shot-learners"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e232" source="layer-normalization" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
+<edge id="e233" source="layer-normalization" target="attention-is-all-you-need"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e234" source="layer-normalization" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e235" source="layer-normalization" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e236" source="layer-normalization" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e237" source="layer-normalization" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e238" source="layer-normalization" target="encoder-decoder-architecture"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e239" source="layer-normalization" target="attention-is-all-you-need"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e240" source="masked-language-modeling" target="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e241" source="masked-language-modeling" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e242" source="masked-language-modeling" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e243" source="masked-language-modeling" target="autoregressive-language-model"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e244" source="masked-language-modeling" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e245" source="masked-language-modeling" target="next-sentence-prediction"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e246" source="masked-language-modeling" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e247" source="masked-language-modeling" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e248" source="masked-language-modeling" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e249" source="masked-language-modeling" target="next-sentence-prediction"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e250" source="masked-language-modeling" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e251" source="masked-language-modeling" target="autoregressive-language-model"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e252" source="masked-language-modeling" target="autoregressive-language-model"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e253" source="masked-language-modeling" target="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e254" source="multi-head-attention" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e255" source="multi-head-attention" target="scaled-dot-product-attention"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e256" source="multi-head-attention" target="attention-is-all-you-need"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e257" source="multi-head-attention" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e258" source="multi-head-attention" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e259" source="multi-head-attention" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e260" source="multi-head-attention" target="scaled-dot-product-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e261" source="multi-head-attention" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e262" source="multi-head-attention" target="attention-mechanism"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e263" source="multi-head-attention" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e264" source="multi-head-attention" target="attention-is-all-you-need"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e265" source="next-sentence-prediction" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e266" source="next-sentence-prediction" target="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e267" source="next-sentence-prediction" target="masked-language-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e268" source="next-sentence-prediction" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e269" source="next-sentence-prediction" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e270" source="next-sentence-prediction" target="masked-language-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e271" source="next-sentence-prediction" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e272" source="next-sentence-prediction" target="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e273" source="training-language-models-to-follow-instructions-with-human-feedback" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e274" source="training-language-models-to-follow-instructions-with-human-feedback" target="reward-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e275" source="training-language-models-to-follow-instructions-with-human-feedback" target="proximal-policy-optimization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e276" source="training-language-models-to-follow-instructions-with-human-feedback" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e277" source="positional-encoding" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e278" source="positional-encoding" target="attention-is-all-you-need"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e279" source="positional-encoding" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e280" source="positional-encoding" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e281" source="positional-encoding" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e282" source="positional-encoding" target="attention-is-all-you-need"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e283" source="pre-training-and-fine-tuning" target="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e284" source="pre-training-and-fine-tuning" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e285" source="pre-training-and-fine-tuning" target="masked-language-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e286" source="pre-training-and-fine-tuning" target="next-sentence-prediction"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e287" source="pre-training-and-fine-tuning" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e288" source="pre-training-and-fine-tuning" target="language-models-are-few-shot-learners"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e289" source="pre-training-and-fine-tuning" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e290" source="pre-training-and-fine-tuning" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e291" source="pre-training-and-fine-tuning" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e292" source="pre-training-and-fine-tuning" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e293" source="pre-training-and-fine-tuning" target="masked-language-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e294" source="pre-training-and-fine-tuning" target="next-sentence-prediction"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e295" source="pre-training-and-fine-tuning" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e296" source="pre-training-and-fine-tuning" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e297" source="pre-training-and-fine-tuning" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e298" source="pre-training-and-fine-tuning" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e299" source="pre-training-and-fine-tuning" target="in-context-learning"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e300" source="pre-training-and-fine-tuning" target="scale-and-scaling"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e301" source="pre-training-and-fine-tuning" target="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e302" source="pre-training-and-fine-tuning" target="language-models-are-few-shot-learners"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e303" source="proximal-policy-optimization" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e304" source="proximal-policy-optimization" target="reward-modeling"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
+<edge id="e305" source="proximal-policy-optimization" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e306" source="proximal-policy-optimization" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e307" source="proximal-policy-optimization" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e308" source="proximal-policy-optimization" target="reward-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e309" source="proximal-policy-optimization" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e310" source="proximal-policy-optimization" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e311" source="proximal-policy-optimization" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e312" source="rlhf" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e313" source="rlhf" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e314" source="rlhf" target="reward-modeling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e315" source="rlhf" target="proximal-policy-optimization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e316" source="rlhf" target="alignment"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e317" source="rlhf" target="pre-training-and-fine-tuning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e318" source="rlhf" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e319" source="rlhf" target="reward-modeling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e320" source="rlhf" target="proximal-policy-optimization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e321" source="rlhf" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e322" source="rlhf" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e323" source="rlhf" target="pre-training-and-fine-tuning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e324" source="rlhf" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e325" source="rlhf" target="scale-and-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e326" source="rlhf" target="gpt-3"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e327" source="rlhf" target="in-context-learning"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e328" source="rlhf" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e329" source="reward-modeling" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e330" source="reward-modeling" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e331" source="reward-modeling" target="proximal-policy-optimization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e332" source="reward-modeling" target="alignment"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e333" source="reward-modeling" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e334" source="reward-modeling" target="proximal-policy-optimization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e335" source="reward-modeling" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e336" source="reward-modeling" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e337" source="scale-and-scaling" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
+<edge id="e338" source="scale-and-scaling" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">2</data></edge>
+<edge id="e339" source="scale-and-scaling" target="language-models-are-few-shot-learners"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e340" source="scale-and-scaling" target="few-shot-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e341" source="scale-and-scaling" target="in-context-learning"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e342" source="scale-and-scaling" target="on-the-opportunities-and-risks-of-foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e343" source="scale-and-scaling" target="emergent-capabilities"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e344" source="scale-and-scaling" target="homogenization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e345" source="scale-and-scaling" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e346" source="scale-and-scaling" target="rlhf"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e347" source="scale-and-scaling" target="alignment"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e348" source="scale-and-scaling" target="training-compute-optimal-large-language-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e349" source="scale-and-scaling" target="chinchilla"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e350" source="scale-and-scaling" target="compute-optimal-scaling"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e351" source="scale-and-scaling" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e352" source="scale-and-scaling" target="few-shot-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e353" source="scale-and-scaling" target="in-context-learning"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e354" source="scale-and-scaling" target="emergent-capabilities"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e355" source="scale-and-scaling" target="foundation-models"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e356" source="scale-and-scaling" target="homogenization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e357" source="scale-and-scaling" target="rlhf"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e358" source="scale-and-scaling" target="alignment"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e359" source="scale-and-scaling" target="chinchilla"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e360" source="scale-and-scaling" target="compute-optimal-scaling"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e361" source="scale-and-scaling" target="rlhf"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e362" source="scale-and-scaling" target="chinchilla"><data key="e_type">contradicts</data><data key="e_via">Contradictions / tensions</data><data key="e_w">1</data></edge>
+<edge id="e363" source="scale-and-scaling" target="language-models-are-few-shot-learners"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e364" source="scale-and-scaling" target="on-the-opportunities-and-risks-of-foundation-models"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e365" source="scale-and-scaling" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e366" source="scale-and-scaling" target="training-compute-optimal-large-language-models"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e367" source="scaled-dot-product-attention" target="attention-mechanism"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e368" source="scaled-dot-product-attention" target="transformer"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e369" source="scaled-dot-product-attention" target="attention-is-all-you-need"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e370" source="scaled-dot-product-attention" target="multi-head-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e371" source="scaled-dot-product-attention" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e372" source="scaled-dot-product-attention" target="attention-mechanism"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e373" source="scaled-dot-product-attention" target="multi-head-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e374" source="scaled-dot-product-attention" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e375" source="scaled-dot-product-attention" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e376" source="scaled-dot-product-attention" target="attention-is-all-you-need"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e377" source="self-attention" target="attention-mechanism"><data key="e_type">mentions</data><data key="e_via">Summary</data><data key="e_w">1</data></edge>
+<edge id="e378" source="self-attention" target="transformer"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e379" source="self-attention" target="attention-is-all-you-need"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e380" source="self-attention" target="autoregressive-language-model"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e381" source="self-attention" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e382" source="self-attention" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e383" source="self-attention" target="multi-head-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e384" source="self-attention" target="scaled-dot-product-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e385" source="self-attention" target="attention-mechanism"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e386" source="self-attention" target="multi-head-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e387" source="self-attention" target="scaled-dot-product-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e388" source="self-attention" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e389" source="self-attention" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e390" source="self-attention" target="autoregressive-language-model"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e391" source="self-attention" target="attention-is-all-you-need"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e392" source="transformer" target="attention-is-all-you-need"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e393" source="transformer" target="encoder-decoder-architecture"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e394" source="transformer" target="self-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">2</data></edge>
+<edge id="e395" source="transformer" target="layer-normalization"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e396" source="transformer" target="positional-encoding"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e397" source="transformer" target="attention-mechanism"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e398" source="transformer" target="scaled-dot-product-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e399" source="transformer" target="multi-head-attention"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e400" source="transformer" target="bert"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e401" source="transformer" target="gpt-3"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e402" source="transformer" target="autoregressive-language-model"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e403" source="transformer" target="foundation-models"><data key="e_type">mentions</data><data key="e_via">Explanation</data><data key="e_w">1</data></edge>
+<edge id="e404" source="transformer" target="attention-mechanism"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e405" source="transformer" target="self-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e406" source="transformer" target="multi-head-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e407" source="transformer" target="scaled-dot-product-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e408" source="transformer" target="positional-encoding"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e409" source="transformer" target="encoder-decoder-architecture"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e410" source="transformer" target="layer-normalization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e411" source="transformer" target="bert"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e412" source="transformer" target="gpt-3"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e413" source="transformer" target="attention-is-all-you-need"><data key="e_type">cites</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e414" source="attention-is-all-you-need" target="transformer"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e415" source="attention-is-all-you-need" target="scaled-dot-product-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e416" source="attention-is-all-you-need" target="multi-head-attention"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e417" source="attention-is-all-you-need" target="positional-encoding"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e418" source="attention-is-all-you-need" target="encoder-decoder-architecture"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e419" source="attention-is-all-you-need" target="layer-normalization"><data key="e_type">related</data><data key="e_via">Related</data><data key="e_w">1</data></edge>
+<edge id="e420" source="wiki-index" target="attention-is-all-you-need"><data key="e_type">indexes</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e421" source="wiki-index" target="bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding"><data key="e_type">indexes</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e422" source="wiki-index" target="language-models-are-few-shot-learners"><data key="e_type">indexes</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e423" source="wiki-index" target="on-the-opportunities-and-risks-of-foundation-models"><data key="e_type">indexes</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e424" source="wiki-index" target="training-language-models-to-follow-instructions-with-human-feedback"><data key="e_type">indexes</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e425" source="wiki-index" target="training-compute-optimal-large-language-models"><data key="e_type">indexes</data><data key="e_via">Sources</data><data key="e_w">1</data></edge>
+<edge id="e426" source="wiki-index" target="transformer"><data key="e_type">indexes</data><data key="e_via">Transformer architecture</data><data key="e_w">1</data></edge>
+<edge id="e427" source="wiki-index" target="attention-mechanism"><data key="e_type">indexes</data><data key="e_via">Transformer architecture</data><data key="e_w">1</data></edge>
+<edge id="e428" source="wiki-index" target="scaled-dot-product-attention"><data key="e_type">indexes</data><data key="e_via">Transformer architecture</data><data key="e_w">1</data></edge>
+<edge id="e429" source="wiki-index" target="multi-head-attention"><data key="e_type">indexes</data><data key="e_via">Transformer architecture</data><data key="e_w">1</data></edge>
+<edge id="e430" source="wiki-index" target="self-attention"><data key="e_type">indexes</data><data key="e_via">Transformer architecture</data><data key="e_w">1</data></edge>
+<edge id="e431" source="wiki-index" target="positional-encoding"><data key="e_type">indexes</data><data key="e_via">Transformer architecture</data><data key="e_w">1</data></edge>
+<edge id="e432" source="wiki-index" target="encoder-decoder-architecture"><data key="e_type">indexes</data><data key="e_via">Transformer architecture</data><data key="e_w">1</data></edge>
+<edge id="e433" source="wiki-index" target="layer-normalization"><data key="e_type">indexes</data><data key="e_via">Transformer architecture</data><data key="e_w">1</data></edge>
+<edge id="e434" source="wiki-index" target="bert"><data key="e_type">indexes</data><data key="e_via">Understanding and pre-training</data><data key="e_w">2</data></edge>
+<edge id="e435" source="wiki-index" target="masked-language-modeling"><data key="e_type">indexes</data><data key="e_via">Understanding and pre-training</data><data key="e_w">1</data></edge>
+<edge id="e436" source="wiki-index" target="next-sentence-prediction"><data key="e_type">indexes</data><data key="e_via">Understanding and pre-training</data><data key="e_w">1</data></edge>
+<edge id="e437" source="wiki-index" target="pre-training-and-fine-tuning"><data key="e_type">indexes</data><data key="e_via">Understanding and pre-training</data><data key="e_w">1</data></edge>
+<edge id="e438" source="wiki-index" target="gpt-3"><data key="e_type">indexes</data><data key="e_via">Scale and few-shot learning</data><data key="e_w">1</data></edge>
+<edge id="e439" source="wiki-index" target="autoregressive-language-model"><data key="e_type">indexes</data><data key="e_via">Scale and few-shot learning</data><data key="e_w">1</data></edge>
+<edge id="e440" source="wiki-index" target="in-context-learning"><data key="e_type">indexes</data><data key="e_via">Scale and few-shot learning</data><data key="e_w">2</data></edge>
+<edge id="e441" source="wiki-index" target="few-shot-learning"><data key="e_type">indexes</data><data key="e_via">Scale and few-shot learning</data><data key="e_w">1</data></edge>
+<edge id="e442" source="wiki-index" target="scale-and-scaling"><data key="e_type">indexes</data><data key="e_via">Scale and few-shot learning</data><data key="e_w">1</data></edge>
+<edge id="e443" source="wiki-index" target="emergent-capabilities"><data key="e_type">indexes</data><data key="e_via">Scale and few-shot learning</data><data key="e_w">2</data></edge>
+<edge id="e444" source="wiki-index" target="chinchilla"><data key="e_type">indexes</data><data key="e_via">Compute-optimal scaling</data><data key="e_w">2</data></edge>
+<edge id="e445" source="wiki-index" target="compute-optimal-scaling"><data key="e_type">indexes</data><data key="e_via">Compute-optimal scaling</data><data key="e_w">1</data></edge>
+<edge id="e446" source="wiki-index" target="foundation-models"><data key="e_type">indexes</data><data key="e_via">The paradigm</data><data key="e_w">1</data></edge>
+<edge id="e447" source="wiki-index" target="homogenization"><data key="e_type">indexes</data><data key="e_via">The paradigm</data><data key="e_w">1</data></edge>
+<edge id="e448" source="wiki-index" target="rlhf"><data key="e_type">indexes</data><data key="e_via">Alignment</data><data key="e_w">2</data></edge>
+<edge id="e449" source="wiki-index" target="reward-modeling"><data key="e_type">indexes</data><data key="e_via">Alignment</data><data key="e_w">1</data></edge>
+<edge id="e450" source="wiki-index" target="proximal-policy-optimization"><data key="e_type">indexes</data><data key="e_via">Alignment</data><data key="e_w">1</data></edge>
+<edge id="e451" source="wiki-index" target="alignment"><data key="e_type">indexes</data><data key="e_via">Alignment</data><data key="e_w">1</data></edge>
 </graph>
 </graphml>

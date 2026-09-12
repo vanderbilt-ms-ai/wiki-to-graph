@@ -21,17 +21,17 @@
     {
       "id": "bert",
       "name": "BERT",
-      "description": "BERT (Bidirectional Encoder Representations from Transformers, 2018) is an **encoder-only** Transformer pre-trained to produce deeply bidirectional language representations, then fine-tuned for downstream tasks. It set new state-of-the-art on eleven NLP tasks."
+      "description": "BERT (Bidirectional Encoder Representations from Transformers) is an **encoder-only** Transformer pre-trained to produce deeply bidirectional language representations, then fine-tuned for downstream tasks. It set new state-of-the-art on eleven NLP tasks."
     },
     {
       "id": "chinchilla",
       "name": "Chinchilla",
-      "description": "Chinchilla (*Training Compute-Optimal Large Language Models*, DeepMind, 2022) is a 70B-parameter model trained on 4× more data than Gopher under the same compute budget. It outperforms much larger models — including the 175B GPT-3 — establishing that most large LMs were **undertrained**."
+      "description": "Chinchilla is a 70B-parameter model trained on 4× more data than Gopher under the same compute budget. It outperforms much larger models — including the 175B GPT-3 — establishing that most large LMs were **undertrained**."
     },
     {
       "id": "compute-optimal-scaling",
       "name": "Compute-Optimal Scaling",
-      "description": "The principle, established by Chinchilla (Hoffmann et al., 2022), that under a fixed compute budget a transformer language model's parameter count and number of training tokens should be scaled **equally** — for every doubling of model size, double the training data."
+      "description": "The principle that under a fixed compute budget a transformer language model's parameter count and number of training tokens should be scaled **equally** — for every doubling of model size, double the training data."
     },
     {
       "id": "emergent-capabilities",
@@ -51,22 +51,22 @@
     {
       "id": "foundation-models",
       "name": "Foundation Models",
-      "description": "Coined by Stanford's CRFM (*On the Opportunities and Risks of Foundation Models*, 2021): a model trained on broad data at scale and adaptable to a wide range of downstream tasks. Examples given include BERT, DALL-E, and GPT-3."
+      "description": "A model trained on broad data at scale and adaptable to a wide range of downstream tasks. Examples given include BERT, DALL-E, and GPT-3."
     },
     {
       "id": "gpt-3",
       "name": "GPT-3",
-      "description": "GPT-3 (*Language Models are Few-Shot Learners*, 2020) is a 175-billion-parameter **decoder-only** Autoregressive Language Model. Its central claim: scaling up language models yields strong task-agnostic Few-Shot Learning via In-Context Learning, often without any fine-tuning."
+      "description": "GPT-3 is a 175-billion-parameter **decoder-only** Autoregressive Language Model. Its central claim: scaling up language models yields strong task-agnostic Few-Shot Learning via In-Context Learning, often without any fine-tuning."
     },
     {
       "id": "homogenization",
       "name": "Homogenization",
-      "description": "The tendency, described in *Foundation Models*, for a single model to become the shared basis for many downstream applications — concentrating both capability and risk."
+      "description": "The tendency for a single model to become the shared basis for many downstream applications — concentrating both capability and risk."
     },
     {
       "id": "in-context-learning",
       "name": "In-Context Learning",
-      "description": "The ability, highlighted by GPT-3, to perform a new task by conditioning on instructions and/or a few examples provided in the prompt at inference time — with **no gradient updates or fine-tuning**."
+      "description": "The ability to perform a new task by conditioning on instructions and/or a few examples provided in the prompt at inference time — with **no gradient updates or fine-tuning**."
     },
     {
       "id": "layer-normalization",
@@ -76,7 +76,7 @@
     {
       "id": "masked-language-modeling",
       "name": "Masked Language Modeling",
-      "description": "The pre-training objective introduced by BERT: randomly mask ~15% of input tokens and train the model to predict them from surrounding context on both sides."
+      "description": "A pre-training objective: randomly mask ~15% of input tokens and train the model to predict them from surrounding context on both sides."
     },
     {
       "id": "multi-head-attention",
@@ -86,7 +86,7 @@
     {
       "id": "next-sentence-prediction",
       "name": "Next Sentence Prediction",
-      "description": "A secondary pre-training objective in BERT: given two sentences A and B, predict whether B actually follows A in the corpus. Intended to teach inter-sentence relationships useful for tasks like question answering and natural language inference."
+      "description": "A secondary pre-training objective: given two sentences A and B, predict whether B actually follows A in the corpus. Intended to teach inter-sentence relationships useful for tasks like question answering and natural language inference."
     },
     {
       "id": "positional-encoding",
@@ -106,7 +106,7 @@
     {
       "id": "rlhf",
       "name": "RLHF",
-      "description": "Reinforcement Learning from Human Feedback: the technique in *Training Language Models to Follow Instructions with Human Feedback* (2022) used to align GPT-3 into **InstructGPT**. It fine-tunes a model to follow user intent using human preference data."
+      "description": "Reinforcement Learning from Human Feedback: the technique used to align GPT-3 into **InstructGPT**. It fine-tunes a model to follow user intent using human preference data."
     },
     {
       "id": "reward-modeling",
@@ -131,7 +131,7 @@
     {
       "id": "transformer",
       "name": "Transformer",
-      "description": "The Transformer is a neural network architecture based entirely on Attention Mechanism, dispensing with recurrence and convolution. Introduced in *Attention Is All You Need* (2017), it became the foundation for essentially all modern large language models."
+      "description": "The Transformer is a neural network architecture based entirely on attention, dispensing with recurrence and convolution. It became the foundation for essentially all modern large language models."
     }
   ],
   "prerequisites": [
@@ -154,6 +154,42 @@
     [
       "alignment",
       "scale-and-scaling"
+    ],
+    [
+      "attention-is-all-you-need",
+      "attention-mechanism"
+    ],
+    [
+      "attention-is-all-you-need",
+      "autoregressive-language-model"
+    ],
+    [
+      "attention-is-all-you-need",
+      "encoder-decoder-architecture"
+    ],
+    [
+      "attention-is-all-you-need",
+      "layer-normalization"
+    ],
+    [
+      "attention-is-all-you-need",
+      "multi-head-attention"
+    ],
+    [
+      "attention-is-all-you-need",
+      "positional-encoding"
+    ],
+    [
+      "attention-is-all-you-need",
+      "scaled-dot-product-attention"
+    ],
+    [
+      "attention-is-all-you-need",
+      "self-attention"
+    ],
+    [
+      "attention-is-all-you-need",
+      "transformer"
     ],
     [
       "attention-mechanism",
@@ -230,6 +266,22 @@
     [
       "bert",
       "transformer"
+    ],
+    [
+      "bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding",
+      "bert"
+    ],
+    [
+      "bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding",
+      "masked-language-modeling"
+    ],
+    [
+      "bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding",
+      "next-sentence-prediction"
+    ],
+    [
+      "bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding",
+      "pre-training-and-fine-tuning"
     ],
     [
       "chinchilla",
@@ -464,6 +516,34 @@
       "scale-and-scaling"
     ],
     [
+      "language-models-are-few-shot-learners",
+      "autoregressive-language-model"
+    ],
+    [
+      "language-models-are-few-shot-learners",
+      "emergent-capabilities"
+    ],
+    [
+      "language-models-are-few-shot-learners",
+      "few-shot-learning"
+    ],
+    [
+      "language-models-are-few-shot-learners",
+      "gpt-3"
+    ],
+    [
+      "language-models-are-few-shot-learners",
+      "in-context-learning"
+    ],
+    [
+      "language-models-are-few-shot-learners",
+      "pre-training-and-fine-tuning"
+    ],
+    [
+      "language-models-are-few-shot-learners",
+      "scale-and-scaling"
+    ],
+    [
       "layer-normalization",
       "encoder-decoder-architecture"
     ],
@@ -518,6 +598,22 @@
     [
       "next-sentence-prediction",
       "pre-training-and-fine-tuning"
+    ],
+    [
+      "on-the-opportunities-and-risks-of-foundation-models",
+      "emergent-capabilities"
+    ],
+    [
+      "on-the-opportunities-and-risks-of-foundation-models",
+      "foundation-models"
+    ],
+    [
+      "on-the-opportunities-and-risks-of-foundation-models",
+      "homogenization"
+    ],
+    [
+      "on-the-opportunities-and-risks-of-foundation-models",
+      "scale-and-scaling"
     ],
     [
       "positional-encoding",
@@ -694,6 +790,38 @@
     [
       "self-attention",
       "transformer"
+    ],
+    [
+      "training-compute-optimal-large-language-models",
+      "chinchilla"
+    ],
+    [
+      "training-compute-optimal-large-language-models",
+      "compute-optimal-scaling"
+    ],
+    [
+      "training-compute-optimal-large-language-models",
+      "scale-and-scaling"
+    ],
+    [
+      "training-language-models-to-follow-instructions-with-human-feedback",
+      "alignment"
+    ],
+    [
+      "training-language-models-to-follow-instructions-with-human-feedback",
+      "proximal-policy-optimization"
+    ],
+    [
+      "training-language-models-to-follow-instructions-with-human-feedback",
+      "reward-modeling"
+    ],
+    [
+      "training-language-models-to-follow-instructions-with-human-feedback",
+      "rlhf"
+    ],
+    [
+      "training-language-models-to-follow-instructions-with-human-feedback",
+      "scale-and-scaling"
     ],
     [
       "transformer",
