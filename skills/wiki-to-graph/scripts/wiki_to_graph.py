@@ -840,59 +840,203 @@ def find_page(wiki_dir, name):
     return None
 
 
-SECTION_FOR = {"related": "Related", "contradicts": "Contradictions / tensions", "mentions": "Explanation"}
+SECTION_FOR = {"related": "Related", "contradicts": "Contradictions / tensions",
+               "mentions": "Explanation", "cites": "Sources"}
+
+
+def split_frontmatter(txt):
+    """-> (fields, key_order, body). Missing frontmatter yields ({}, [], txt)."""
+    lines = txt.split("\n")
+    if not lines or lines[0].strip() != "---":
+        return {}, [], txt
+    fm, order, j = {}, [], 1
+    while j < len(lines) and lines[j].strip() != "---":
+        m = re.match(r"\s*([A-Za-z_][\w-]*)\s*:\s*(.*?)\s*$", lines[j])
+        if m:
+            k = m.group(1).lower()
+            fm[k] = m.group(2)
+            order.append(k)
+        j += 1
+    return fm, order, "\n".join(lines[j + 1:]).lstrip("\n")
+
+
+def join_frontmatter(fm, order, body):
+    keys = order + [k for k in fm if k not in order]
+    rows = ["%s: %s" % (k, fm[k]) for k in keys if fm.get(k)]
+    return "---\n" + "\n".join(rows) + "\n---\n\n" + body
+
+
+def link_names_for(wiki_dir, name):
+    """Every spelling a [[link]] to `name` might use: given name, H1 title, filename stem."""
+    out = {name}
+    f = find_page(wiki_dir, name)
+    if f:
+        out.add(parse_page(f)[0])
+        out.add(os.path.splitext(os.path.basename(f))[0])
+    return {x for x in out if x}
+
+
+def link_pattern(names):
+    return re.compile(r"\[\[\s*(?:%s)\s*(\|[^\]]*)?\]\]"
+                      % "|".join(re.escape(n) for n in sorted(names, key=len, reverse=True)), re.I)
 
 
 def cmd_update(args):
     """Edit the SOURCE wiki markdown (single source of truth); re-run build to regenerate."""
     wd, act = args.wiki_dir, args.action
-    if act == "add-node":
+
+    if act in ("add-node", "add-source"):
         if not args.title:
-            print("add-node needs --title"); sys.exit(1)
-        kind = (args.kind or "concept").lower()
+            print("%s needs --title" % act); sys.exit(1)
         path = os.path.join(wd, args.title + ".md")
         if os.path.exists(path):
             print("already exists:", path); sys.exit(1)
-        open(path, "w", encoding="utf-8").write(
-            f"---\nkind: {kind}\n---\n\n# {args.title}\n\n## Summary\n{args.summary or ''}\n\n"
-            f"## Explanation\n{args.explanation or ''}\n\n## Related\n\n"
-            f"## Contradictions / tensions\n\n## Sources\n")
-        print("created", path)
+        if act == "add-source":
+            if not args.locator:
+                print("add-source needs --locator (a path, URL, or doi:/isbn:/arxiv: id)")
+                sys.exit(1)
+            fm = {"type": "source", "locator": args.locator,
+                  "medium": (args.medium or medium_for(args.locator) or "document")}
+            for k in ("author", "date"):
+                if getattr(args, k, None):
+                    fm[k] = getattr(args, k)
+            order = ["type", "medium", "locator", "author", "date"]
+            body = ("# %s\n\n## Summary\n%s\n\n## Explanation\n%s\n\n## Related\n\n"
+                    % (args.title, args.summary or "", args.explanation or ""))
+            open(path, "w", encoding="utf-8").write(join_frontmatter(fm, order, body))
+            print("created source", path, "(%s)" % fm["medium"])
+        else:
+            kind = (args.kind or "concept").lower()
+            if kind not in KINDS:
+                print("--kind must be one of:", ", ".join(sorted(KINDS))); sys.exit(1)
+            open(path, "w", encoding="utf-8").write(
+                "---\nkind: %s\n---\n\n# %s\n\n## Summary\n%s\n\n"
+                "## Explanation\n%s\n\n## Related\n\n"
+                "## Contradictions / tensions\n\n## Sources\n"
+                % (kind, args.title, args.summary or "", args.explanation or ""))
+            print("created", path)
 
     elif act == "add-edge":
         if args.type not in SECTION_FOR:
-            print("--type must be one of: related, contradicts, mentions"); sys.exit(1)
+            print("--type must be one of:", ", ".join(sorted(SECTION_FOR))); sys.exit(1)
         src = find_page(wd, args.frm or "")
         if not src:
             print("no source page for --from", args.frm); sys.exit(1)
         tgt = find_page(wd, args.to or "")
         tgt_title = parse_page(tgt)[0] if tgt else args.to
         header = "## " + SECTION_FOR[args.type]
+        # A `## Sources` entry is a literal citation line, not a [[link]]: prefer the
+        # target's declared locator so the bullet resolves onto the authored source page.
+        if args.type == "cites":
+            loc = parse_page(tgt)[2].get("locator") if tgt else None
+            entry = "- %s — %s" % (loc, tgt_title) if loc else "- [[%s]]" % tgt_title
+        else:
+            entry = "[[%s]]" % tgt_title
         lines = open(src, encoding="utf-8").read().split("\n")
-        link = f"[[{tgt_title}]]"
         idx = next((k for k, l in enumerate(lines) if l.strip() == header), -1)
         if idx == -1:
-            lines += ["", header, link]
+            lines += ["", header, "", entry]
         else:
-            lines.insert(idx + 1, link)
+            lines.insert(idx + 1, entry)
         open(src, "w", encoding="utf-8").write("\n".join(lines))
-        warn = "" if tgt else f"  (warning: no page named '{args.to}' yet — link will be dangling)"
-        print(f'added {link} to "{SECTION_FOR[args.type]}" of {os.path.basename(src)}{warn}')
+        warn = "" if tgt else "  (warning: no page named '%s' yet — link will be dangling)" % args.to
+        print('added %s to "%s" of %s%s' % (entry.strip("- "), SECTION_FOR[args.type],
+                                            os.path.basename(src), warn))
 
-    elif act == "set-kind":
+    elif act == "remove-edge":
+        src = find_page(wd, args.frm or "")
+        if not src:
+            print("no source page for --from", args.frm); sys.exit(1)
+        names = link_names_for(wd, args.to or "")
+        if not names:
+            print("remove-edge needs --to"); sys.exit(1)
+        pat = link_pattern(names)
+        want = SECTION_FOR.get(args.type) if args.type else None
+        out, sec, removed = [], None, 0
+        for line in open(src, encoding="utf-8").read().split("\n"):
+            m = H2_RE.match(line)
+            if m:
+                sec = m.group(1).strip()
+                out.append(line); continue
+            if want is None or sec == want:
+                new = pat.sub("", line)
+                if new != line:
+                    removed += len(pat.findall(line))
+                    stripped = new.strip().lstrip("-*·").strip()
+                    if not stripped or stripped in ("—", "-"):
+                        continue                      # bullet held only that link
+                    line = new
+            out.append(line)
+        open(src, "w", encoding="utf-8").write("\n".join(out))
+        scope = 'section "%s"' % want if want else "all sections"
+        print("removed %d link(s) to '%s' from %s of %s"
+              % (removed, args.to, scope, os.path.basename(src)))
+
+    elif act == "remove-node":
         p = find_page(wd, args.node or "")
         if not p:
             print("no page for --node", args.node); sys.exit(1)
+        names = link_names_for(wd, args.node)
+        pat = link_pattern(names)
+        inbound = []
+        for f in sorted(glob.glob(os.path.join(wd, "*.md"))):
+            if os.path.abspath(f) == os.path.abspath(p):
+                continue
+            if pat.search(CODE_RE.sub("", open(f, encoding="utf-8").read())):
+                inbound.append(os.path.basename(f))
+        os.remove(p)
+        print("deleted", os.path.basename(p))
+        if inbound:
+            print("  WARNING: %d page(s) still link here and will now dangle: %s"
+                  % (len(inbound), ", ".join(inbound)))
+            print("  fix with: update <wiki> remove-edge --from <page> --to '%s'" % args.node)
+
+    elif act == "rename":
+        p = find_page(wd, args.node or "")
+        if not p:
+            print("no page for --node", args.node); sys.exit(1)
+        if not args.title:
+            print("rename needs --title (the new title)"); sys.exit(1)
+        old_names = link_names_for(wd, args.node)
         txt = open(p, encoding="utf-8").read()
-        if txt.startswith("---"):
-            if re.search(r"(?m)^kind\s*:", txt):
-                txt = re.sub(r"(?m)^kind\s*:.*$", f"kind: {args.kind}", txt, count=1)
-            else:
-                txt = txt.replace("---", f"---\nkind: {args.kind}", 1)
-        else:
-            txt = f"---\nkind: {args.kind}\n---\n\n" + txt
+        txt = H1_RE.sub("# " + args.title, txt, count=1) if H1_RE.search(txt) \
+            else txt.replace("\n", "\n", 1)
         open(p, "w", encoding="utf-8").write(txt)
-        print(f"set kind={args.kind} on {os.path.basename(p)}")
+        newp = os.path.join(wd, args.title + ".md")
+        if os.path.abspath(newp) != os.path.abspath(p):
+            if os.path.exists(newp):
+                print("target filename already exists:", newp); sys.exit(1)
+            os.rename(p, newp)
+        pat = link_pattern(old_names)
+        touched = 0
+        for f in sorted(glob.glob(os.path.join(wd, "*.md"))):
+            t = open(f, encoding="utf-8").read()
+            nt = pat.sub(lambda m: "[[%s%s]]" % (args.title, m.group(1) or ""), t)
+            if nt != t:
+                open(f, "w", encoding="utf-8").write(nt); touched += 1
+        print("renamed to '%s' (%s); rewrote links in %d page(s)"
+              % (args.title, os.path.basename(newp), touched))
+
+    elif act in ("set-kind", "set-type"):
+        p = find_page(wd, args.node or "")
+        if not p:
+            print("no page for --node", args.node); sys.exit(1)
+        field = "kind" if act == "set-kind" else "type"
+        val = (args.kind if act == "set-kind" else args.type or "")
+        val = (val or "").lower()
+        allowed = KINDS if act == "set-kind" else NODE_TYPES
+        if val not in allowed:
+            print("--%s must be one of: %s" % (field, ", ".join(sorted(allowed)))); sys.exit(1)
+        fm, order, body = split_frontmatter(open(p, encoding="utf-8").read())
+        fm[field] = val
+        if field not in order:
+            order.insert(0, field)
+        if val != "concept" and field == "type" and "kind" in fm:
+            # a source/index/log node holds no knowledge kind
+            fm.pop("kind"); order = [k for k in order if k != "kind"]
+            print("  (dropped `kind`: it classifies knowledge, and only concepts carry it)")
+        open(p, "w", encoding="utf-8").write(join_frontmatter(fm, order, body))
+        print("set %s=%s on %s" % (field, val, os.path.basename(p)))
 
     print("→ re-run `build` to regenerate the graph.")
 
@@ -944,11 +1088,17 @@ def main():
 
     u = sub.add_parser("update", help="edit the source wiki markdown, then re-run build")
     u.add_argument("wiki_dir")
-    u.add_argument("action", choices=["add-node", "add-edge", "set-kind"])
-    u.add_argument("--title"); u.add_argument("--kind")
+    u.add_argument("action", choices=["add-node", "add-source", "add-edge", "remove-edge",
+                                      "remove-node", "rename", "set-kind", "set-type"])
+    u.add_argument("--title", help="new node title; with `rename`, the new title")
+    u.add_argument("--kind", help="concept|schema|procedure|fact (concept nodes only)")
     u.add_argument("--summary"); u.add_argument("--explanation")
-    u.add_argument("--from", dest="frm"); u.add_argument("--to"); u.add_argument("--type")
-    u.add_argument("--node")
+    u.add_argument("--from", dest="frm"); u.add_argument("--to")
+    u.add_argument("--type", help="edge type for add/remove-edge; node type for set-type")
+    u.add_argument("--node", help="the page to act on")
+    u.add_argument("--locator", help="add-source: path, URL, or doi:/arxiv:/isbn: identifier")
+    u.add_argument("--medium", help="add-source: paper|web|book|slides|video|transcript|code|…")
+    u.add_argument("--author"); u.add_argument("--date")
     u.set_defaults(func=cmd_update)
 
     args = ap.parse_args()
