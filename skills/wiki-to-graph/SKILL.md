@@ -38,7 +38,31 @@ Then open `build/graph-viewer.html` for the user, and report:
 - the `normalized:` line verbatim, so they can see what was adapted,
 - `validate`'s `RESULT` line.
 
-That is the whole job. Everything below is reference.
+That is the whole job for a build. Everything below is reference.
+
+## Answering questions in conversation
+
+Many users never see a command line; the conversation is their only interface to the graph
+(`docs/user-guide.md` is written for them). Answer in plain language, from the graph:
+
+| The user asks | Run | Answer with |
+|---|---|---|
+| "tell me about X" | `query graph.json node "X"` | summary, kind, sources, relations grouped by type |
+| "what is related to X, and why" | `query graph.json neighbors "X"` and `backlinks "X"` | each relation with its reason |
+| "how is X connected to Y" | `query graph.json path "X" "Y"` | every hop, its edge type and reason |
+| "what can I reach from X via related" | `query graph.json bfs "X" --edges related` | the pages, nearest first |
+| "what are the contradictions" / "what disagrees with X" | `query graph.json contradicts` | both sides and the stated disagreement |
+| "which sources does X cite" / "which pages use source S" | `neighbors "X" --edges cites` / `backlinks "S" --edges cites` | the sources or pages |
+| "most central", "most contested", "main themes" | `analyze graph.json --top 10` | PageRank, in-degree, contested nodes, communities — quoted |
+| "list every procedure" (or fact, schema, concept) | `query graph.json list --kind procedure` | the pages |
+| "which links have no reason" | `query graph.json unexplained` | the pairs |
+| "open the viewer on X" | open `graph-viewer.html#X` | — |
+| "add this paper / page / link", rename, remove | `update …`, or the `wiki-graph-maintain` skill for new sources | rebuild, then report what changed |
+
+The **reason** for a relationship is the edge's `context` field in `graph.json` — the sentence the
+link was written in. Quote it; do not paraphrase it into something stronger. If a relationship is
+not in the graph, say so and offer to add it to the wiki — never describe one the graph does not
+contain. Edits go to the wiki's markdown, followed by a rebuild; never edit `graph.json`.
 
 ## What `build` normalizes automatically
 

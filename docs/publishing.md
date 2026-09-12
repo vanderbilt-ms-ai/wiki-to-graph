@@ -13,28 +13,38 @@ claude plugin marketplace add vanderbilt-ms-ai/wiki-to-graph
 claude plugin install wiki-to-graph@wiki-to-graph
 
 # command-line tools
-pip install git+https://github.com/vanderbilt-ms-ai/wiki-to-graph.git
+pip install wiki-to-graph
 
 # source
 git clone https://github.com/vanderbilt-ms-ai/wiki-to-graph.git
 ```
 
-The PyPI package is at 0.2.0, behind this repository; publishing a new release (below) closes
-that gap, after which `pip install wiki-to-graph` is equivalent.
+## Publish a new release
 
-## Publish a new release to PyPI
+Packaging lives in [`pyproject.toml`](../pyproject.toml) (console entry points `wiki-to-graph` and
+`wiki-to-graph-viewer`; modules `wiki_to_graph`, `wiki_normalize`, `build_graph_viewer`;
+stdlib-only, no runtime dependencies). Release from an up-to-date `main`.
 
-Packaging lives in [`pyproject.toml`](../pyproject.toml) (console entry points
-`wiki-to-graph` and `wiki-to-graph-viewer`; stdlib-only, no runtime deps).
-
-```bash
-python3 -m pip install --upgrade build twine
-python3 -m build                 # -> dist/*.tar.gz and dist/*.whl
-python3 -m twine upload dist/*   # prompts for your PyPI token
-```
-Bump `version` in `pyproject.toml`, `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
-before each release.
-To rehearse first: `twine upload --repository testpypi dist/*`.
+1. **Bump the version** in all four places: `pyproject.toml`, `.claude-plugin/plugin.json`,
+   `.claude-plugin/marketplace.json` (metadata and plugin entry), and the `generator` string in
+   `skills/wiki-to-graph/scripts/wiki_to_graph.py`. Merge that to `main`.
+2. **Test:** `python3 -m unittest discover tests`.
+3. **Build and check** (`build/lib/` and `dist/` are git-ignored):
+   ```bash
+   python3 -m pip install --upgrade build twine
+   rm -rf dist && python3 -m build
+   python3 -m twine check dist/*
+   ```
+4. **Upload** — prompts for a PyPI API token (username `__token__`). Rehearse with
+   `--repository testpypi` if in doubt; a version number can never be re-uploaded.
+   ```bash
+   python3 -m twine upload dist/*
+   ```
+5. **Tag and release on GitHub**, attaching the same files:
+   ```bash
+   git tag -a vX.Y.Z -m "wiki-to-graph X.Y.Z" && git push origin vX.Y.Z
+   gh release create vX.Y.Z dist/* --title "wiki-to-graph X.Y.Z" --notes-file <notes>
+   ```
 
 ## Directories & lists
 

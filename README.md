@@ -32,6 +32,10 @@ graph however it was written. Your files are never modified.
 *The included viewer, opened at `graph-viewer.html#Transformer`: nodes colored by kind and edges by
 type, with the selected node's summary, sources, and relations — each showing the reason it was made.*
 
+**Working with the graph through Claude rather than code?** Read the
+[**User Guide**](docs/user-guide.md): what is in the graph, how to read the viewer, what to ask, and
+how to change it.
+
 ---
 
 ## Install
@@ -47,11 +51,11 @@ checks that it worked. Or install it yourself:
 |---|---|---|
 | **Claude Code plugin** | `claude plugin marketplace add vanderbilt-ms-ai/wiki-to-graph`<br>`claude plugin install wiki-to-graph@wiki-to-graph` | the three skills, loaded in your next session. Inside a session, use `/plugin marketplace add …` and `/plugin install …` |
 | **Clone** | `git clone https://github.com/vanderbilt-ms-ai/wiki-to-graph.git` | everything: scripts, skills, example, tests. Nothing to install |
-| **pip** | `pip install git+https://github.com/vanderbilt-ms-ai/wiki-to-graph.git` | the `wiki-to-graph` and `wiki-to-graph-viewer` commands |
+| **pip** | `pip install wiki-to-graph` | the `wiki-to-graph` and `wiki-to-graph-viewer` commands |
 
 Requirements: Python 3.8+, standard library only. `networkx` / `scipy` are optional, for your own
-heavier analysis. Install with pip from GitHub as shown: the PyPI release (0.2.0) predates
-automatic normalization, source pages and the current viewer.
+heavier analysis. For changes newer than the latest release:
+`pip install git+https://github.com/vanderbilt-ms-ai/wiki-to-graph.git`.
 
 Once installed, tell your agent: *"Turn my wiki at `<path>` into a graph."* No reformatting first.
 
@@ -92,6 +96,7 @@ wiki-to-graph/                      ← plugin root (also a one-plugin marketpla
 ├── tests/                          ← proves any wiki shape builds the same graph
 ├── build/                          ← sample outputs, regenerated from examples/llm-wiki/wiki
 ├── docs/
+│   ├── user-guide.md               ← using the graph through a Claude conversation
 │   ├── outputs-and-workflows.md    ← what each build object is + example workflows
 │   ├── custom-vocabulary.md        ← --vocab format, and the orphan trap it avoids
 │   └── publishing.md               ← distribution + release steps

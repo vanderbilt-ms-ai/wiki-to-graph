@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "wiki-to-graph"
-version = "0.4.0"
+version = "1.0.0"
 description = "Turn an LLM wiki in any common shape into a typed, queryable knowledge graph: normalize, build, validate, analyze, query, update, and view."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -21,9 +21,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/MangroveTechnologies/wiki-to-graph"
-Repository = "https://github.com/MangroveTechnologies/wiki-to-graph"
-Issues = "https://github.com/MangroveTechnologies/wiki-to-graph/issues"
+Homepage = "https://github.com/vanderbilt-ms-ai/wiki-to-graph"
+Repository = "https://github.com/vanderbilt-ms-ai/wiki-to-graph"
+Issues = "https://github.com/vanderbilt-ms-ai/wiki-to-graph/issues"
 
 # Free for personal/academic use under CC BY-NC-SA 4.0.
 # Commercial use requires a paid license — contact tim.darrah@mangrove.ai.

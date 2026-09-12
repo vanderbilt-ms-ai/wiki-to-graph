@@ -55,13 +55,12 @@ mkdir -p ~/.claude/skills && cp -R skills/wiki-to-graph skills/wiki-author skill
 Use this for the commands without any skills.
 
 ```bash
-pip install git+https://github.com/vanderbilt-ms-ai/wiki-to-graph.git
+pip install wiki-to-graph
 ```
 
-**Check:** `wiki-to-graph --help` and `wiki-to-graph-viewer --help` both print usage.
-
-Install from GitHub as above: the `wiki-to-graph` package on PyPI is version 0.2.0, which
-predates automatic normalization, source pages and the current viewer.
+**Check:** `pip show wiki-to-graph` reports version 1.0.0 or later, and `wiki-to-graph --help`
+prints usage. If it reports 0.2.0, that release predates automatic normalization — install from
+GitHub instead: `pip install git+https://github.com/vanderbilt-ms-ai/wiki-to-graph.git`.
 
 ## After installing
 

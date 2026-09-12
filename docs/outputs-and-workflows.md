@@ -1,5 +1,8 @@
 # Outputs & example workflows
 
+*Command-line reference. If you work with the graph through a Claude conversation instead, see the
+[User Guide](user-guide.md).*
+
 This repo ships a complete, runnable example: the wiki in
 [`examples/llm-wiki/`](../examples/llm-wiki) is the exact wiki the committed
 `build/` artifacts were generated from. Everything below runs from the repo
