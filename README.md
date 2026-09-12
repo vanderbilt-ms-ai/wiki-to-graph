@@ -32,6 +32,10 @@ graph however it was written. Your files are never modified.
 *The included viewer, opened at `graph-viewer.html#Transformer`: nodes colored by kind and edges by
 type, with the selected node's summary, sources, and relations — each showing the reason it was made.*
 
+**Working with the graph through Claude rather than code?** Read the
+[**User Guide**](docs/user-guide.md): what is in the graph, how to read the viewer, what to ask, and
+how to change it.
+
 ---
 
 ## Install
@@ -92,6 +96,7 @@ wiki-to-graph/                      ← plugin root (also a one-plugin marketpla
 ├── tests/                          ← proves any wiki shape builds the same graph
 ├── build/                          ← sample outputs, regenerated from examples/llm-wiki/wiki
 ├── docs/
+│   ├── user-guide.md               ← using the graph through a Claude conversation
 │   ├── outputs-and-workflows.md    ← what each build object is + example workflows
 │   ├── custom-vocabulary.md        ← --vocab format, and the orphan trap it avoids
 │   └── publishing.md               ← distribution + release steps

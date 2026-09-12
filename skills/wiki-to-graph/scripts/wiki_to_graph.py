@@ -888,6 +888,26 @@ def cmd_validate(args):
     sys.exit(0 if problems == 0 else 1)
 
 
+def resolve_node(nodes, name):
+    """A page name as a person would say it -> node id, or None.
+
+    Tries the id, then the title, then every alias. A wiki links a page by its filename
+    as often as by its title ([[Hoffmann 2022]] for "Training Compute-Optimal Large
+    Language Models"), and in conversation people name pages the way they are linked;
+    every node records both forms as aliases."""
+    s = slug(name)
+    if s in nodes:
+        return s
+    low = name.strip().lower()
+    for n in nodes.values():
+        if n["title"].lower() == low:
+            return n["id"]
+    for n in nodes.values():
+        if any(a.lower() == low or slug(a) == s for a in (n.get("aliases") or [])):
+            return n["id"]
+    return None
+
+
 def cmd_analyze(args):
     from collections import Counter
     g, nodes, edges = load_graph(args.graph)
@@ -936,9 +956,17 @@ def cmd_analyze(args):
         print(f"    C{i} ({len(c)}): {names}{' …' if len(c) > 6 else ''}")
 
     if args.path:
-        s, t = slug(args.path[0]), slug(args.path[1])
-        p = bfs_path(adjU, s, t)
-        pretty = " → ".join(nodes[x]["title"] for x in p) if p else "no path"
+        ends = [resolve_node(nodes, x) for x in args.path]
+        missing = [x for x, i in zip(args.path, ends) if i is None]
+        outside = [x for x, i in zip(args.path, ends) if i is not None and i not in adjU]
+        if missing:
+            pretty = "no node matching " + ", ".join("'%s'" % x for x in missing)
+        elif outside:
+            pretty = ("%s is not a concept page; analyze measures paths between concepts. "
+                      "Use `query <graph> path` to include sources." % ", ".join("'%s'" % x for x in outside))
+        else:
+            p = bfs_path(adjU, ends[0], ends[1])
+            pretty = " → ".join(nodes[x]["title"] for x in p) if p else "no path"
         print(f"\n  Shortest path {args.path[0]} — {args.path[1]}: {pretty}")
 
 
@@ -960,11 +988,7 @@ def cmd_query(args):
     g, nodes, edges = load_graph(args.graph)
     def title(i): return nodes[i]["title"] if i in nodes else i
     def resolve(name):
-        s = slug(name)
-        if s in nodes: return s
-        for n in nodes.values():
-            if n["title"].lower() == name.lower(): return n["id"]
-        return None
+        return resolve_node(nodes, name)
 
     # ---- resolve include/exclude filters ----
     inc_e, exc_e = _csv(args.edges), _csv(args.ignore_edges) or set()

@@ -168,6 +168,26 @@ class LegacyWiki(unittest.TestCase):
             self.assertIn(pair, c)
 
 
+class QueryByName(unittest.TestCase):
+    """In conversation a page is named the way the wiki links it, often by its filename."""
+
+    def test_query_resolves_a_filename_alias(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = os.path.join(tmp, "graph.json")
+            cli = [sys.executable, os.path.join(SCRIPTS, "wiki_to_graph.py")]
+            subprocess.run(cli + ["build", EXAMPLE, "-o", out], check=True, capture_output=True)
+            proc = subprocess.run(cli + ["query", out, "backlinks", "Hoffmann 2022", "--edges", "cites"],
+                                  capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertIn("Chinchilla", proc.stdout)
+            proc = subprocess.run(cli + ["analyze", out, "--top", "1", "--path", "Vaswani 2017", "RLHF"],
+                                  capture_output=True, text=True)
+            self.assertIn("not a concept page", proc.stdout)
+            proc = subprocess.run(cli + ["analyze", out, "--top", "1", "--path", "Positional Encoding", "RLHF"],
+                                  capture_output=True, text=True)
+            self.assertIn("Positional Encoding \u2192", proc.stdout)
+
+
 class Parsing(unittest.TestCase):
     def test_section_synonyms(self):
         self.assertEqual(section_kind("See also"), "related")
