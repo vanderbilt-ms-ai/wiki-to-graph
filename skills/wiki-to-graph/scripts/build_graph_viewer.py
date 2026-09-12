@@ -49,6 +49,22 @@ TEMPLATE = r"""<!DOCTYPE html>
   #side .grp .ct{font-size:11px;color:var(--muted)}
   #side .body{font-size:12.5px;line-height:1.6;color:#cfd3e4}
   #side .body p{margin:0 0 9px}
+  #side .body h3.mdh,#side .body h4.mdh,#side .body h5.mdh{
+       font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#aab0c6;
+       margin:14px 0 5px;font-weight:600;text-transform:none;font-size:12.5px}
+  #side .body ul,#side .body ol{margin:0 0 9px;padding-left:18px}
+  #side .body li{margin:2px 0}
+  #side .body blockquote{margin:0 0 9px;padding:2px 0 2px 10px;border-left:2px solid #3a4166;color:var(--muted)}
+  #side .body pre{background:#0e1226;border:1px solid var(--edge);border-radius:6px;
+       padding:8px 10px;overflow-x:auto;margin:0 0 9px}
+  #side .body pre code{font-size:11px;line-height:1.45;background:none;padding:0}
+  #side .body code{background:#0e1226;padding:1px 4px;border-radius:4px;font-size:11.5px}
+  #side .tw{overflow-x:auto;margin:0 0 10px}
+  #side .body table{border-collapse:collapse;font-size:11.5px;min-width:100%}
+  #side .body th,#side .body td{border:1px solid var(--edge);padding:4px 7px;text-align:left;vertical-align:top}
+  #side .body th{background:#0e1226;color:var(--ink);font-weight:600;white-space:nowrap}
+  #side .why .hint{opacity:.5;font-style:italic}
+  #side .why .src{color:#7f9cff;font-style:normal;opacity:.8}
   #side details.expl{margin:10px 0 4px}
   #side details.expl summary{font-size:11px;text-transform:uppercase;letter-spacing:.6px;
        color:var(--muted);cursor:pointer;user-select:none;margin-bottom:8px}
@@ -204,31 +220,87 @@ function draw(){
   applyView();
 }
 function esc(t){return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function md(t){return esc(t)
+function inl(t){return esc(t)
   .replace(/`([^`]+)`/g,'<code>$1</code>')
-  .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');}
-function paras(t){return (t||'').split(/\n{2,}/).filter(x=>x.trim())
-  .map(p=>'<p>'+md(p.trim().replace(/\n/g,' '))+'</p>').join('');}
+  .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+  .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,;:!?]|$)/g,'$1<em>$2</em>');}
 
-// Edges grouped by type, each showing the author's stated reason. A flat list of
-// link names answers "what is connected" and never "why", which is the question.
-function edgeGroups(list, dir){
+// Page prose is markdown: ### subsections, tables, fenced code, lists, quotes.
+// Rendering it as flat paragraphs leaks the markup as literal text.
+const UL=/^\s*[-*+]\s+/, OL=/^\s*\d+[.)]\s+/, BLOCKSTART=/^\s*(#{1,6}\s|```|>|\|)/;
+function renderMd(src){
+  const L=(src||'').split('\n'); const out=[]; let i=0;
+  const cells=r=>r.trim().replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+  while(i<L.length){
+    const l=L[i];
+    if(/^\s*```/.test(l)){
+      const buf=[]; i++;
+      while(i<L.length && !/^\s*```/.test(L[i])) buf.push(L[i++]);
+      i++; out.push('<pre><code>'+esc(buf.join('\n'))+'</code></pre>'); continue;
+    }
+    const h=l.match(/^\s*(#{1,6})\s+(.*)$/);
+    if(h){ const lvl=Math.min(5,Math.max(3,h[1].length));
+      out.push('<h'+lvl+' class="mdh">'+inl(h[2])+'</h'+lvl+'>'); i++; continue; }
+    if(/^\s*\|.*\|\s*$/.test(l) && i+1<L.length && /^\s*\|[\s:|-]+\|\s*$/.test(L[i+1])){
+      const head=cells(l); i+=2; const rows=[];
+      while(i<L.length && /^\s*\|.*\|\s*$/.test(L[i])) rows.push(cells(L[i++]));
+      out.push('<div class="tw"><table><thead><tr>'+head.map(c=>'<th>'+inl(c)+'</th>').join('')+
+        '</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+inl(c)+'</td>').join('')+'</tr>').join('')+
+        '</tbody></table></div>'); continue;
+    }
+    if(/^\s*>/.test(l)){ const buf=[];
+      while(i<L.length && /^\s*>/.test(L[i])) buf.push(L[i++].replace(/^\s*>\s?/,''));
+      out.push('<blockquote>'+inl(buf.join(' '))+'</blockquote>'); continue; }
+    if(UL.test(l)||OL.test(l)){
+      const ordered=OL.test(l), items=[];
+      while(i<L.length && (UL.test(L[i])||OL.test(L[i]))){
+        let it=L[i++].replace(UL,'').replace(OL,'');
+        while(i<L.length && L[i].trim() && !UL.test(L[i]) && !OL.test(L[i]) && !BLOCKSTART.test(L[i]))
+          it+=' '+L[i++].trim();
+        items.push('<li>'+inl(it)+'</li>');
+      }
+      out.push((ordered?'<ol>':'<ul>')+items.join('')+(ordered?'</ol>':'</ul>')); continue;
+    }
+    if(!l.trim()){ i++; continue; }
+    const buf=[];
+    while(i<L.length && L[i].trim() && !BLOCKSTART.test(L[i]) && !UL.test(L[i]) && !OL.test(L[i]))
+      buf.push(L[i++].trim());
+    out.push('<p>'+inl(buf.join(' '))+'</p>');
+  }
+  return out.join('');
+}
+
+// `related` and `contradicts` are symmetric: the same pair appears once as an
+// outgoing edge and once as a backlink. Listing both is the same fact twice.
+const SYMM={related:1,contradicts:1};
+
+// A link with no stated reason still often has one — written in the body of either
+// page. Fall back to that, and say where it came from rather than inventing it.
+function reasonFor(rel,id){
+  if(rel.context) return '<span class="why">'+inl(rel.context)+'</span>';
+  const m=allEdges.find(e=>e.type==='mentions'&&e.context&&
+    ((e.source===id&&e.target===rel.other)||(e.source===rel.other&&e.target===id)));
+  if(m){ const who=m.source===id?'this page':(byId[rel.other]||{}).title;
+    return '<span class="why">'+inl(m.context)+
+           '<span class="src"> — from '+esc(who)+'’s body text</span></span>'; }
+  return '<span class="why"><span class="hint">no reason given — add '+
+         '“— why” after the link on either page</span></span>';
+}
+
+function relRows(list,id){
   const byType={};
   list.forEach(e=>{(byType[e.type]=byType[e.type]||[]).push(e);});
   return Object.keys(EDGE).filter(t=>byType[t]&&byType[t].length).map(t=>{
     const rows=byType[t].map(e=>{
-      const other = dir==='out' ? e.target : e.source;
-      const nd = byId[other];
-      const why = e.context
-        ? '<span class="why">'+md(e.context)+'</span>'
-        : '<span class="why none">no reason stated on the page</span>';
-      return '<div class="e" data-go="'+other+'"><span class="tgt">'+esc(nd?nd.title:other)+'</span>'+
-             (e.weight>1?' <span style="opacity:.5">×'+e.weight+'</span>':'')+why+'</div>';
+      const nd=byId[e.other];
+      return '<div class="e" data-go="'+e.other+'"><span class="tgt">'+esc(nd?nd.title:e.other)+'</span>'+
+             (e.weight>1?' <span style="opacity:.5">×'+e.weight+'</span>':'')+reasonFor(e,id)+'</div>';
     }).join('');
     return '<div class="grp"><span class="nm" style="background:'+EDGE[t]+'">'+t+'</span>'+
            '<span class="ct">'+byType[t].length+(EDGE_DESC[t]?' · '+EDGE_DESC[t]:'')+'</span></div>'+rows;
-  }).join('') || '<p style="color:var(--muted);font-size:12px">none with the current edge filters</p>';
+  }).join('');
 }
+const NONE='<p style="color:var(--muted);font-size:12px">none with the current edge filters</p>';
 
 let hist=[];
 function select(id, viaHistory){
@@ -237,6 +309,17 @@ function select(id, viaHistory){
   const n=byId[id], s=document.getElementById('detail'), col=nodeColor(n);
   const outs=(n.edges||[]).filter(e=>enabled[e.type]);
   const backs=allEdges.filter(e=>e.target===id&&enabled[e.type]);
+  const symMap={};
+  outs.filter(e=>SYMM[e.type]).forEach(e=>{
+    symMap[e.type+'|'+e.target]={type:e.type,other:e.target,context:e.context,weight:e.weight};});
+  backs.filter(e=>SYMM[e.type]).forEach(e=>{
+    const k=e.type+'|'+e.source, cur=symMap[k];
+    if(!cur) symMap[k]={type:e.type,other:e.source,context:e.context,weight:e.weight};
+    else if((e.context||'').length>(cur.context||'').length) cur.context=e.context;});
+  const sym=Object.values(symMap);
+  const mk=(list,k)=>list.filter(e=>!SYMM[e.type])
+    .map(e=>({type:e.type,other:e[k],context:e.context,weight:e.weight}));
+  const outD=mk(outs,'target'), backD=mk(backs,'source');
   s.innerHTML=
     (hist.length?'<span class="back" id="back">← back</span>':'')+
     '<h2>'+esc(n.title)+'</h2>'+
@@ -247,13 +330,14 @@ function select(id, viaHistory){
     (n.type==='source'&&(n.medium||n.locator)
       ? '<div class="deg">'+(n.medium?'<b style="color:var(--ink)">'+esc(n.medium)+'</b>':'')+
         (n.medium&&n.locator?' · ':'')+(n.locator?'<code>'+esc(n.locator)+'</code>':'')+'</div>' : '')+
-    (n.summary?'<div class="body">'+paras(n.summary)+'</div>':'')+
-    (n.explanation?'<details class="expl"><summary>Explanation</summary>'+
-        '<div class="body">'+paras(n.explanation)+'</div></details>':'')+
+    (n.summary?'<div class="body">'+renderMd(n.summary)+'</div>':'')+
+    (n.explanation?'<details class="expl"><summary>Full explanation</summary>'+
+        '<div class="body">'+renderMd(n.explanation)+'</div></details>':'')+
     ((n.sources&&n.sources.length)
-      ? '<h3>Sources</h3><ul class="srcs">'+n.sources.map(x=>'<li>'+md(x)+'</li>').join('')+'</ul>' : '')+
-    '<h3>Outgoing — what this page says about others ('+outs.length+')</h3>'+edgeGroups(outs,'out')+
-    '<h3>Backlinks — what others say about this ('+backs.length+')</h3>'+edgeGroups(backs,'in');
+      ? '<h3>Sources</h3><ul class="srcs">'+n.sources.map(x=>'<li>'+inl(x)+'</li>').join('')+'</ul>' : '')+
+    '<h3>Mutual — holds in both directions ('+sym.length+')</h3>'+(sym.length?relRows(sym,id):NONE)+
+    '<h3>This page points to ('+outD.length+')</h3>'+(outD.length?relRows(outD,id):NONE)+
+    '<h3>Points at this page ('+backD.length+')</h3>'+(backD.length?relRows(backD,id):NONE);
   s.querySelectorAll('.e').forEach(el=>el.onclick=()=>select(el.dataset.go));
   const b=document.getElementById('back');
   if(b) b.onclick=()=>{const p=hist.pop(); if(p) select(p,true);};

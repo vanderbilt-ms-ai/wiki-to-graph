@@ -71,6 +71,7 @@ python3 scripts/wiki_to_graph.py query graph.json dfs "GPT-3" --edges contradict
 python3 scripts/wiki_to_graph.py query graph.json path "Positional Encoding" "RLHF"
 
 # 5) UPDATE: edit the SOURCE wiki markdown, then re-run build. Actions:
+python3 scripts/wiki_to_graph.py query  <graph.json> unexplained   # typed links nobody justified
 python3 scripts/wiki_to_graph.py update <wiki_dir> add-node   --title "Mixture of Experts" --kind schema --summary "..."
 python3 scripts/wiki_to_graph.py update <wiki_dir> add-source --title "Switch Transformer" --locator "arxiv:2101.03961"
 python3 scripts/wiki_to_graph.py update <wiki_dir> add-edge   --from "Mixture of Experts" --to "Transformer" --type related

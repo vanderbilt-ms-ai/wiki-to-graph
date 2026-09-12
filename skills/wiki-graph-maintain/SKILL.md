@@ -104,7 +104,12 @@ python3 $SCRIPT update <wiki> add-edge --from "<a>" --to "<source>" --type cites
 ```
 
 - Every atom `cites` at least one source. An uncited atom is an assertion.
-- A link with no stated reason does not go in. Write the reason on the bullet.
+- A link with no stated reason does not go in. Write it on the bullet:
+  `- [[Other Page]] — one line on why`. The parser keeps that line as the edge's
+  `context`, and it is the only part of the relationship a reader actually sees.
+- **One link per bullet in a typed section.** In `- [[A]] — because [[P]] found X`, A is
+  the relation and P is evidence: the parser types P as `mentions`, not as the relation.
+  A bare `- [[a]] · [[b]] · [[c]]` line types every link and explains none.
 - Only `contradicts` when both sides cite an artifact and **cannot both be
   true**. Different scope, different benchmark or different era is a *scope
   dispute* — record it as `related` and explain the difference. Promoting
@@ -144,10 +149,14 @@ Run periodically, and always after a bulk ingest:
 python3 $SCRIPT validate build/graph.json          # dangling / orphans / self-loops
 python3 $SCRIPT analyze  build/graph.json --top 10 # PageRank, in-degree, contested, communities
 python3 $SCRIPT query    build/graph.json contradicts
+python3 $SCRIPT query    build/graph.json unexplained
 ```
 
 What to look for:
 
+- **Unexplained links** — `query unexplained` lists typed links with no reason on the link
+  and none in either page's body. Each asserts a connection the wiki never justifies. Write
+  the reason or remove the link; do not invent one.
 - **Orphans** — a concept nothing links to. Either link it or remove it.
 - **A community that is one artifact's vocabulary** — a paper was ingested
   without connecting its atoms to what was already there. Add the cross-links.

@@ -217,26 +217,33 @@ def blocks_of(text):
 
 
 def link_contexts(text):
-    """-> {target: {"count": int, "context": str}}.
+    """-> {target: {"count", "context", "lead", "para"}}.
 
-    `context` is the prose of the bullet or paragraph the link sits in. Without it
-    an edge records THAT two pages are related and discards the author's statement
-    of HOW, which is usually the only part a reader wants.
+    `context` is the prose of the bullet or paragraph the link sits in \u2014 where the
+    author said WHY the link is there. Without it an edge records THAT two pages are
+    related and discards the how, which is usually the only part a reader wants.
 
-    Two things are deliberately NOT context. A leading "[[X]] \u2014 " is the bullet's
-    subject and is already shown as the edge's label, so it is dropped. And a block
-    that is only links ("[[a]] \u00b7 [[b]] \u00b7 [[c]]") has no prose at all \u2014 storing the
-    sibling names would be noise, so such edges get an empty context.
+    `typed` drives edge typing in a typed-relation section (see build_graph).
+    In "- [[A]] \u2014 because [[P]] found X", A is what the bullet is ABOUT and P is
+    evidence cited in passing. Typing both as `contradicts` asserts that this page
+    disagrees with P, which is not what the sentence says.
+
+    Two things are deliberately excluded from `context`. A leading "[[X]] \u2014 " is the
+    bullet's subject and is already the edge's target. And a block that is only links
+    ("[[a]] \u00b7 [[b]] \u00b7 [[c]]") has no prose, so its edges get "" rather than a list of
+    sibling names \u2014 an empty context truthfully means no reason was given.
     """
     out = {}
     for block in blocks_of(CODE_RE.sub("", text)):
         found = LINK_RE.findall(block)
         if not found:
             continue
+        is_bullet = bool(BULLET_RE.match(block))
         body = BULLET_RE.sub("", block.strip())
-        lead = re.match(r"\s*\[\[[^\]]+\]\]\s*[\u2014\u2013:-]\s+", body)
-        if lead:
-            body = body[lead.end():]
+        lead_m = re.match(r"\s*\[\[([^\]|]+)(?:\|[^\]]*)?\]\]\s*[\u2014\u2013:-]\s+", body)
+        lead_target = lead_m.group(1).strip() if (is_bullet and lead_m) else None
+        if lead_m:
+            body = body[lead_m.end():]
         bare = re.sub(r"[\s\u00b7*+:;,.|\u2014\u2013-]+", " ", LINK_RE.sub("", body)).strip()
         if len(bare) < 12:
             ctx = ""                                  # link list, no prose
@@ -248,8 +255,14 @@ def link_contexts(text):
             t = t.strip()
             if not t or t.lower() == "wiki-links":
                 continue
-            e = out.setdefault(t, {"count": 0, "context": ""})
+            e = out.setdefault(t, {"count": 0, "context": "", "typed": False})
             e["count"] += 1
+            # Carries the section's relation unless it is plainly a citation inside
+            # another bullet's prose: that needs the bullet to HAVE a subject link and
+            # HAVE prose after it. A bare list ("- [[a]] \u00b7 [[b]]") and a prose
+            # paragraph both stay fully typed.
+            if (not is_bullet) or lead_target is None or not ctx or t == lead_target:
+                e["typed"] = True
             if len(ctx) > len(e["context"]):
                 e["context"] = ctx
     return out
@@ -406,6 +419,12 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
                 continue
             for tgt, info in link_contexts(text).items():
                 cnt = info["count"]
+                # In a typed-relation section, only what a bullet is ABOUT carries the
+                # relation. Links cited inside the bullet's prose are evidence, and
+                # typing them as `contradicts`/`related` asserts a disagreement or
+                # association the sentence never claimed. Prose blocks keep the section
+                # type for every link, which is the older paragraph-style convention.
+                etype = et if info["typed"] else "mentions"
                 tid = alias.get(tgt.lower())
                 if tid is None:
                     warnings["dangling"].append([p["title"], tgt])
@@ -420,7 +439,7 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
                 if tid == cid:
                     warnings["self_loops"].append([cid, sec])
                     continue
-                add_edge(cid, tid, et, sec, cnt, info["context"])
+                add_edge(cid, tid, etype, sec, cnt, info["context"])
 
     nodes.update(src_nodes)
 
@@ -738,6 +757,26 @@ def dfs_order(adj, start, allowed=None):
     return order
 
 
+def unexplained_edges(nodes, edges):
+    """Typed relations with no stated reason anywhere — not on the link, and not in
+    either page's body prose about the same pair. A `related` link nobody explained
+    asserts a connection the wiki never justifies, which is a content defect a
+    structural check cannot see."""
+    ctx = {}
+    for e in edges:
+        if e["type"] == "mentions" and e.get("context"):
+            ctx[(e["source"], e["target"])] = True
+    out = []
+    for e in edges:
+        if e["type"] not in ("related", "contradicts") or e.get("context"):
+            continue
+        a, b = e["source"], e["target"]
+        if ctx.get((a, b)) or ctx.get((b, a)):
+            continue
+        out.append([a, b, e["type"]])
+    return out
+
+
 def cmd_validate(args):
     g, nodes, edges = load_graph(args.graph)
     ids = set(nodes)
@@ -759,6 +798,10 @@ def cmd_validate(args):
     print(f"  dangling links : {len(dangling)} {dangling[:5]}")
     print(f"  orphan concepts: {len(orphans)} {orphans[:5]}")
     print(f"  self-loops     : {len(selfl)} {selfl[:5]}")
+    unex = unexplained_edges(nodes, edges)
+    print(f"  [info] links with no stated reason: {len(unex)}"
+          + (f"  (e.g. {unex[0][0]} -{unex[0][2]}-> {unex[0][1]})" if unex else "")
+          + "  \u2014 see `query <graph> unexplained`")
     print(f"  [info] DAG over {sorted(dedges)}: "
           f"{'acyclic' if dag['acyclic'] else 'has cycles (expected for cross-references)'}")
     print(f"  RESULT: {'PASS' if problems == 0 else str(problems)+' issue group(s)'}")
@@ -866,6 +909,15 @@ def cmd_query(args):
         for n in sorted((x for x in nodes.values() if node_ok(x["id"])), key=lambda x: x["id"]):
             print(f'{n["id"]:34} {str(n.get("kind")):9} {n["type"]:8} in={n.get("in_degree",0):<3} out={n.get("out_degree",0)}')
         return
+    if q == "unexplained":
+        rows = unexplained_edges(nodes, edges)
+        for a, b, t in rows:
+            if node_ok(a) and node_ok(b):
+                print(f"  {nodes[a]['title']}  -{t}->  {nodes[b]['title']}")
+        print(f"\n  {len(rows)} typed link(s) with no reason on the link and none in either "
+              f"page's body. Add \u201c \u2014 why\u201d after the link, or remove it.")
+        return
+
     if q == "contradicts":
         seen = set()
         for e in edges:
@@ -1203,7 +1255,7 @@ def main():
     q.add_argument("graph")
     q.add_argument("question",
                    choices=["list", "node", "neighbors", "backlinks", "kind", "edgetype",
-                            "contradicts", "path", "bfs", "dfs"])
+                            "contradicts", "unexplained", "path", "bfs", "dfs"])
     q.add_argument("terms", nargs="*", help="node name(s), or a kind/edge-type argument")
     # filters — any combination:
     q.add_argument("--edges", default=None, help="ONLY traverse/show these edge types (comma list)")

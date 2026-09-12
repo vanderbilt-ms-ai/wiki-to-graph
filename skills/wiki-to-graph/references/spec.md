@@ -155,6 +155,25 @@ carried as the edge's target, so it is dropped. And a block that is only links
 (`[[a]] · [[b]] · [[c]]`) has no prose, so its edges get `context: ""` rather than a list of
 sibling names. An empty `context` is therefore a real signal: **that link was never given a
 reason.** When merging duplicate edges, the longest context wins.
+
+### The subject rule in typed sections
+
+In a typed-relation section, a bullet's **leading link is what the bullet is about**; links
+inside its prose are evidence cited in passing.
+
+```
+- [[Zero-Shot Prompting]] — [[GPT-3]] makes demonstrations the flagship capability;
+  [[DeepSeek-R1]] reports they degrade performance.
+```
+
+That is one `contradicts` edge to Zero-Shot Prompting, plus `mentions` to GPT-3 and
+DeepSeek-R1. Typing all three as `contradicts` would assert that this page disagrees with two
+papers it is merely citing — and would give all three an identical context, since they share a
+sentence. On one corpus this rule removed 60 of 104 `contradicts` edges as spurious.
+
+The demotion requires the bullet to have *both* a leading link *and* prose after it. A bare
+list (`- [[a]] · [[b]] · [[c]]`) and a prose paragraph both stay fully typed, so the older
+paragraph-style convention is unchanged.
 Symmetric edges are stored once with `directed: false`; consumers may add the reverse.
 
 **`weight` — meaning, determination, use, update.**

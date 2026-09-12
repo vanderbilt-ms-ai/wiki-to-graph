@@ -123,6 +123,7 @@ python3 $SCR query build/graph.json node "RLHF"            # details + edges
 python3 $SCR query build/graph.json neighbors "GPT-3"      # outgoing
 python3 $SCR query build/graph.json backlinks "Transformer"# incoming
 python3 $SCR query build/graph.json contradicts            # all tension pairs
+python3 $SCR query build/graph.json unexplained            # typed links with no stated reason
 python3 $SCR query build/graph.json bfs "Transformer" --edges related
 python3 $SCR query build/graph.json dfs "GPT-3" --edges contradicts --undirected
 python3 $SCR query build/graph.json path "Positional Encoding" "RLHF"
@@ -201,7 +202,10 @@ showing the reason the link was made**, with `← back` to retrace. Colours and 
   is stored as plain names — the relationship lives in the edge, not in `[[markup]]`.
 - **Every edge carries `context`** — the bullet or sentence the link was written in, which is where
   the author said *why* the two are connected. An empty `context` means the link was never given a
-  reason, which is worth knowing.
+  reason: `query unexplained` lists those.
+- In a typed section, a bullet's **leading link is the relation**; links inside its prose are
+  evidence and become `mentions`. `- [[A]] — because [[P]] found X` does not mean this page
+  disagrees with P.
 
 Full details: `skills/wiki-to-graph/references/spec.md`.
 
