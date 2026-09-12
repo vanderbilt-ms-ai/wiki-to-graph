@@ -58,7 +58,7 @@ Use this for the commands without any skills.
 pip install wiki-to-graph
 ```
 
-**Check:** `pip show wiki-to-graph` reports version 0.4.0 or later, and `wiki-to-graph --help`
+**Check:** `pip show wiki-to-graph` reports version 1.0.0 or later, and `wiki-to-graph --help`
 prints usage. If it reports 0.2.0, that release predates automatic normalization — install from
 GitHub instead: `pip install git+https://github.com/vanderbilt-ms-ai/wiki-to-graph.git`.
 

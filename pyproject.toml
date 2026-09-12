@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "wiki-to-graph"
-version = "0.4.0"
+version = "1.0.0"
 description = "Turn an LLM wiki in any common shape into a typed, queryable knowledge graph: normalize, build, validate, analyze, query, update, and view."
 readme = "README.md"
 requires-python = ">=3.8"

@@ -613,7 +613,7 @@ def cmd_build(args):
     # multigraph=True: two nodes may be joined by several *typed* edges
     # (e.g. both `related` and `mentions`); a simple DiGraph would collapse them.
     graph={"directed":True,"multigraph":True,
-           "meta":{"generator":"wiki_to_graph/0.4",
+           "meta":{"generator":"wiki_to_graph/1.0",
                    "generated":datetime.datetime.now().isoformat(timespec="seconds"),
                    "source_dir":os.path.normpath(args.wiki_dir),
                    "counts":{**ncount,"edges":ecount},

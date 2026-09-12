@@ -2,8 +2,8 @@
   "directed": true,
   "multigraph": true,
   "meta": {
-    "generator": "wiki_to_graph/0.4",
-    "generated": "2026-09-12T15:36:45",
+    "generator": "wiki_to_graph/1.0",
+    "generated": "2026-09-12T16:07:24",
     "source_dir": "examples/llm-wiki/wiki",
     "counts": {
       "concept": 26,
