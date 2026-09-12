@@ -20,7 +20,9 @@ of that has to be right for the graph to come out right. What no builder can sup
 is content: a reason for a link, the right kind for a page, a disagreement stated on
 the pages that actually disagree. This skill is about writing those well.
 
-`SCRIPT=skills/wiki-to-graph/scripts/wiki_to_graph.py` throughout.
+`SCRIPT` is `wiki_to_graph.py` in the sibling `wiki-to-graph` skill —
+`<this skill's base directory>/../wiki-to-graph/scripts/wiki_to_graph.py` — or the
+`wiki-to-graph` command after a pip install.
 
 ## 1. Sources first, concepts second
 
@@ -131,7 +133,7 @@ no reason. It never blocks a build; use it to improve the writing, not as a gate
 python3 $SCRIPT build  <wiki> -o build/graph.json --emit sqlite,graphml
 python3 $SCRIPT validate build/graph.json
 python3 $SCRIPT query    build/graph.json unexplained
-python3 skills/wiki-to-graph/scripts/build_graph_viewer.py build/graph.json -o build/graph-viewer.html
+python3 "$(dirname "$SCRIPT")/build_graph_viewer.py" build/graph.json -o build/graph-viewer.html
 ```
 
 `validate` must print `RESULT: PASS`. Then **open the viewer and click three nodes.**

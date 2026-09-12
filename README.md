@@ -29,8 +29,39 @@ graph however it was written. Your files are never modified.
 
 ![The interactive graph viewer, with the Transformer node selected](assets/graph-viewer.png)
 
-*The included graph viewer (`graph-viewer.html`): nodes colored by kind, edges by type; click any
-node to read its summary and walk its edges.*
+*The included viewer, opened at `graph-viewer.html#Transformer`: nodes colored by kind and edges by
+type, with the selected node's summary, sources, and relations — each showing the reason it was made.*
+
+---
+
+## Install
+
+**Easiest: give your agent this repository's link and tell it to install.**
+
+> Install https://github.com/vanderbilt-ms-ai/wiki-to-graph
+
+Agents follow [`INSTALL.md`](INSTALL.md), which picks the right method for their environment and
+checks that it worked. Or install it yourself:
+
+| Method | Commands | You get |
+|---|---|---|
+| **Claude Code plugin** | `claude plugin marketplace add vanderbilt-ms-ai/wiki-to-graph`<br>`claude plugin install wiki-to-graph@wiki-to-graph` | the three skills, loaded in your next session. Inside a session, use `/plugin marketplace add …` and `/plugin install …` |
+| **Clone** | `git clone https://github.com/vanderbilt-ms-ai/wiki-to-graph.git` | everything: scripts, skills, example, tests. Nothing to install |
+| **pip** | `pip install git+https://github.com/vanderbilt-ms-ai/wiki-to-graph.git` | the `wiki-to-graph` and `wiki-to-graph-viewer` commands |
+
+Requirements: Python 3.8+, standard library only. `networkx` / `scipy` are optional, for your own
+heavier analysis. Install with pip from GitHub as shown: the PyPI release (0.2.0) predates
+automatic normalization, source pages and the current viewer.
+
+Once installed, tell your agent: *"Turn my wiki at `<path>` into a graph."* No reformatting first.
+
+The plugin ships **three skills**, one per stage:
+
+| Skill | Use when |
+|---|---|
+| `wiki-to-graph` | you have a wiki — build it into a graph and view it |
+| `wiki-author` | you have source material and no wiki yet |
+| `wiki-graph-maintain` | you have a graph — ingest new sources, keep it healthy |
 
 ---
 
@@ -66,6 +97,8 @@ wiki-to-graph/                      ← plugin root (also a one-plugin marketpla
 │   └── publishing.md               ← distribution + release steps
 ├── pyproject.toml
 ├── assets/graph-viewer.png
+├── INSTALL.md                      ← install steps an agent can follow
+├── AGENTS.md                       ← pointers for agents working in this repo
 ├── LICENSE.md
 └── README.md
 ```
@@ -75,32 +108,13 @@ committed `build/` artifacts were generated from, so the whole pipeline runs
 from a fresh clone. New here? Start with
 [`docs/outputs-and-workflows.md`](docs/outputs-and-workflows.md).
 
-### Install
-
-The plugin ships **three skills**, one per stage:
-
-| Skill | Use when |
-|---|---|
-| `wiki-author` | you have artifacts and no wiki yet — the page contract and link rules |
-| `wiki-to-graph` | you have a wiki — build, validate, analyse, query, view |
-| `wiki-graph-maintain` | you have a graph — ingest new artifacts, keep it healthy |
-
-- **As a plugin (Cowork):** open the delivered `wiki-to-graph.plugin` file and click install; or
-  Settings → Capabilities → add plugin.
-- **As a marketplace / skill repo (Claude Code):**
-  `/plugin marketplace add MangroveTechnologies/wiki-to-graph` then `/plugin install wiki-to-graph`.
-- **From PyPI:** `pip install wiki-to-graph` — installs the `wiki-to-graph` and
-  `wiki-to-graph-viewer` console commands.
-- **No install needed:** the scripts are plain Python — just run them (below).
-
-Requirements: Python 3 (standard library only). `networkx`/`scipy` are optional, for your own
-heavier analysis. Distribution details and release steps: [`docs/publishing.md`](docs/publishing.md).
-
 ---
 
 ## Quick start
 
-Paths below are from the plugin root. (`SCR=skills/wiki-to-graph/scripts`)
+Paths below are from a clone of this repo (`SCR=skills/wiki-to-graph/scripts`). After a pip install, use
+`wiki-to-graph` in place of `python3 skills/wiki-to-graph/scripts/wiki_to_graph.py`, and
+`wiki-to-graph-viewer` in place of `build_graph_viewer.py`.
 
 ### 1 · Build the graph
 
@@ -201,7 +215,8 @@ python3 skills/wiki-to-graph/scripts/build_graph_viewer.py build/graph.json -o b
 Double-click `build/graph-viewer.html` (offline, no dependencies). Scroll to zoom, drag the
 background to pan, drag a node to reposition it, `fit` to reframe. Click a node for its summary,
 full explanation, sources, and its outgoing edges and backlinks — **grouped by edge type, each
-showing the reason the link was made**, with `← back` to retrace. Colours and toggles are derived from the graph, so a custom
+showing the reason the link was made**, with `← back` to retrace. Add a node's title to the URL —
+`graph-viewer.html#Transformer` — to open with that node selected. Colours and toggles are derived from the graph, so a custom
 `--vocab` renders correctly without touching the viewer.
 
 ---

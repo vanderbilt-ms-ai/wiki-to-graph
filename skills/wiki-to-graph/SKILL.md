@@ -21,8 +21,12 @@ with a README for an index, `**Type:**` lines instead of frontmatter, papers wri
 up as pages, every disagreement on one hub page, and no Sources sections builds the
 same graph as the same content written to the page contract.
 
+The scripts are in `scripts/` inside this skill's base directory, however it was installed
+(plugin, skills folder, or a clone). After a pip install, use the `wiki-to-graph` and
+`wiki-to-graph-viewer` commands instead.
+
 ```bash
-S=${CLAUDE_PLUGIN_ROOT}/skills/wiki-to-graph/scripts     # or skills/wiki-to-graph/scripts in a clone
+S="<this skill's base directory>/scripts"
 python3 $S/wiki_to_graph.py build <wiki_dir> -o build/graph.json --emit sqlite,graphml
 python3 $S/wiki_to_graph.py validate build/graph.json
 python3 $S/build_graph_viewer.py build/graph.json -o build/graph-viewer.html

@@ -20,7 +20,9 @@ graph. This one keeps it correct while it grows. The failure mode it exists to p
 a graph that accumulates near-duplicate concepts, uncited claims, and orphans
 until its metrics stop meaning anything.
 
-`SCRIPT=skills/wiki-to-graph/scripts/wiki_to_graph.py` throughout.
+`SCRIPT` is `wiki_to_graph.py` in the sibling `wiki-to-graph` skill —
+`<this skill's base directory>/../wiki-to-graph/scripts/wiki_to_graph.py` — or the
+`wiki-to-graph` command after a pip install.
 
 ## The rule that makes the rest work
 

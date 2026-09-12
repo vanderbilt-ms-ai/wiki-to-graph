@@ -4,21 +4,23 @@ How to get `wiki-to-graph`, how to publish a new release, and where it's listed.
 
 ## Get it
 
-**As a Claude plugin (Claude Code):**
-```
-/plugin marketplace add MangroveTechnologies/wiki-to-graph
-/plugin install wiki-to-graph
-```
+See **Install** in the [README](../README.md#install), or give an agent the repository link and
+ask it to install — it follows [`INSTALL.md`](../INSTALL.md). The methods, all verified:
 
-**From PyPI:**
 ```bash
-pip install wiki-to-graph
-```
-Installs two console commands: `wiki-to-graph` (the toolkit) and `wiki-to-graph-viewer`
-(the HTML viewer generator).
+# Claude Code plugin
+claude plugin marketplace add vanderbilt-ms-ai/wiki-to-graph
+claude plugin install wiki-to-graph@wiki-to-graph
 
-**From source (no install):** the scripts are stdlib-only Python — clone and run them directly
-(see the [README](../README.md) quick start).
+# command-line tools
+pip install git+https://github.com/vanderbilt-ms-ai/wiki-to-graph.git
+
+# source
+git clone https://github.com/vanderbilt-ms-ai/wiki-to-graph.git
+```
+
+The PyPI package is at 0.2.0, behind this repository; publishing a new release (below) closes
+that gap, after which `pip install wiki-to-graph` is equivalent.
 
 ## Publish a new release to PyPI
 
@@ -30,7 +32,8 @@ python3 -m pip install --upgrade build twine
 python3 -m build                 # -> dist/*.tar.gz and dist/*.whl
 python3 -m twine upload dist/*   # prompts for your PyPI token
 ```
-Bump `version` in `pyproject.toml` (and `.claude-plugin/plugin.json`) before each release.
+Bump `version` in `pyproject.toml`, `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
+before each release.
 To rehearse first: `twine upload --repository testpypi dist/*`.
 
 ## Directories & lists

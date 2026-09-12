@@ -13,3 +13,6 @@ __pycache__/
 # Python packaging byproducts (build/ is intentionally committed as sample output)
 dist/
 *.egg-info/
+
+# setuptools byproduct of `pip install .` (build/ itself is committed sample output)
+build/lib/
