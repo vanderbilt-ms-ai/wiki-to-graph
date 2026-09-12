@@ -41,6 +41,17 @@ TEMPLATE = r"""<!DOCTYPE html>
   #side .et{font-size:9px;padding:1px 5px;border-radius:8px;color:#fff;margin-right:6px}
   .legend{font-size:11px;color:var(--muted)}
   .legend b{color:var(--ink);font-weight:600}
+  .legend .row{margin:3px 0;display:flex;align-items:center;gap:2px}
+  .legend .swatch{display:inline-block;width:18px;border-top:2px solid;margin-right:5px;flex:none}
+  details#legendwrap{border-bottom:1px solid var(--edge);padding-bottom:10px;margin-bottom:12px}
+  details#legendwrap summary{font-size:11px;text-transform:uppercase;letter-spacing:.6px;
+       color:var(--muted);cursor:pointer;user-select:none;margin-bottom:8px}
+  svg.panning{cursor:grabbing}
+  #zoomctl{position:absolute;left:12px;bottom:12px;display:flex;gap:6px;z-index:4}
+  #zoomctl button{background:var(--panel);border:1px solid var(--edge);color:var(--ink);
+       border-radius:6px;width:28px;height:28px;font-size:15px;cursor:pointer;line-height:1;padding:0}
+  #zoomctl button:hover{border-color:#4f7cff}
+  #zoomctl button.wide{width:auto;padding:0 10px;font-size:11px}
   .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
   text{pointer-events:none;fill:var(--muted);font-size:9px}
   .node circle{cursor:pointer;stroke:#0e1226;stroke-width:1px}
@@ -54,9 +65,18 @@ TEMPLATE = r"""<!DOCTYPE html>
   <input type="search" id="search" placeholder="find a node…" autocomplete="off">
   <span id="edgeToggles"></span>
 </div>
-<div id="stage"><svg id="svg"></svg></div>
-<div id="side"><div class="legend" id="legend"></div>
-  <p style="color:var(--muted);font-size:13px;margin-top:14px">Click a node to inspect it.</p>
+<div id="stage"><svg id="svg"></svg>
+  <div id="zoomctl">
+    <button id="zin" title="Zoom in">+</button>
+    <button id="zout" title="Zoom out">−</button>
+    <button id="zfit" class="wide" title="Fit graph to view">fit</button>
+  </div>
+</div>
+<div id="side">
+  <details id="legendwrap" open><summary>Legend</summary>
+    <div class="legend" id="legend"></div>
+  </details>
+  <div id="detail"><p style="color:var(--muted);font-size:13px">Click a node to inspect it.</p></div>
 </div>
 <script id="data" type="application/json">__DATA__</script>
 <script>
@@ -91,10 +111,26 @@ Object.keys(EDGE).forEach(t=>{
 });
 
 // ---- legend ----
+const KIND_DESC = {concept:'abstract idea, property, category',schema:'concrete structure, formula, architecture',
+                   procedure:'process, method, technique',fact:'empirical finding or result'};
+const TYPE_DESC = {source:'an ingested artifact (paper, page, book, deck…)',
+                   index:'navigational hub',log:'chronological record'};
+const EDGE_DESC = {mentions:'reference in body prose',related:'explicit association',
+                   contradicts:'documented disagreement',cites:'provenance \u2192 source',
+                   indexes:'hub listing',records:'log entry'};
+const present = t => allEdges.some(e=>e.type===t);
 document.getElementById('legend').innerHTML =
-  '<b>Node kind</b><br>'+Object.entries(KIND).map(([k,c])=>`<span class="dot" style="background:${c}"></span>${k}`).join('&nbsp; ')+
-  '<br><span class="dot" style="background:#8a8f9a"></span>source &nbsp;<span class="dot" style="background:#d4a72c"></span>index/log'+
-  '<br><br><b>Edge type</b> = color; toggle in top bar. Node size = degree.';
+  '<b>Node kind</b> <span style="opacity:.65">— what the node knows</span>'+
+  Object.entries(KIND).map(([k,c])=>
+    `<div class="row"><span class="dot" style="background:${c}"></span>${k} <span style="opacity:.65">— ${KIND_DESC[k]||''}</span></div>`).join('')+
+  '<div style="height:8px"></div><b>Node type</b> <span style="opacity:.65">— what the node is</span>'+
+  Object.entries(TYPEN).map(([k,c])=>
+    `<div class="row"><span class="dot" style="background:${c}"></span>${k} <span style="opacity:.65">— ${TYPE_DESC[k]||''}</span></div>`).join('')+
+  '<div style="height:8px"></div><b>Edge type</b> <span style="opacity:.65">— toggle in top bar</span>'+
+  Object.keys(EDGE).filter(present).map(t=>
+    `<div class="row"><span class="swatch" style="border-top-color:${EDGE[t]}${t==='cites'?';border-top-style:dashed':''}"></span>${t} <span style="opacity:.65">— ${EDGE_DESC[t]||''}</span></div>`).join('')+
+  '<div style="height:8px"></div><div class="row">Node size = in-degree \u00b7 line width = edge weight</div>'+
+  '<div class="row">Scroll to zoom \u00b7 drag background to pan \u00b7 drag a node to move it</div>';
 
 // ---- force layout ----
 function sim(){
@@ -111,8 +147,12 @@ function sim(){
   }
 }
 function neighborsOf(id){const s=new Set([id]);visibleEdges().forEach(e=>{if(e.source===id)s.add(e.target);if(e.target===id)s.add(e.source);});return s;}
+// ---- viewport (pan / zoom) ----
+let view={k:1,x:0,y:0}, viewG=null;
+function applyView(){ if(viewG) viewG.setAttribute('transform',`translate(${view.x},${view.y}) scale(${view.k})`); }
 function draw(){
   const E=visibleEdges();svg.innerHTML='';
+  viewG=document.createElementNS(NS,'g');svg.appendChild(viewG);
   const near=selected?neighborsOf(selected):null;
   for(const e of E){const a=nodes[nIdx[e.source]],b=nodes[nIdx[e.target]];
     const l=document.createElementNS(NS,'line');
@@ -121,18 +161,20 @@ function draw(){
     l.setAttribute('stroke-width',Math.min(4,e.weight||1));
     if(e.type==='cites')l.setAttribute('stroke-dasharray','3,3');
     if(near&&!(near.has(e.source)&&near.has(e.target)))l.setAttribute('class','dim');
-    svg.appendChild(l);}
+    viewG.appendChild(l);}
   for(const n of nodes){
     const g=document.createElementNS(NS,'g');g.setAttribute('class','node'+(n.id===selected?' sel':'')+((near&&!near.has(n.id))?' dim':''));
-    g.setAttribute('transform',`translate(${n.x},${n.y})`);g.onclick=()=>select(n.id);
+    g.setAttribute('transform',`translate(${n.x},${n.y})`);g.dataset.id=n.id;
+    g.onclick=()=>{if(dragMoved){dragMoved=false;return;}select(n.id);};
     const r=4+Math.min(9,(n.in_degree||0)*0.5);
     const c=document.createElementNS(NS,'circle');c.setAttribute('r',r);c.setAttribute('fill',nodeColor(n));g.appendChild(c);
     const t=document.createElementNS(NS,'text');t.setAttribute('x',r+3);t.setAttribute('y',3);
     t.textContent=n.title.length>26?n.title.slice(0,24)+'…':n.title;g.appendChild(t);
-    svg.appendChild(g);}
+    viewG.appendChild(g);}
+  applyView();
 }
 function select(id){
-  selected=id;const n=byId[id];const s=document.getElementById('side');
+  selected=id;const n=byId[id];const s=document.getElementById('detail');
   const col=nodeColor(n);
   const outs=(n.edges||[]).filter(e=>enabled[e.type]);
   s.innerHTML=`<h2>${n.title}</h2>`+
@@ -154,8 +196,52 @@ document.getElementById('search').oninput=e=>{
   const q=e.target.value.toLowerCase().trim();if(!q)return;
   const hit=nodes.find(n=>n.title.toLowerCase().includes(q));if(hit)select(hit.id);
 };
-window.addEventListener('resize',()=>{sim();draw();});
-sim();draw();
+function fit(){
+  if(!nodes.length)return;
+  const W=svg.clientWidth||900,H=svg.clientHeight||650,pad=70;
+  const xs=nodes.map(n=>n.x),ys=nodes.map(n=>n.y);
+  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const k=Math.min((W-pad*2)/Math.max(1,x1-x0),(H-pad*2)/Math.max(1,y1-y0),2.5);
+  view.k=Math.max(0.15,Math.min(6,k));
+  view.x=(W-(x0+x1)*view.k)/2; view.y=(H-(y0+y1)*view.k)/2;
+  applyView();
+}
+function zoomAt(mx,my,f){
+  const k=Math.max(0.15,Math.min(6,view.k*f)),f2=k/view.k;
+  view.x=mx-(mx-view.x)*f2; view.y=my-(my-view.y)*f2; view.k=k; applyView();
+}
+svg.addEventListener('wheel',ev=>{
+  ev.preventDefault();
+  const r=svg.getBoundingClientRect();
+  zoomAt(ev.clientX-r.left, ev.clientY-r.top, Math.exp(-ev.deltaY*0.0015));
+},{passive:false});
+
+let drag=null, dragMoved=false;
+svg.addEventListener('mousedown',ev=>{
+  if(ev.button!==0)return;
+  dragMoved=false;
+  const ng=ev.target.closest&&ev.target.closest('g.node');
+  if(ng){drag={mode:'node',id:ng.dataset.id};}
+  else{drag={mode:'pan',sx:ev.clientX,sy:ev.clientY,ox:view.x,oy:view.y};svg.classList.add('panning');}
+});
+window.addEventListener('mousemove',ev=>{
+  if(!drag)return;
+  if(drag.mode==='pan'){
+    view.x=drag.ox+(ev.clientX-drag.sx); view.y=drag.oy+(ev.clientY-drag.sy); applyView();
+  }else{
+    const r=svg.getBoundingClientRect(), n=nodes[nIdx[drag.id]];
+    if(!n)return;
+    n.x=(ev.clientX-r.left-view.x)/view.k; n.y=(ev.clientY-r.top-view.y)/view.k;
+    dragMoved=true; draw();
+  }
+});
+window.addEventListener('mouseup',()=>{svg.classList.remove('panning');drag=null;});
+document.getElementById('zin').onclick=()=>zoomAt(svg.clientWidth/2,svg.clientHeight/2,1.3);
+document.getElementById('zout').onclick=()=>zoomAt(svg.clientWidth/2,svg.clientHeight/2,1/1.3);
+document.getElementById('zfit').onclick=fit;
+
+window.addEventListener('resize',()=>{sim();draw();fit();});
+sim();draw();fit();
 </script></body></html>"""
 
 def main():
