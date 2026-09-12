@@ -42,7 +42,7 @@ text (→ `mentions`).
 | Type | One per… | Key properties |
 |------|----------|----------------|
 | `concept` | entity page | `id` (slug of title), `kind`, `title`, `summary`, `explanation`, `sources[]`, `file`, `in_degree`, `out_degree`, `edges[]` |
-| `source`  | distinct document/citation in any `## Sources` | `id` (slug), `ref` (original string), `path` (if it resolves to a `raw/` file), `title`, `edges[]` |
+| `source`  | an ingested artifact — authored as a page with `type: source`, or generated from a `## Sources` bullet | `id` (slug), `locator`, `medium`, `title`, plus `summary`/`explanation`/`file` when authored, `ref` when generated, `edges[]` |
 | `index`   | the `index.md` hub (0–1) | `id`, `title`, `file`, `edges[]` |
 | `log`     | the `log.md` provenance file (0–1) | `id`, `title`, `file`, `edges[]` |
 
@@ -50,9 +50,39 @@ text (→ `mentions`).
 
 Two orthogonal classifiers on a node:
 
-- **`type`** — structural role in *this* parse: `concept | source | index | log`.
-- **`kind`** — the knowledge taxonomy of a concept node: **`concept | fact | schema | procedure`**
+- **`type`** — structural role: `concept | source | index | log`. Set per page via
+  frontmatter `type:`; falls back to the filename stem (`index.md`, `log.md`), else `concept`.
+- **`kind`** — the knowledge taxonomy of a **concept** node: **`concept | fact | schema | procedure`**
   (default `concept`; set per page via frontmatter `kind:`). `source/index/log` have `kind: null`.
+
+These axes are independent and must not be conflated. `kind` classifies *knowledge*; an
+artifact is not knowledge. **A paper is not a `fact` — it CONTAINS facts.** It is a
+`source` whose claims become `fact` atoms that `cites` it. The same holds for a web page,
+a book, a deck, a transcript or a repository: the artifact is the source, the atoms
+extracted from it are the concepts.
+
+### Source pages and locators
+
+A source may be *authored* as a full page, so an artifact you have something to say about
+gets prose, a summary and its own edges rather than existing only as a citation string:
+
+```
+---
+type: source
+medium: paper          # paper|web|book|slides|video|transcript|notebook|code|data|audio|note|document
+locator: raw/attention.pdf
+author: Vaswani et al.
+date: 2017
+---
+```
+
+`locator` identifies the artifact and is format-agnostic: a repo-relative file, an
+`http(s)://` URL, or a `doi:` / `arxiv:` / `isbn:` / `issn:` / `urn:` / `hdl:` identifier.
+`medium` is inferred from the locator when omitted.
+
+A `## Sources` bullet resolves, in order: an explicit `[[link]]` to an authored source
+page; a locator that an authored source page declares; otherwise a generated stub node.
+One artifact is therefore always one node, however it is referenced.
 
 **`edges`** — every node carries its own outgoing edges as a list of
 `{target, type, via, weight}`. This is the canonical carrier: relationships live in the graph as

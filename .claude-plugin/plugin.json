@@ -1,8 +1,20 @@
 {
   "name": "wiki-to-graph",
-  "version": "0.2.0",
-  "description": "Turn an LLM wiki (a folder of interlinked markdown pages) into a typed, queryable knowledge graph. Build, validate, analyze, query (BFS/DFS/shortest-path with edge- and node-type filters), update, and view it in a browser.",
-  "author": { "name": "Tim Darrah" },
-  "keywords": ["knowledge-graph", "llm-wiki", "markdown", "graph", "kst", "obsidian", "networkx"],
+  "version": "0.3.0",
+  "description": "Turn any collection of artifacts — papers, web pages, books, decks, transcripts, code — into a typed, queryable knowledge graph via an interlinked markdown wiki. Build, validate, analyze, query (BFS/DFS/shortest-path with edge- and node-type filters), maintain, and view it in a browser.",
+  "author": {
+    "name": "Tim Darrah"
+  },
+  "keywords": [
+    "knowledge-graph",
+    "llm-wiki",
+    "markdown",
+    "graph",
+    "kst",
+    "obsidian",
+    "networkx",
+    "knowledge-management",
+    "provenance"
+  ],
   "license": "CC-BY-NC-SA-4.0"
 }

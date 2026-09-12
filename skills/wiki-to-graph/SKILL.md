@@ -28,8 +28,13 @@ Data Science Dojo's tutorial: https://datasciencedojo.com/blog/llm-wiki-tutorial
 
 ## Ontology (one screen)
 
-- **Nodes:** `concept` (an entity page), `source` (a doc/citation in `## Sources`),
-  plus `index` and `log` hub nodes for the navigational files.
+- **Nodes:** `concept` (an entity page), `source` (an ingested artifact — a page with
+  `type: source`, or a citation in `## Sources`), plus `index` and `log` hub nodes.
+- **Two independent axes.** `type` is what a node *is*; `kind`
+  (`concept|schema|procedure|fact`) is what a concept *knows*, and applies to concepts
+  only. A paper is not a `fact` — it *contains* facts; it is a `source`, and the claims
+  drawn from it are `fact` atoms that `cites` it. Artifacts of any medium work the same
+  way: a web page, book, deck, transcript or repo is a `source` with a `locator`.
 - **Edges:** `mentions` (body links), `related` (`## Related`), `contradicts`
   (`## Contradictions / tensions`), `cites` (concept→source), and hub edges
   `indexes` / `records` from index/log. `related` and `contradicts` are symmetric.
@@ -66,9 +71,18 @@ python3 scripts/wiki_to_graph.py query graph.json dfs "GPT-3" --edges contradict
 python3 scripts/wiki_to_graph.py query graph.json path "Positional Encoding" "RLHF"
 
 # 5) UPDATE: edit the SOURCE wiki markdown, then re-run build. Actions:
-python3 scripts/wiki_to_graph.py update <wiki_dir> add-node --title "Mixture of Experts" --kind schema --summary "..."
-python3 scripts/wiki_to_graph.py update <wiki_dir> add-edge --from "Mixture of Experts" --to "Transformer" --type related
-python3 scripts/wiki_to_graph.py update <wiki_dir> set-kind --node "GPT-3" --kind schema
+python3 scripts/wiki_to_graph.py update <wiki_dir> add-node   --title "Mixture of Experts" --kind schema --summary "..."
+python3 scripts/wiki_to_graph.py update <wiki_dir> add-source --title "Switch Transformer" --locator "arxiv:2101.03961"
+python3 scripts/wiki_to_graph.py update <wiki_dir> add-edge   --from "Mixture of Experts" --to "Transformer" --type related
+python3 scripts/wiki_to_graph.py update <wiki_dir> add-edge   --from "Mixture of Experts" --to "Switch Transformer" --type cites
+python3 scripts/wiki_to_graph.py update <wiki_dir> remove-edge --from "Mixture of Experts" --to "Transformer" --type related
+python3 scripts/wiki_to_graph.py update <wiki_dir> remove-node --node "Mixture of Experts"
+python3 scripts/wiki_to_graph.py update <wiki_dir> rename     --node "GPT-3" --title "GPT-3 (Brown et al., 2020)"
+python3 scripts/wiki_to_graph.py update <wiki_dir> set-kind   --node "GPT-3" --kind schema
+python3 scripts/wiki_to_graph.py update <wiki_dir> set-type   --node "GPT-3" --type source
+
+Maintaining a graph over time — ingesting a new artifact, deduping against what exists,
+health checks — is the **`wiki-graph-maintain`** skill.
 
 # 6) VIEW: render an interactive, offline HTML graph
 python3 scripts/build_graph_viewer.py graph.json -o graph-viewer.html
