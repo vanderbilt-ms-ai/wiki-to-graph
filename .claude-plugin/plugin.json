@@ -1,7 +1,7 @@
 {
   "name": "wiki-to-graph",
-  "version": "0.3.0",
-  "description": "Turn any collection of artifacts — papers, web pages, books, decks, transcripts, code — into a typed, queryable knowledge graph via an interlinked markdown wiki. Build, validate, analyze, query (BFS/DFS/shortest-path with edge- and node-type filters), maintain, and view it in a browser.",
+  "version": "0.4.0",
+  "description": "Author, build, and maintain a typed knowledge graph from any collection of artifacts — papers, web pages, books, decks, transcripts, code — via an interlinked markdown wiki. Lints the wiki before building, then validates, analyzes, queries (BFS/DFS/shortest-path with edge- and node-type filters), and renders an offline interactive viewer.",
   "author": {
     "name": "Tim Darrah"
   },

@@ -43,8 +43,10 @@ wiki-to-graph/                      ← plugin root (also a one-plugin marketpla
 │   │   └── scripts/
 │   │       ├── wiki_to_graph.py        ← the toolkit
 │   │       └── build_graph_viewer.py   ← HTML graph viewer generator
-│   └── wiki-graph-maintain/
-│       └── SKILL.md                ← keeping a graph correct as it grows
+│   ├── wiki-graph-maintain/
+│   │   └── SKILL.md                ← keeping a graph correct as it grows
+│   └── wiki-author/
+│       └── SKILL.md                ← writing a wiki that graphs cleanly
 ├── examples/
 │   ├── llm-wiki/                   ← the runnable example wiki (source of build/)
 │   │   ├── wiki/                   ← 28 markdown pages (the LLM wiki)
@@ -68,8 +70,13 @@ from a fresh clone. New here? Start with
 
 ### Install
 
-The plugin ships **two skills**: `wiki-to-graph` (build a graph from a wiki) and
-`wiki-graph-maintain` (ingest new artifacts and keep the graph healthy).
+The plugin ships **three skills**, one per stage:
+
+| Skill | Use when |
+|---|---|
+| `wiki-author` | you have artifacts and no wiki yet — the page contract and link rules |
+| `wiki-to-graph` | you have a wiki — build, validate, analyse, query, view |
+| `wiki-graph-maintain` | you have a graph — ingest new artifacts, keep it healthy |
 
 - **As a plugin (Cowork):** open the delivered `wiki-to-graph.plugin` file and click install; or
   Settings → Capabilities → add plugin.
@@ -87,6 +94,18 @@ heavier analysis. Distribution details and release steps: [`docs/publishing.md`]
 ## Quick start
 
 Paths below are from the plugin root. (`SCR=skills/wiki-to-graph/scripts`)
+
+### 0 · Lint the wiki (before building)
+
+```bash
+python3 $SCR lint examples/llm-wiki/wiki [--strict]
+```
+
+Reads the **markdown**, not the graph. `validate` only sees structural defects in a
+built graph; most damage is done at authoring time and builds perfectly cleanly:
+links with no stated reason, bullets whose subject is ambiguous so every link gets
+typed as the relation, missing `kind:`, missing `## Sources`, a `README.md` standing
+in for `index.md`, disagreements piled onto one hub page.
 
 ### 1 · Build the graph
 

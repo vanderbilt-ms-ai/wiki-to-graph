@@ -15,8 +15,8 @@ description: >-
 
 # Maintaining a wiki knowledge graph
 
-The `wiki-to-graph` skill turns a wiki into a graph. This one keeps it correct
-while it grows. The failure mode it exists to prevent is **silent degradation**:
+`wiki-author` writes a wiki from artifacts; `wiki-to-graph` turns a wiki into a
+graph. This one keeps it correct while it grows. The failure mode it exists to prevent is **silent degradation**:
 a graph that accumulates near-duplicate concepts, uncited claims, and orphans
 until its metrics stop meaning anything.
 
@@ -115,12 +115,17 @@ python3 $SCRIPT update <wiki> add-edge --from "<a>" --to "<source>" --type cites
   dispute* — record it as `related` and explain the difference. Promoting
   paraphrase to disagreement is the most common way these graphs go wrong.
 
-### 6. Rebuild and validate
+### 6. Lint, rebuild, validate
 
 ```
-python3 $SCRIPT build <wiki> -o build/graph.json --emit sqlite,graphml
+python3 $SCRIPT lint     <wiki>
+python3 $SCRIPT build    <wiki> -o build/graph.json --emit sqlite,graphml
 python3 $SCRIPT validate build/graph.json
 ```
+
+`lint` reads the markdown and catches what `validate` cannot see once built: a link
+you added without a reason, a bullet whose subject is ambiguous, a new page missing
+`kind:` or `## Sources`. Run it before building, and fix every error.
 
 `validate` must print `RESULT: PASS`. Dangling links, orphans and self-loops are
 structural defects, not warnings to note and move past. A `mentions` cycle is
@@ -146,6 +151,7 @@ quote its output. This holds even when the number seems obvious.
 Run periodically, and always after a bulk ingest:
 
 ```
+python3 $SCRIPT lint     <wiki>                    # authoring defects, pre-build
 python3 $SCRIPT validate build/graph.json          # dangling / orphans / self-loops
 python3 $SCRIPT analyze  build/graph.json --top 10 # PageRank, in-degree, contested, communities
 python3 $SCRIPT query    build/graph.json contradicts
@@ -178,6 +184,7 @@ lists, then rebuild — do not leave the wiki failing validation.
 
 ## Before telling the user you are done
 
+- `lint` shows zero errors.
 - `validate` prints `RESULT: PASS`.
 - Every page added in this pass has at least one inbound link.
 - Every atom added in this pass `cites` a source.

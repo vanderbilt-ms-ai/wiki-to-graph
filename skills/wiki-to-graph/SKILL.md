@@ -15,6 +15,20 @@ description: >-
 
 # Wiki → Knowledge Space
 
+**Authoring a wiki from scratch?** Use **`wiki-author`** first — it carries the page
+contract and the link rules that decide whether this graph is worth querying.
+**Keeping one healthy as it grows?** That is **`wiki-graph-maintain`**. This skill
+turns an existing wiki into a graph and analyses it.
+
+**Always `lint` before you `build`.** `validate` inspects a built graph and can only
+see structural defects; `lint` reads the markdown and catches the authoring defects
+that build cleanly and query uselessly — unexplained links, ambiguous bullets,
+missing `kind:`, missing `## Sources`, a hub hoarding every disagreement.
+
+```
+python3 scripts/wiki_to_graph.py lint <wiki_dir> [--strict]
+```
+
 Turns the *implicit* graph in an LLM wiki (pages + `[[links]]`) into an
 *explicit*, typed property graph you can run algorithms on. The trick: every
 entity page uses the same sections, so **the section a link sits in determines

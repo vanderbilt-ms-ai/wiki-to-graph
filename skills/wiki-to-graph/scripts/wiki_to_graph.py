@@ -777,6 +777,119 @@ def unexplained_edges(nodes, edges):
     return out
 
 
+def cmd_lint(args):
+    """Check the SOURCE MARKDOWN before a graph exists.
+
+    `validate` checks a built graph and can only see structural defects. Most of the
+    damage is done earlier, at authoring time, and is invisible once built: a bare
+    link list produces perfectly valid edges that explain nothing; a paper written as
+    a concept produces a well-formed node of the wrong kind. Those are caught here.
+    """
+    wiki = args.wiki_dir
+    files = sorted(glob.glob(os.path.join(wiki, "*.md")))
+    mapping = DEFAULT_MAP
+    issues = []                                   # (level, code, where, msg)
+
+    def add(lvl, code, where, msg):
+        issues.append((lvl, code, where, msg))
+
+    stems = {os.path.splitext(os.path.basename(f))[0].lower() for f in files}
+    if not files:
+        print("LINT %s\n  no .md files found" % wiki); sys.exit(1)
+    if "index" not in stems:
+        add("error", "no-index", wiki,
+            "no index.md. README.md is on the default exclude list, so a hub written as "
+            "README.md is absent from the graph entirely — no node, no `indexes` edges.")
+
+    tension_counts, total_tension = {}, 0
+    for f in files:
+        stem = os.path.splitext(os.path.basename(f))[0]
+        base = os.path.basename(f)
+        if stem.lower() == "readme":
+            continue
+        raw = open(f, encoding="utf-8").read()
+        title, sections, meta = parse_page(f)
+        ntype = node_type_for(stem, meta)
+
+        if not re.search(r"(?m)^#\s+\S", raw):
+            add("error", "no-h1", base, "no `# H1` title — the node id is derived from it.")
+        if ntype == "source" and not meta.get("locator"):
+            add("error", "no-locator", base,
+                "`type: source` with no `locator:` — the artifact cannot be identified or deduped.")
+        if ntype == "concept":
+            if "kind" not in meta:
+                add("warn", "no-kind", base,
+                    "no `kind:` frontmatter — defaults to concept, so --kind filters and the "
+                    "KST projection cannot tell it apart from anything else.")
+            elif meta["kind"] not in KINDS:
+                add("error", "bad-kind", base,
+                    "kind: %s is not one of %s" % (meta["kind"], ", ".join(sorted(KINDS))))
+            if not any(edge_type_for(sec, mapping) == "cites" for sec in sections):
+                add("warn", "no-sources", base,
+                    "no `## Sources` section — nothing anchors this page to an artifact, so it "
+                    "makes claims the graph cannot trace.")
+        if meta.get("type") and meta["type"] not in NODE_TYPES:
+            add("error", "bad-type", base,
+                "type: %s is not one of %s" % (meta["type"], ", ".join(sorted(NODE_TYPES))))
+
+        for sec, lines in sections.items():
+            et = edge_type_for(sec, mapping)
+            if et in ("mentions", "cites"):
+                continue
+            if et == "contradicts":
+                n = len(LINK_RE.findall(CODE_RE.sub("", "\n".join(lines))))
+                tension_counts[base] = tension_counts.get(base, 0) + n
+                total_tension += n
+            for block in blocks_of(CODE_RE.sub("", "\n".join(lines))):
+                found = LINK_RE.findall(block)
+                if not found:
+                    continue
+                is_bullet = bool(BULLET_RE.match(block))
+                body = BULLET_RE.sub("", block.strip())
+                lead = re.match(r"\s*\[\[([^\]|]+)(?:\|[^\]]*)?\]\]\s*[—–:-]\s+", body)
+                rest = body[lead.end():] if lead else body
+                bare = re.sub(r"[\s·*+:;,.|—–-]+", " ", LINK_RE.sub("", rest)).strip()
+                if len(bare) < 12:
+                    for t, _a in found:
+                        add("warn", "no-reason", "%s · ## %s" % (base, sec),
+                            "[[%s]] has no stated reason. Write `- [[%s]] — why` — the reason is "
+                            "the only part of the relationship a reader sees." % (t.strip(), t.strip()))
+                elif not lead and len(found) > 1:
+                    add("warn", "ambiguous-subject", "%s · ## %s" % (base, sec),
+                        "%s has %d links and prose but no leading subject link, so ALL %d are "
+                        "typed `%s` \u2014 including any cited only as evidence. Write one bullet per "
+                        "relation, leading with the page it is about."
+                        % ("bullet" if is_bullet else "paragraph", len(found), len(found), et))
+
+    if total_tension:
+        for page, n in sorted(tension_counts.items(), key=lambda x: -x[1])[:1]:
+            if n > total_tension * 0.4 and n > 4:
+                add("warn", "tension-hub", page,
+                    "holds %d of %d tension links (%d%%). Disagreements recorded on one hub page "
+                    "connect the hub to each concept instead of connecting the concepts that "
+                    "actually disagree. Put each on both pages; keep the hub for narrative."
+                    % (n, total_tension, round(100.0 * n / total_tension)))
+
+    errs = [i for i in issues if i[0] == "error"]
+    warns = [i for i in issues if i[0] == "warn"]
+    print("LINT %s" % wiki)
+    print("  pages: %d" % len(files))
+    by_code = {}
+    for lvl, code, where, msg in issues:
+        by_code.setdefault((lvl, code), []).append((where, msg))
+    for (lvl, code), rows in sorted(by_code.items(), key=lambda x: (x[0][0] != "error", -len(x[1]))):
+        print("\n  [%s] %s ×%d" % (lvl, code, len(rows)))
+        for where, msg in rows[: (args.limit if args.limit else 3)]:
+            print("    %s\n      %s" % (where, msg))
+        if len(rows) > (args.limit if args.limit else 3):
+            print("    … and %d more" % (len(rows) - (args.limit if args.limit else 3)))
+    print("\n  RESULT: %d error(s), %d warning(s)" % (len(errs), len(warns)))
+    fail = len(errs) > 0 or (args.strict and len(warns) > 0)
+    if not fail and not issues:
+        print("  clean — safe to build.")
+    sys.exit(1 if fail else 0)
+
+
 def cmd_validate(args):
     g, nodes, edges = load_graph(args.graph)
     ids = set(nodes)
@@ -1268,6 +1381,12 @@ def main():
     q.add_argument("--vocab", default=None,
                    help="JSON file overriding the kind/edge vocabulary")
     q.set_defaults(func=cmd_query)
+
+    li = sub.add_parser("lint", help="check the source markdown BEFORE building")
+    li.add_argument("wiki_dir")
+    li.add_argument("--strict", action="store_true", help="exit non-zero on warnings too")
+    li.add_argument("--limit", type=int, default=3, help="examples to print per issue class")
+    li.set_defaults(func=cmd_lint)
 
     u = sub.add_parser("update", help="edit the source wiki markdown, then re-run build")
     u.add_argument("wiki_dir")
