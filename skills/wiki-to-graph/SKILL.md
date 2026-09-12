@@ -54,7 +54,7 @@ All are stdlib-only — no numpy/scipy/networkx required.
 
 ```bash
 # 1) BUILD: parse a wiki folder into graph.json (+ optional views / KST projection)
-python3 scripts/wiki_to_graph.py build <wiki_dir> -o graph.json --emit sqlite,graphml --kspace
+python3 scripts/wiki_to_graph.py build <wiki_dir> -o graph.json --emit sqlite,graphml --kst
 
 # 2) VALIDATE: structural check (exit 1 on defects). Dangling links, orphan concepts,
 #    and self-loops fail; DAG cycles over cross-references are informational.
@@ -122,7 +122,7 @@ nx.pagerank(G.subgraph(concepts))                                # centrality, e
 
 ## Loading into the borrowed KST toolkit
 
-`--kspace` emits a `domain.json` compatible with the course-development `kst.py`
+`--kst` emits a `domain.json` compatible with the course-development `kst.py`
 (`items` = concepts, `prerequisites` = the `--dag-edges` subset). Those
 prerequisites are **heuristic candidates** from body references — curate them
 before treating them as a true KST surmise relation.

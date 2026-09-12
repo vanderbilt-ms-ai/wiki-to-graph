@@ -9,3 +9,7 @@ __pycache__/
 *.db-journal
 *.db-wal
 *.db-shm
+
+# Python packaging byproducts (build/ is intentionally committed as sample output)
+dist/
+*.egg-info/

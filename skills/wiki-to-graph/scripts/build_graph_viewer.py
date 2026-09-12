@@ -82,14 +82,27 @@ TEMPLATE = r"""<!DOCTYPE html>
 <script id="data" type="application/json">__DATA__</script>
 <script>
 const G = JSON.parse(document.getElementById('data').textContent);
-const KIND = {concept:'#4f7cff',schema:'#9b5cff',procedure:'#2ec27e',fact:'#f5a623'};
+const KIND = Object.assign({concept:'#4f7cff',schema:'#9b5cff',procedure:'#2ec27e',fact:'#f5a623'},
+  // Any kind the graph actually contains that we have no colour for gets one from the palette, so a
+  // custom vocabulary is legible instead of uniformly grey.
+  Object.fromEntries([...new Set(G.nodes.map(n=>n.kind).filter(k=>k &&
+      !['concept','schema','procedure','fact'].includes(k)))]
+    .map((k,i)=>[k, ['#00b3a4','#e5484d','#d4a72c','#7aa2ff','#b07aa1','#59a14f','#ff9da7','#9c755f'][i%8]])));
 const TYPEN = {source:'#8a8f9a',index:'#d4a72c',log:'#6b7280'};
-const EDGE = {mentions:'#5b6070',related:'#4f7cff',contradicts:'#e5484d',
-              cites:'#7a7f8c',indexes:'#3f466b',records:'#3f466b'};
+const EDGE = Object.assign({mentions:'#5b6070',related:'#4f7cff',contradicts:'#e5484d',
+              cites:'#7a7f8c',indexes:'#3f466b',records:'#3f466b'},
+  Object.fromEntries([...new Set(G.links.map(e=>e.type))]
+    .filter(t=>!['mentions','related','contradicts','cites','indexes','records'].includes(t))
+    .map((t,i)=>[t, ['#4f7cff','#e5484d','#2ec27e','#f5a623','#9b5cff','#00b3a4','#b07aa1','#d4a72c'][i%8]])));
 const nodeColor = n => KIND[n.kind] || TYPEN[n.type] || '#8a8f9a';
 
 // default-visible edge types (hub edges off to reduce clutter)
-const enabled = {mentions:true,related:true,contradicts:true,cites:false,indexes:false,records:false};
+// Hub edges stay off to reduce clutter; everything else the graph contains is ON by default.
+// Hardcoding this list meant a custom vocabulary rendered as unconnected dots — every edge type
+// present but none of them drawable.
+const enabled = Object.assign(
+  Object.fromEntries([...new Set(G.links.map(e=>e.type))].map(t=>[t,true])),
+  {cites:false,indexes:false,records:false});
 
 const svg = document.getElementById('svg'), NS='http://www.w3.org/2000/svg';
 const byId = Object.fromEntries(G.nodes.map(n=>[n.id,n]));
@@ -123,13 +136,13 @@ const present = t => allEdges.some(e=>e.type===t);
 document.getElementById('legend').innerHTML =
   '<b>Node kind</b> <span style="opacity:.65">— what the node knows</span>'+
   Object.entries(KIND).map(([k,c])=>
-    `<div class="row"><span class="dot" style="background:${c}"></span>${k} <span style="opacity:.65">— ${KIND_DESC[k]||''}</span></div>`).join('')+
+    `<div class="row"><span class="dot" style="background:${c}"></span>${k}${KIND_DESC[k]?` <span style="opacity:.65">— ${KIND_DESC[k]}</span>`:''}</div>`).join('')+
   '<div style="height:8px"></div><b>Node type</b> <span style="opacity:.65">— what the node is</span>'+
   Object.entries(TYPEN).map(([k,c])=>
-    `<div class="row"><span class="dot" style="background:${c}"></span>${k} <span style="opacity:.65">— ${TYPE_DESC[k]||''}</span></div>`).join('')+
+    `<div class="row"><span class="dot" style="background:${c}"></span>${k}${TYPE_DESC[k]?` <span style="opacity:.65">— ${TYPE_DESC[k]}</span>`:''}</div>`).join('')+
   '<div style="height:8px"></div><b>Edge type</b> <span style="opacity:.65">— toggle in top bar</span>'+
   Object.keys(EDGE).filter(present).map(t=>
-    `<div class="row"><span class="swatch" style="border-top-color:${EDGE[t]}${t==='cites'?';border-top-style:dashed':''}"></span>${t} <span style="opacity:.65">— ${EDGE_DESC[t]||''}</span></div>`).join('')+
+    `<div class="row"><span class="swatch" style="border-top-color:${EDGE[t]}${t==='cites'?';border-top-style:dashed':''}"></span>${t}${EDGE_DESC[t]?` <span style="opacity:.65">— ${EDGE_DESC[t]}</span>`:''}</div>`).join('')+
   '<div style="height:8px"></div><div class="row">Node size = in-degree \u00b7 line width = edge weight</div>'+
   '<div class="row">Scroll to zoom \u00b7 drag background to pan \u00b7 drag a node to move it</div>';
 

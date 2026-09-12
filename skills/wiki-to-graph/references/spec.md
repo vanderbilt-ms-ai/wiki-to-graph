@@ -274,7 +274,7 @@ Run after every build:
 
 ## 7. Optional: knowledge-space projection
 
-With `--kspace`, additionally emit a `domain.json` compatible with the borrowed KST toolkit:
+With `--kst`, additionally emit a `domain.json` compatible with the borrowed KST toolkit:
 `items` = concepts (carrying `id`, `name`, `description` = Summary), `prerequisites` = a chosen
 directed edge subset (default `mentions`). These are **candidate** prerequisites derived
 heuristically from body references — they must be curated before being treated as a true KST

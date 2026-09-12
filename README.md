@@ -5,6 +5,7 @@
 <h1 align="center">wiki-to-graph</h1>
 
 <p align="center">
+  <a href="https://pypi.org/project/wiki-to-graph/"><img src="https://img.shields.io/pypi/v/wiki-to-graph.svg?color=4f7cff&logo=pypi&logoColor=white" alt="PyPI version"></a>
   <img src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-blue.svg" alt="License: CC BY-NC-SA 4.0">
   <img src="https://img.shields.io/badge/python-3.x-3776AB.svg?logo=python&logoColor=white" alt="Python 3.x">
   <img src="https://img.shields.io/badge/dependencies-none%20(stdlib)-2ec27e.svg" alt="No dependencies">
@@ -61,13 +62,14 @@ from a fresh clone. New here? Start with
 
 - **As a plugin (Cowork):** open the delivered `wiki-to-graph.plugin` file and click install; or
   Settings → Capabilities → add plugin.
-- **As a marketplace / skill repo:** push this folder to a git repo and add it as a plugin
-  marketplace (`.claude-plugin/marketplace.json` lists the plugin). Claude Code:
-  `/plugin marketplace add <repo-url>` then `/plugin install wiki-to-graph`.
+- **As a marketplace / skill repo (Claude Code):**
+  `/plugin marketplace add MangroveTechnologies/wiki-to-graph` then `/plugin install wiki-to-graph`.
+- **From PyPI:** `pip install wiki-to-graph` — installs the `wiki-to-graph` and
+  `wiki-to-graph-viewer` console commands.
 - **No install needed:** the scripts are plain Python — just run them (below).
 
 Requirements: Python 3 (standard library only). `networkx`/`scipy` are optional, for your own
-heavier analysis.
+heavier analysis. Distribution details and release steps: [`docs/publishing.md`](docs/publishing.md).
 
 ---
 
@@ -83,7 +85,7 @@ python3 skills/wiki-to-graph/scripts/wiki_to_graph.py build examples/llm-wiki/wi
 ```
 
 Writes **`build/graph.json`** (canonical), plus `graph.db` (SQLite) and `graph.graphml` (Gephi/yEd).
-Add `--kspace` for a `domain.json` KST projection.
+Add `--kst` for a `domain.json` KST projection.
 
 ### 2 · Validate
 
