@@ -15,7 +15,12 @@ Stdlib only. Usage:
   python3 wiki_to_graph.py <wiki_dir> [-o graph.json] [--emit sqlite,graphml]
                             [--stubs] [--dag-edges mentions] [--kst] [--exclude index,log]
 """
-import argparse, glob, json, os, re, sqlite3, sys, datetime, xml.sax.saxutils as sx
+import argparse, glob, json, os, re, shutil, sqlite3, sys, tempfile, datetime, xml.sax.saxutils as sx
+
+# Locators, the section vocabulary and structural normalization live in one module so
+# the parser and the normalizer can never disagree about what a heading or locator means.
+from wiki_normalize import (LOCATOR_RE, locator_in, medium_for, section_kind,
+                            normalize_wiki, report_lines)
 
 LINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\]")
 CODE_RE = re.compile(r"`[^`]*`")
@@ -23,10 +28,12 @@ H1_RE   = re.compile(r"^#\s+(.*)$")
 H2_RE   = re.compile(r"^##\s+(.*)$")
 
 DEFAULT_MAP = [  # (predicate on lowercased section name, edge type)
-    (lambda s: "contradict" in s or "tension" in s, "contradicts"),
-    (lambda s: s.startswith("related"),             "related"),
-    (lambda s: s.startswith("source"),              "cites"),
-    (lambda s: True,                                "mentions"),  # summary/explanation/other
+    # Synonyms are accepted ("See also", "Tensions", "References", ...) because a wiki is
+    # rarely written with this parser in mind; see wiki_normalize.section_kind.
+    (lambda s: section_kind(s) == "contradicts", "contradicts"),
+    (lambda s: section_kind(s) == "related",     "related"),
+    (lambda s: section_kind(s) == "cites",       "cites"),
+    (lambda s: True,                             "mentions"),  # summary/explanation/other
 ]
 SYMMETRIC = {"related", "contradicts"}
 # index.md / log.md are navigational hubs, not concepts. Their links get their own
@@ -37,48 +44,6 @@ CONCEPT_EDGE_TYPES = {"mentions", "related", "contradicts", "cites"}
 
 
 NODE_TYPES = {"concept", "source", "index", "log"}
-
-# A locator identifies the artifact a source node stands for. It is deliberately
-# format-agnostic: a repo-relative file, a URL, or a registered identifier. Nothing
-# here assumes academic papers or a `raw/` directory.
-LOCATOR_RE = re.compile(
-    r"(https?://\S+"
-    r"|(?:doi|arxiv|isbn|issn|urn|hdl):\S+"
-    r"|[\w./~@\-]+\.(?:pdf|md|txt|html?|epub|mobi|docx?|pptx?|xlsx?|csv|tsv|json|ya?ml"
-    r"|mp4|mov|webm|mp3|wav|m4a|vtt|srt|ipynb|py|ts|js|rs|go)\b)", re.I)
-
-MEDIUM_BY_EXT = {
-    "pdf": "paper", "md": "note", "txt": "note", "html": "web", "htm": "web",
-    "epub": "book", "mobi": "book", "doc": "document", "docx": "document",
-    "ppt": "slides", "pptx": "slides", "xls": "data", "xlsx": "data",
-    "csv": "data", "tsv": "data", "json": "data", "yaml": "data", "yml": "data",
-    "mp4": "video", "mov": "video", "webm": "video", "mp3": "audio", "wav": "audio",
-    "m4a": "audio", "vtt": "transcript", "srt": "transcript",
-    "ipynb": "notebook", "py": "code", "ts": "code", "js": "code", "rs": "code", "go": "code",
-}
-MEDIUM_BY_SCHEME = {"doi": "paper", "arxiv": "paper", "isbn": "book",
-                    "issn": "periodical", "urn": "document", "hdl": "document"}
-
-
-def locator_in(text):
-    """First locator in a string, or None."""
-    m = LOCATOR_RE.search(text or "")
-    return m.group(1).rstrip(".,;)") if m else None
-
-
-def medium_for(loc):
-    """Best-effort medium from a locator. None when it cannot be inferred."""
-    if not loc:
-        return None
-    l = loc.strip().lower()
-    if l.startswith(("http://", "https://")):
-        return "web"
-    scheme = l.split(":", 1)[0]
-    if scheme in MEDIUM_BY_SCHEME:
-        return MEDIUM_BY_SCHEME[scheme]
-    ext = l.rsplit(".", 1)[-1] if "." in l else ""
-    return MEDIUM_BY_EXT.get(ext)
-
 
 def node_type_for(stem, meta=None):
     """Declared `type:` in frontmatter wins; filename stem is the legacy fallback."""
@@ -177,10 +142,16 @@ def parse_page(path):
                     meta[k] = v.lower() if k in ("kind", "type", "medium") else v
             j += 1
         i = j + 1
+    fence = False
     for raw in lines[i:]:
         line = raw.rstrip("\n")
-        m1 = H1_RE.match(line)
-        m2 = H2_RE.match(line)
+        if line.lstrip().startswith("```"):
+            fence = not fence            # a '# comment' inside a code block is not a heading
+            if cur is not None:
+                sections[cur].append(line)
+            continue
+        m1 = None if fence else H1_RE.match(line)
+        m2 = None if fence else H2_RE.match(line)
         if m1 and title is None:
             title = m1.group(1).strip()
         elif m2:
@@ -216,22 +187,33 @@ def blocks_of(text):
     return blocks
 
 
-def link_contexts(text):
-    """-> {target: {"count", "context", "lead", "para"}}.
+NONE_RE = re.compile(
+    r"^\W*(none|no (?:known |real )?(?:contradictions?|tensions?|conflicts?|disagreements?)|n/?a)\b",
+    re.I)
+
+
+def link_contexts(text, subject_rule=False):
+    """-> {target: {"count", "context", "typed"}}.
 
     `context` is the prose of the bullet or paragraph the link sits in \u2014 where the
-    author said WHY the link is there. Without it an edge records THAT two pages are
-    related and discards the how, which is usually the only part a reader wants.
+    author said WHY the link is there. A leading "[[X]] \u2014 " is the bullet's subject
+    and already the edge's target, so it is left out; a block that is only links
+    ("[[a]] \u00b7 [[b]]") has no prose, so its edges get "" rather than sibling names.
 
-    `typed` drives edge typing in a typed-relation section (see build_graph).
-    In "- [[A]] \u2014 because [[P]] found X", A is what the bullet is ABOUT and P is
-    evidence cited in passing. Typing both as `contradicts` asserts that this page
-    disagrees with P, which is not what the sentence says.
+    `typed` says whether the link carries the section's relation or is only mentioned.
+    A bare link list types every link. Otherwise a block states one relation, and
+    links cited inside its prose are evidence:
 
-    Two things are deliberately excluded from `context`. A leading "[[X]] \u2014 " is the
-    bullet's subject and is already the edge's target. And a block that is only links
-    ("[[a]] \u00b7 [[b]] \u00b7 [[c]]") has no prose, so its edges get "" rather than a list of
-    sibling names \u2014 an empty context truthfully means no reason was given.
+      "- [[A]] \u2014 because [[P]] found X"      A is the relation, P a mention
+
+    With `subject_rule` (disagreement sections) every prose block names exactly one
+    subject even without a leading link, because disagreements are overwhelmingly
+    written as sentences citing evidence:
+      a leading link           "- [[A]]: claim"
+      else a link in a label   "- **vs [[A]]:** ..."
+      else the first link      "[[A]] contrasts with the objective of [[B]]"
+      none at all              "None across the sources \u2014 see [[A]] and [[B]]"
+    Typing every link in such a sentence asserts disagreements it never makes.
     """
     out = {}
     for block in blocks_of(CODE_RE.sub("", text)):
@@ -241,27 +223,36 @@ def link_contexts(text):
         is_bullet = bool(BULLET_RE.match(block))
         body = BULLET_RE.sub("", block.strip())
         lead_m = re.match(r"\s*\[\[([^\]|]+)(?:\|[^\]]*)?\]\]\s*[\u2014\u2013:-]\s+", body)
-        lead_target = lead_m.group(1).strip() if (is_bullet and lead_m) else None
-        if lead_m:
-            body = body[lead_m.end():]
-        bare = re.sub(r"[\s\u00b7*+:;,.|\u2014\u2013-]+", " ", LINK_RE.sub("", body)).strip()
-        if len(bare) < 12:
-            ctx = ""                                  # link list, no prose
-        else:
-            ctx = re.sub(r"\s+", " ", strip_links(body)).strip()
+        rest = body[lead_m.end():] if lead_m else body
+        bare = re.sub(r"[\s\u00b7*+:;,.|\u2014\u2013-]+", " ", LINK_RE.sub("", rest)).strip()
+        has_prose = len(bare) >= 12
+        ctx = ""
+        if has_prose:
+            ctx = re.sub(r"\s+", " ", strip_links(rest)).strip()
             if len(ctx) > MAX_CONTEXT:
                 ctx = ctx[:MAX_CONTEXT].rsplit(" ", 1)[0] + "\u2026"
+        if not has_prose:
+            subject, typed_all = None, True
+        elif subject_rule:
+            typed_all = False
+            if NONE_RE.match(strip_links(body)):
+                subject = None
+            elif lead_m:
+                subject = lead_m.group(1).strip()
+            else:
+                label = re.match(r"\s*\*\*(.+?)\*\*", body)
+                in_label = LINK_RE.findall(label.group(1)) if label else []
+                subject = (in_label[0][0] if in_label else found[0][0]).strip()
+        else:
+            subject = lead_m.group(1).strip() if (is_bullet and lead_m) else None
+            typed_all = subject is None
         for t, _alias in found:
             t = t.strip()
             if not t or t.lower() == "wiki-links":
                 continue
             e = out.setdefault(t, {"count": 0, "context": "", "typed": False})
             e["count"] += 1
-            # Carries the section's relation unless it is plainly a citation inside
-            # another bullet's prose: that needs the bullet to HAVE a subject link and
-            # HAVE prose after it. A bare list ("- [[a]] \u00b7 [[b]]") and a prose
-            # paragraph both stay fully typed.
-            if (not is_bullet) or lead_target is None or not ctx or t == lead_target:
+            if typed_all or t == subject:
                 e["typed"] = True
             if len(ctx) > len(e["context"]):
                 e["context"] = ctx
@@ -412,12 +403,18 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
                     b = ln.strip().lstrip("-*").strip()
                     if not b:
                         continue
-                    source_strings.append(b)
-                    sid = resolve_source(b)
-                    if sid != cid:
-                        add_edge(cid, sid, "cites", sec, 1, re.sub(r"\s+", " ", b).strip())
+                    # "raw/a.md (X); raw/b.md (Y)" on one line is two citations, not one
+                    parts = ([x.strip() for x in b.split(";")]
+                             if len(LOCATOR_RE.findall(b)) > 1 else [b])
+                    for part in parts:
+                        if not part:
+                            continue
+                        source_strings.append(part)
+                        sid = resolve_source(part)
+                        if sid != cid:
+                            add_edge(cid, sid, "cites", sec, 1, re.sub(r"\s+", " ", part).strip())
                 continue
-            for tgt, info in link_contexts(text).items():
+            for tgt, info in link_contexts(text, subject_rule=(et == "contradicts")).items():
                 cnt = info["count"]
                 # In a typed-relation section, only what a bullet is ABOUT carries the
                 # relation. Links cited inside the bullet's prose are evidence, and
@@ -589,7 +586,23 @@ def cmd_build(args):
         mapping=[( (lambda kw: (lambda s: kw in s))(k), v) for k,v in raw.items()]
         mapping.append((lambda s: True,"mentions"))
 
-    nodes,edges,warnings=build_graph(args.wiki_dir,exclude,mapping,args.stubs)
+    # Normalize a COPY first, so a wiki in any common shape builds the same graph as
+    # the same content in the page contract. The source wiki is never modified.
+    work, tmp, norm = args.wiki_dir, None, None
+    if not args.no_normalize:
+        if args.emit_normalized:
+            work = args.emit_normalized
+        else:
+            tmp = work = tempfile.mkdtemp(prefix="wiki-normalized-")
+        try:
+            norm = normalize_wiki(args.wiki_dir, work)
+        except ValueError as ex:
+            print(ex); sys.exit(1)
+    try:
+        nodes,edges,warnings=build_graph(work,exclude,mapping,args.stubs)
+    finally:
+        if tmp:
+            shutil.rmtree(tmp, ignore_errors=True)
 
     ecount={}
     for e in edges: ecount[e["type"]]=ecount.get(e["type"],0)+1
@@ -600,11 +613,11 @@ def cmd_build(args):
     # multigraph=True: two nodes may be joined by several *typed* edges
     # (e.g. both `related` and `mentions`); a simple DiGraph would collapse them.
     graph={"directed":True,"multigraph":True,
-           "meta":{"generator":"wiki_to_graph/0.2",
+           "meta":{"generator":"wiki_to_graph/0.4",
                    "generated":datetime.datetime.now().isoformat(timespec="seconds"),
                    "source_dir":os.path.normpath(args.wiki_dir),
                    "counts":{**ncount,"edges":ecount},
-                   "dag_check":dag,"warnings":warnings},
+                   "dag_check":dag,"warnings":warnings,"normalization":norm},
            "nodes":list(nodes.values()),
            "links":edges}
     open(args.out,"w",encoding="utf-8").write(json.dumps(graph,indent=2,ensure_ascii=False))
@@ -621,6 +634,9 @@ def cmd_build(args):
           f"self-loops: {len(warnings['self_loops'])}")
     print(f"DAG check over {dag['edge_types']}: "
           f"{'acyclic' if dag['acyclic'] else 'CYCLES: '+str(dag['cyclic_components'])}")
+    if norm is not None:
+        done = report_lines(norm)
+        print("normalized: " + ("; ".join(done) if done else "already in the page contract, nothing changed"))
     print(f"wrote {args.out}" + (f" (+ {', '.join(sorted(emits))})" if emits else ""))
 
 
@@ -778,116 +794,67 @@ def unexplained_edges(nodes, edges):
 
 
 def cmd_lint(args):
-    """Check the SOURCE MARKDOWN before a graph exists.
+    """Report what `build` will normalize in this wiki, and the content notes it cannot.
 
-    `validate` checks a built graph and can only see structural defects. Most of the
-    damage is done earlier, at authoring time, and is invisible once built: a bare
-    link list produces perfectly valid edges that explain nothing; a paper written as
-    a concept produces a well-formed node of the wrong kind. Those are caught here.
+    Nothing here blocks a build: structure is normalized automatically. What remains are
+    things only an author can supply \u2014 a reason for a link, a locator for a source.
     """
     wiki = args.wiki_dir
-    files = sorted(glob.glob(os.path.join(wiki, "*.md")))
-    mapping = DEFAULT_MAP
-    issues = []                                   # (level, code, where, msg)
-
-    def add(lvl, code, where, msg):
-        issues.append((lvl, code, where, msg))
-
-    stems = {os.path.splitext(os.path.basename(f))[0].lower() for f in files}
-    if not files:
+    if not glob.glob(os.path.join(wiki, "*.md")):
         print("LINT %s\n  no .md files found" % wiki); sys.exit(1)
-    if "index" not in stems:
-        add("error", "no-index", wiki,
-            "no index.md. README.md is on the default exclude list, so a hub written as "
-            "README.md is absent from the graph entirely — no node, no `indexes` edges.")
-
-    tension_counts, total_tension = {}, 0
-    for f in files:
-        stem = os.path.splitext(os.path.basename(f))[0]
-        base = os.path.basename(f)
-        if stem.lower() == "readme":
-            continue
-        raw = open(f, encoding="utf-8").read()
-        title, sections, meta = parse_page(f)
-        ntype = node_type_for(stem, meta)
-
-        if not re.search(r"(?m)^#\s+\S", raw):
-            add("error", "no-h1", base, "no `# H1` title — the node id is derived from it.")
-        if ntype == "source" and not meta.get("locator"):
-            add("error", "no-locator", base,
-                "`type: source` with no `locator:` — the artifact cannot be identified or deduped.")
-        if ntype == "concept":
-            if "kind" not in meta:
-                add("warn", "no-kind", base,
-                    "no `kind:` frontmatter — defaults to concept, so --kind filters and the "
-                    "KST projection cannot tell it apart from anything else.")
-            elif meta["kind"] not in KINDS:
-                add("error", "bad-kind", base,
-                    "kind: %s is not one of %s" % (meta["kind"], ", ".join(sorted(KINDS))))
-            if not any(edge_type_for(sec, mapping) == "cites" for sec in sections):
-                add("warn", "no-sources", base,
-                    "no `## Sources` section — nothing anchors this page to an artifact, so it "
-                    "makes claims the graph cannot trace.")
-        if meta.get("type") and meta["type"] not in NODE_TYPES:
-            add("error", "bad-type", base,
-                "type: %s is not one of %s" % (meta["type"], ", ".join(sorted(NODE_TYPES))))
-
-        for sec, lines in sections.items():
-            et = edge_type_for(sec, mapping)
-            if et in ("mentions", "cites"):
+    tmp = tempfile.mkdtemp(prefix="wiki-lint-")
+    notes = []
+    try:
+        norm = normalize_wiki(wiki, tmp)
+        for f in sorted(glob.glob(os.path.join(tmp, "*.md"))):
+            stem = os.path.splitext(os.path.basename(f))[0]
+            base = os.path.basename(f)
+            if stem.lower() == "readme":
                 continue
-            if et == "contradicts":
-                n = len(LINK_RE.findall(CODE_RE.sub("", "\n".join(lines))))
-                tension_counts[base] = tension_counts.get(base, 0) + n
-                total_tension += n
-            for block in blocks_of(CODE_RE.sub("", "\n".join(lines))):
-                found = LINK_RE.findall(block)
-                if not found:
+            _title, sections, meta = parse_page(f)
+            ntype = node_type_for(stem, meta)
+            if ntype in ("index", "log"):
+                continue
+            if ntype == "concept" and meta.get("kind") and meta["kind"] not in KINDS:
+                notes.append(("unknown-kind", base, "kind: %s is not in the vocabulary (%s)"
+                              % (meta["kind"], ", ".join(sorted(KINDS)))))
+            if ntype == "source" and not meta.get("locator"):
+                notes.append(("no-locator", base, "a source with no locator cannot be matched "
+                              "to citations of the same artifact"))
+            if ntype == "concept" and not any(edge_type_for(sec, DEFAULT_MAP) == "cites"
+                                              for sec in sections):
+                notes.append(("uncited", base, "cites no source \u2014 its claims cannot be traced"))
+            for sec, lines in sections.items():
+                et = edge_type_for(sec, DEFAULT_MAP)
+                if et not in ("related", "contradicts"):
                     continue
-                is_bullet = bool(BULLET_RE.match(block))
-                body = BULLET_RE.sub("", block.strip())
-                lead = re.match(r"\s*\[\[([^\]|]+)(?:\|[^\]]*)?\]\]\s*[—–:-]\s+", body)
-                rest = body[lead.end():] if lead else body
-                bare = re.sub(r"[\s·*+:;,.|—–-]+", " ", LINK_RE.sub("", rest)).strip()
-                if len(bare) < 12:
-                    for t, _a in found:
-                        add("warn", "no-reason", "%s · ## %s" % (base, sec),
-                            "[[%s]] has no stated reason. Write `- [[%s]] — why` — the reason is "
-                            "the only part of the relationship a reader sees." % (t.strip(), t.strip()))
-                elif not lead and len(found) > 1:
-                    add("warn", "ambiguous-subject", "%s · ## %s" % (base, sec),
-                        "%s has %d links and prose but no leading subject link, so ALL %d are "
-                        "typed `%s` \u2014 including any cited only as evidence. Write one bullet per "
-                        "relation, leading with the page it is about."
-                        % ("bullet" if is_bullet else "paragraph", len(found), len(found), et))
+                for t, info in link_contexts("\n".join(lines), subject_rule=(et == "contradicts")).items():
+                    if info["typed"] and not info["context"]:
+                        notes.append(("no-reason", "%s \u00b7 ## %s" % (base, sec),
+                                      "[[%s]] is given no reason on the link" % t))
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
-    if total_tension:
-        for page, n in sorted(tension_counts.items(), key=lambda x: -x[1])[:1]:
-            if n > total_tension * 0.4 and n > 4:
-                add("warn", "tension-hub", page,
-                    "holds %d of %d tension links (%d%%). Disagreements recorded on one hub page "
-                    "connect the hub to each concept instead of connecting the concepts that "
-                    "actually disagree. Put each on both pages; keep the hub for narrative."
-                    % (n, total_tension, round(100.0 * n / total_tension)))
-
-    errs = [i for i in issues if i[0] == "error"]
-    warns = [i for i in issues if i[0] == "warn"]
     print("LINT %s" % wiki)
-    print("  pages: %d" % len(files))
-    by_code = {}
-    for lvl, code, where, msg in issues:
-        by_code.setdefault((lvl, code), []).append((where, msg))
-    for (lvl, code), rows in sorted(by_code.items(), key=lambda x: (x[0][0] != "error", -len(x[1]))):
-        print("\n  [%s] %s ×%d" % (lvl, code, len(rows)))
-        for where, msg in rows[: (args.limit if args.limit else 3)]:
-            print("    %s\n      %s" % (where, msg))
-        if len(rows) > (args.limit if args.limit else 3):
-            print("    … and %d more" % (len(rows) - (args.limit if args.limit else 3)))
-    print("\n  RESULT: %d error(s), %d warning(s)" % (len(errs), len(warns)))
-    fail = len(errs) > 0 or (args.strict and len(warns) > 0)
-    if not fail and not issues:
-        print("  clean — safe to build.")
-    sys.exit(1 if fail else 0)
+    done = report_lines(norm)
+    print("  build normalizes automatically:" if done else
+          "  structure: already in the page contract")
+    for d in done:
+        print("    - " + d)
+    by = {}
+    for code, where, msg in notes:
+        by.setdefault(code, []).append((where, msg))
+    if by:
+        print("  content notes (informational; none of these block a build):")
+    lim = args.limit if args.limit else 3
+    for code, rows in sorted(by.items(), key=lambda x: -len(x[1])):
+        print("    %s \u00d7%d" % (code, len(rows)))
+        for where, msg in rows[:lim]:
+            print("      %s \u2014 %s" % (where, msg))
+        if len(rows) > lim:
+            print("      \u2026 and %d more" % (len(rows) - lim))
+    print("  RESULT: %d content note(s)" % len(notes))
+    sys.exit(1 if (args.strict and notes) else 0)
 
 
 def cmd_validate(args):
@@ -1344,6 +1311,10 @@ def main():
     b.add_argument("--map", default=None, help="JSON file overriding section->edge map")
     b.add_argument("--vocab", default=None,
                    help="JSON file overriding the kind/edge vocabulary")
+    b.add_argument("--no-normalize", action="store_true",
+                   help="parse the wiki exactly as written (skip structural normalization)")
+    b.add_argument("--emit-normalized", default=None, metavar="DIR",
+                   help="also keep the normalized wiki in DIR (must be empty)")
     b.set_defaults(func=cmd_build)
 
     v = sub.add_parser("validate", help="check an existing graph.json (exit 1 on issues)")
