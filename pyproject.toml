@@ -21,9 +21,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/MangroveTechnologies/wiki-to-graph"
-Repository = "https://github.com/MangroveTechnologies/wiki-to-graph"
-Issues = "https://github.com/MangroveTechnologies/wiki-to-graph/issues"
+Homepage = "https://github.com/vanderbilt-ms-ai/wiki-to-graph"
+Repository = "https://github.com/vanderbilt-ms-ai/wiki-to-graph"
+Issues = "https://github.com/vanderbilt-ms-ai/wiki-to-graph/issues"
 
 # Free for personal/academic use under CC BY-NC-SA 4.0.
 # Commercial use requires a paid license — contact tim.darrah@mangrove.ai.
