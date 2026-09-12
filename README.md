@@ -37,17 +37,25 @@ wiki-to-graph/                      ← plugin root (also a one-plugin marketpla
 │   ├── plugin.json                 ← plugin manifest
 │   └── marketplace.json            ← lets the repo be added as a marketplace
 ├── skills/
-│   └── wiki-to-graph/
-│       ├── SKILL.md                ← the skill (build/validate/analyze/query/update/view)
-│       ├── references/spec.md      ← full ontology + format spec
-│       └── scripts/
-│           ├── wiki_to_graph.py       ← the toolkit
-│           └── build_graph_viewer.py   ← HTML graph viewer generator
-├── examples/llm-wiki/              ← the runnable example wiki (source of build/)
-│   ├── wiki/                       ← 28 markdown pages (the LLM wiki)
-│   └── raw/                        ← 6 source papers the pages cite
+│   ├── wiki-to-graph/
+│   │   ├── SKILL.md                ← build/validate/analyze/query/update/view
+│   │   ├── references/spec.md      ← full ontology + format spec
+│   │   └── scripts/
+│   │       ├── wiki_to_graph.py        ← the toolkit
+│   │       └── build_graph_viewer.py   ← HTML graph viewer generator
+│   └── wiki-graph-maintain/
+│       └── SKILL.md                ← keeping a graph correct as it grows
+├── examples/
+│   ├── llm-wiki/                   ← the runnable example wiki (source of build/)
+│   │   ├── wiki/                   ← 28 markdown pages (the LLM wiki)
+│   │   └── raw/                    ← 6 source papers the pages cite
+│   └── vocab.custom.json           ← a custom kind/edge vocabulary for --vocab
 ├── build/                          ← sample outputs, regenerated from examples/llm-wiki/wiki
-├── docs/outputs-and-workflows.md   ← what each build object is + example workflows
+├── docs/
+│   ├── outputs-and-workflows.md    ← what each build object is + example workflows
+│   ├── custom-vocabulary.md        ← --vocab format, and the orphan trap it avoids
+│   └── publishing.md               ← distribution + release steps
+├── pyproject.toml
 ├── assets/graph-viewer.png
 ├── LICENSE.md
 └── README.md
@@ -59,6 +67,9 @@ from a fresh clone. New here? Start with
 [`docs/outputs-and-workflows.md`](docs/outputs-and-workflows.md).
 
 ### Install
+
+The plugin ships **two skills**: `wiki-to-graph` (build a graph from a wiki) and
+`wiki-graph-maintain` (ingest new artifacts and keep the graph healthy).
 
 - **As a plugin (Cowork):** open the delivered `wiki-to-graph.plugin` file and click install; or
   Settings → Capabilities → add plugin.
@@ -133,10 +144,31 @@ python3 $SCR query build/graph.json path "Positional Encoding" "RLHF"
 The graph is derived; edit the source markdown and re-run `build`.
 
 ```bash
-python3 $SCR update examples/llm-wiki/wiki add-node --title "Mixture of Experts" --kind schema --summary "…"
-python3 $SCR update examples/llm-wiki/wiki add-edge --from "Mixture of Experts" --to "Transformer" --type related
-python3 $SCR update examples/llm-wiki/wiki set-kind --node "GPT-3" --kind schema
+W=examples/llm-wiki/wiki
+
+# add knowledge atoms and the artifacts they came from
+python3 $SCR update $W add-node   --title "Mixture of Experts" --kind schema --summary "…"
+python3 $SCR update $W add-source --title "Switch Transformer" --locator "arxiv:2101.03961"
+
+# link them (cites writes the target's locator, so it resolves onto the source page)
+python3 $SCR update $W add-edge   --from "Mixture of Experts" --to "Transformer" --type related
+python3 $SCR update $W add-edge   --from "Mixture of Experts" --to "Switch Transformer" --type cites
+
+# reshape (independent examples)
+python3 $SCR update $W set-kind    --node "GPT-3" --kind schema
+python3 $SCR update $W rename      --node "GPT-3" --title "GPT-3 (Brown et al., 2020)"
+python3 $SCR update $W remove-edge --from "Mixture of Experts" --to "Transformer" --type related
+python3 $SCR update $W remove-node --node "Mixture of Experts"
+
+# a page authored as a concept that is really an artifact: retype it
+# (set-type drops `kind`, since only concepts carry one)
+python3 $SCR update $W set-type    --node "Chinchilla" --type source
 ```
+
+`rename` rewrites inbound `[[links]]` across the wiki. `remove-node` names every page that will
+dangle as a result, with the command to fix each. Maintaining a graph over time — ingesting a new
+artifact, deduping against what already exists, health checks — is the **`wiki-graph-maintain`**
+skill.
 
 ### 6 · View in a browser
 
@@ -144,14 +176,24 @@ python3 $SCR update examples/llm-wiki/wiki set-kind --node "GPT-3" --kind schema
 python3 skills/wiki-to-graph/scripts/build_graph_viewer.py build/graph.json -o build/graph-viewer.html
 ```
 
-Double-click `build/graph-viewer.html` (offline, no dependencies).
+Double-click `build/graph-viewer.html` (offline, no dependencies). Scroll to zoom, drag the
+background to pan, drag a node to reposition it, `fit` to reframe. Click a node for its summary,
+typed outgoing edges and backlinks. Colours and toggles are derived from the graph, so a custom
+`--vocab` renders correctly without touching the viewer.
 
 ---
 
 ## The model in 30 seconds
 
-- **Nodes** have a structural `type` (`concept`, `source`, `index`, `log`); concepts also carry a
-  knowledge `kind`: **concept / schema / procedure / fact** (set per page via frontmatter `kind:`).
+- **Nodes** have a structural `type` (`concept`, `source`, `index`, `log`), set per page via
+  frontmatter `type:`. Concepts *also* carry a knowledge `kind` — **concept / schema / procedure /
+  fact** — via frontmatter `kind:`.
+- **The two axes are independent.** `type` is what a node *is*; `kind` is what a concept *knows*.
+  A paper is **not** a `fact` — it *contains* facts. It is a `source`, and the claims drawn from it
+  are `fact` atoms that `cites` it.
+- **A source is any ingested artifact**, not just a paper: give it a `locator` (a file path, a
+  URL, or a `doi:` / `arxiv:` / `isbn:` / `issn:` / `urn:` / `hdl:` identifier) and `medium` is
+  inferred — paper, web, book, slides, video, transcript, notebook, code, data, audio, note.
 - **Edges** are typed by their source section: `mentions`, `related`, `contradicts`, `cites`, plus
   `indexes` / `records` from the index/log hub pages.
 - Each node carries its own `edges` list, degrees, `word_count`, `n_sources`, `aliases`. Link text
@@ -162,7 +204,29 @@ Full details: `skills/wiki-to-graph/references/spec.md`.
 ## Use on your own wiki
 
 One concept per page, consistent `##` sections, `[[Page Title]]` links, optional `kind:`
-frontmatter. Different section names? Pass `--map map.json` to `build`.
+frontmatter.
+
+Ingesting something that is not a paper? Author it as a source page:
+
+```
+---
+type: source
+medium: slides          # inferred from the locator when omitted
+locator: decks/q3-review.pptx
+author: …
+date: 2026-03
+---
+```
+
+`## Sources` bullets resolve onto that page by `[[link]]` or by matching locator, so one artifact
+is always one node however it is cited.
+
+**Different section names?** Pass `--map map.json`. **Different ontology?** Pass
+`--vocab vocab.json` to supply your own `kinds` / `concept_edges` / `symmetric` / `hub_edges` —
+see [`docs/custom-vocabulary.md`](docs/custom-vocabulary.md) and
+[`examples/vocab.custom.json`](examples/vocab.custom.json). Use both together: a custom `--map`
+without a matching `--vocab` builds a graph in which **every node reports as an orphan**, because
+degree is computed over edge types the vocabulary has never heard of.
 
 ## License
 
@@ -179,7 +243,8 @@ Full terms in [`LICENSE.md`](LICENSE.md).
 
 Working end-to-end: build → validate → analyze → query → update → view. Deliberately simple and
 static — the graph is recomputed from the markdown on every `build` (no incremental updates). Edge
-`weight` is captured but inert (not used by metrics). Not yet aligned to any external ontology.
+`weight` is captured but inert (not used by metrics). No external ontology is imposed, but `--vocab`
+lets you supply one (`examples/vocab.custom.json` carries a Biolink-style relation hierarchy).
 
 ## Acknowledgements
 

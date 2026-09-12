@@ -1042,10 +1042,22 @@ def cmd_update(args):
         if not args.title:
             print("rename needs --title (the new title)"); sys.exit(1)
         old_names = link_names_for(wd, args.node)
-        txt = open(p, encoding="utf-8").read()
-        txt = H1_RE.sub("# " + args.title, txt, count=1) if H1_RE.search(txt) \
-            else txt.replace("\n", "\n", 1)
-        open(p, "w", encoding="utf-8").write(txt)
+        # H1_RE is not MULTILINE — it is applied per line everywhere else, and these
+        # files usually open with frontmatter, so a whole-text search never matches.
+        lines = open(p, encoding="utf-8").read().split("\n")
+        for i, l in enumerate(lines):
+            if H1_RE.match(l):
+                lines[i] = "# " + args.title
+                break
+        else:                                   # no H1: insert one after any frontmatter
+            at = 0
+            if lines and lines[0].strip() == "---":
+                at = next((k for k in range(1, len(lines))
+                           if lines[k].strip() == "---"), 0) + 1
+                while at < len(lines) and not lines[at].strip():
+                    at += 1
+            lines[at:at] = ["# " + args.title, ""]
+        open(p, "w", encoding="utf-8").write("\n".join(lines))
         newp = os.path.join(wd, args.title + ".md")
         if os.path.abspath(newp) != os.path.abspath(p):
             if os.path.exists(newp):
