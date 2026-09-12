@@ -1,15 +1,18 @@
 {
   "name": "wiki-to-graph",
-  "owner": { "name": "Tim Darrah" },
+  "owner": {
+    "name": "Tim Darrah"
+  },
   "metadata": {
     "description": "Tools for turning LLM wikis and note collections into knowledge graphs.",
-    "version": "0.1.0"
+    "version": "0.4.0"
   },
   "plugins": [
     {
       "name": "wiki-to-graph",
       "source": "./",
-      "description": "Turn an LLM wiki into a typed, queryable knowledge graph: build, validate, analyze, query, update, and view."
+      "description": "Turn an LLM wiki in any common shape into a typed, queryable knowledge graph and an offline interactive viewer. The build adapts the wiki's structure automatically, then validates, analyzes, queries (BFS/DFS/shortest path with edge and node filters) and helps maintain it. Sources can be papers, web pages, books, decks, transcripts or code.",
+      "version": "0.4.0"
     }
   ]
 }

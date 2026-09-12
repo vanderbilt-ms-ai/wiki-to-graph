@@ -42,7 +42,7 @@ text (→ `mentions`).
 | Type | One per… | Key properties |
 |------|----------|----------------|
 | `concept` | entity page | `id` (slug of title), `kind`, `title`, `summary`, `explanation`, `sources[]`, `file`, `in_degree`, `out_degree`, `edges[]` |
-| `source`  | distinct document/citation in any `## Sources` | `id` (slug), `ref` (original string), `path` (if it resolves to a `raw/` file), `title`, `edges[]` |
+| `source`  | an ingested artifact — authored as a page with `type: source`, or generated from a `## Sources` bullet | `id` (slug), `locator`, `medium`, `title`, plus `summary`/`explanation`/`file` when authored, `ref` when generated, `edges[]` |
 | `index`   | the `index.md` hub (0–1) | `id`, `title`, `file`, `edges[]` |
 | `log`     | the `log.md` provenance file (0–1) | `id`, `title`, `file`, `edges[]` |
 
@@ -50,12 +50,42 @@ text (→ `mentions`).
 
 Two orthogonal classifiers on a node:
 
-- **`type`** — structural role in *this* parse: `concept | source | index | log`.
-- **`kind`** — the knowledge taxonomy of a concept node: **`concept | fact | schema | procedure`**
+- **`type`** — structural role: `concept | source | index | log`. Set per page via
+  frontmatter `type:`; falls back to the filename stem (`index.md`, `log.md`), else `concept`.
+- **`kind`** — the knowledge taxonomy of a **concept** node: **`concept | fact | schema | procedure`**
   (default `concept`; set per page via frontmatter `kind:`). `source/index/log` have `kind: null`.
 
+These axes are independent and must not be conflated. `kind` classifies *knowledge*; an
+artifact is not knowledge. **A paper is not a `fact` — it CONTAINS facts.** It is a
+`source` whose claims become `fact` atoms that `cites` it. The same holds for a web page,
+a book, a deck, a transcript or a repository: the artifact is the source, the atoms
+extracted from it are the concepts.
+
+### Source pages and locators
+
+A source may be *authored* as a full page, so an artifact you have something to say about
+gets prose, a summary and its own edges rather than existing only as a citation string:
+
+```
+---
+type: source
+medium: paper          # paper|web|book|slides|video|transcript|notebook|code|data|audio|note|document
+locator: raw/attention.pdf
+author: Vaswani et al.
+date: 2017
+---
+```
+
+`locator` identifies the artifact and is format-agnostic: a repo-relative file, an
+`http(s)://` URL, or a `doi:` / `arxiv:` / `isbn:` / `issn:` / `urn:` / `hdl:` identifier.
+`medium` is inferred from the locator when omitted.
+
+A `## Sources` bullet resolves, in order: an explicit `[[link]]` to an authored source
+page; a locator that an authored source page declares; otherwise a generated stub node.
+One artifact is therefore always one node, however it is referenced.
+
 **`edges`** — every node carries its own outgoing edges as a list of
-`{target, type, via, weight}`. This is the canonical carrier: relationships live in the graph as
+`{target, type, via, weight, context}`. This is the canonical carrier: relationships live in the graph as
 structured typed edges, **not** as `[[markup]]` reproduced inside the prose. Accordingly, the
 `summary`/`explanation` text is stored with link markup stripped to plain names (`BERT`, not
 `[[BERT]]`) — the link itself is the corresponding edge.
@@ -108,7 +138,70 @@ from the DAG check, so the index pointing at every concept doesn't mask true orp
 false structure. A concept-level analysis simply filters edges to
 `{mentions, related, contradicts, cites}`.
 
-Edge properties: `type`, `via` (the section that produced it), `directed` (bool), `weight`.
+Edge properties: `type`, `via` (the section that produced it), `directed` (bool), `weight`,
+`context`.
+
+**`context` — the stated reason.** The bullet or paragraph the link sits in, markup stripped and
+capped at 400 characters. An edge without it records *that* two pages are related and discards the
+author's statement of *how*, which is usually the only part a reader wants:
+
+```
+- [[Zero-Shot Prompting]] — Brown 2020 makes demonstrations the flagship capability;
+  DeepSeek-R1 reports they "consistently degrade its performance".
+```
+
+Two things are deliberately excluded. A leading `[[X]] — ` is the bullet's subject and is already
+carried as the edge's target, so it is dropped. And a block that is only links
+(`[[a]] · [[b]] · [[c]]`) has no prose, so its edges get `context: ""` rather than a list of
+sibling names. An empty `context` is therefore a real signal: **that link was never given a
+reason.** When merging duplicate edges, the longest context wins.
+
+### Which links carry a section's relation
+
+A block (a bullet with its continuation lines, or a paragraph) states one relation;
+links inside its prose are evidence and become `mentions`.
+
+| Block | Carries the relation | Mentioned |
+|---|---|---|
+| a bare list, `- [[a]] · [[b]]` | every link | — |
+| `- [[A]] — because [[P]] found X` | A | P |
+| (disagreement sections) `- **vs [[A]]:** … [[P]]` | A | P |
+| (disagreement sections) `A contrasts with [[B]], unlike [[C]]` | B, the first link | C |
+| (disagreement sections) `None across the sources — see [[A]]` | nothing | A |
+| (other typed sections) a prose paragraph | every link | — |
+
+Typing every link in a disagreement sentence asserts disagreements it never makes — the
+page appears to contradict the papers it cites. On one corpus that removed 60 of 104
+`contradicts` edges as spurious.
+
+## Normalization
+
+`build` runs `wiki_normalize.normalize_wiki` on a copy of the wiki before parsing (skip with
+`--no-normalize`; keep the copy with `--emit-normalized DIR`). Every rule is deterministic,
+reported on the `normalized:` line, and idempotent. A page already in the contract passes
+through byte-for-byte.
+
+| Rule | Input | Output |
+|---|---|---|
+| hub | `README.md`, no `index.md` | `index.md` |
+| type/kind | a `**Type:** X` line | frontmatter `kind`, or `type: source` for artifact words (paper, book, video, website, slides, transcript, dataset, …) |
+| locator | a `**File:**` / `**URL:**` / `**Locator:**` field, or a locator on the Type line | `locator:` |
+| title | no `# H1` | a title from the filename |
+| sources | a concept page with no Sources section | `## Sources` listing the source pages it links |
+| disputes | a page named for contradictions/tensions/disputes with `### item` headings holding `- [[side]]: claim` bullets | every opposing pair added to both side pages; each topic linked in the item's prose gets `## Disputed claims` listing each side's claim; the hub becomes `type: index` |
+
+In a dispute item, the text before the first colon outside `[[…]]` names who holds a
+position (`- [[a]], [[b]]: claim` is one position held by two sides); only an indented
+line continues a bullet.
+
+Section names are matched by `section_kind`: *contradict / tension / disagreement /
+conflict* → `contradicts`; *related / see also / links / connections* → `related`;
+*source / reference / citation / bibliography* → `cites`.
+
+The guarantee this buys is tested in `tests/test_convergence.py`: the bundled example rendered
+as a flat notes-app wiki, an Obsidian-style vault and a single contradictions hub builds the
+same node set and typed edge set as the original.
+
 Symmetric edges are stored once with `directed: false`; consumers may add the reverse.
 
 **`weight` — meaning, determination, use, update.**
@@ -194,13 +287,16 @@ SQLite and GraphML are *views* of the same graph; `graph.json` is the source of 
      "sources": ["raw/03_gpt3.md (Brown et al., 2020)"],
      "file": "GPT-3.md", "in_degree": 7, "out_degree": 14,
      "edges": [
-       {"target": "autoregressive-language-model", "type": "mentions", "via": "Summary", "weight": 1},
-       {"target": "bert", "type": "contradicts", "via": "Contradictions / tensions", "weight": 1}
+       {"target": "autoregressive-language-model", "type": "mentions", "via": "Summary",
+        "weight": 1, "context": "Self-attention is the core computation of the Transformer…"},
+       {"target": "bert", "type": "contradicts", "via": "Contradictions / tensions",
+        "weight": 1, "context": "BERT uses bidirectional self-attention; GPT-3 uses masked…"}
      ]}
   ],
   "links": [
     {"source": "gpt-3", "target": "bert", "type": "contradicts",
-     "via": "Contradictions / tensions", "directed": false, "weight": 1}
+     "via": "Contradictions / tensions", "directed": false, "weight": 1,
+     "context": "BERT uses bidirectional self-attention; GPT-3 uses masked (left-to-right)…"}
   ]
 }
 ```
@@ -244,7 +340,7 @@ Run after every build:
 
 ## 7. Optional: knowledge-space projection
 
-With `--kspace`, additionally emit a `domain.json` compatible with the borrowed KST toolkit:
+With `--kst`, additionally emit a `domain.json` compatible with the borrowed KST toolkit:
 `items` = concepts (carrying `id`, `name`, `description` = Summary), `prerequisites` = a chosen
 directed edge subset (default `mentions`). These are **candidate** prerequisites derived
 heuristically from body references — they must be curated before being treated as a true KST

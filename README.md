@@ -5,6 +5,7 @@
 <h1 align="center">wiki-to-graph</h1>
 
 <p align="center">
+  <a href="https://pypi.org/project/wiki-to-graph/"><img src="https://img.shields.io/pypi/v/wiki-to-graph.svg?color=4f7cff&logo=pypi&logoColor=white" alt="PyPI version"></a>
   <img src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-blue.svg" alt="License: CC BY-NC-SA 4.0">
   <img src="https://img.shields.io/badge/python-3.x-3776AB.svg?logo=python&logoColor=white" alt="Python 3.x">
   <img src="https://img.shields.io/badge/dependencies-none%20(stdlib)-2ec27e.svg" alt="No dependencies">
@@ -21,10 +22,46 @@ The insight: an LLM wiki is *already* a graph — pages are nodes, `[[wiki-links
 page's consistent sections tell you what *kind* of edge each link is (a link under `## Related` is a
 `related` edge; one under `## Contradictions` is `contradicts`). This tool makes that graph explicit.
 
+**It works on a wiki in whatever shape it is in.** A README standing in for the index, `**Type:**`
+lines instead of frontmatter, papers written up as pages, every disagreement on one hub page, no
+Sources sections — `build` normalizes a copy before parsing, so the same content produces the same
+graph however it was written. Your files are never modified.
+
 ![The interactive graph viewer, with the Transformer node selected](assets/graph-viewer.png)
 
-*The included graph viewer (`graph-viewer.html`): nodes colored by kind, edges by type; click any
-node to read its summary and walk its edges.*
+*The included viewer, opened at `graph-viewer.html#Transformer`: nodes colored by kind and edges by
+type, with the selected node's summary, sources, and relations — each showing the reason it was made.*
+
+---
+
+## Install
+
+**Easiest: give your agent this repository's link and tell it to install.**
+
+> Install https://github.com/vanderbilt-ms-ai/wiki-to-graph
+
+Agents follow [`INSTALL.md`](INSTALL.md), which picks the right method for their environment and
+checks that it worked. Or install it yourself:
+
+| Method | Commands | You get |
+|---|---|---|
+| **Claude Code plugin** | `claude plugin marketplace add vanderbilt-ms-ai/wiki-to-graph`<br>`claude plugin install wiki-to-graph@wiki-to-graph` | the three skills, loaded in your next session. Inside a session, use `/plugin marketplace add …` and `/plugin install …` |
+| **Clone** | `git clone https://github.com/vanderbilt-ms-ai/wiki-to-graph.git` | everything: scripts, skills, example, tests. Nothing to install |
+| **pip** | `pip install git+https://github.com/vanderbilt-ms-ai/wiki-to-graph.git` | the `wiki-to-graph` and `wiki-to-graph-viewer` commands |
+
+Requirements: Python 3.8+, standard library only. `networkx` / `scipy` are optional, for your own
+heavier analysis. Install with pip from GitHub as shown: the PyPI release (0.2.0) predates
+automatic normalization, source pages and the current viewer.
+
+Once installed, tell your agent: *"Turn my wiki at `<path>` into a graph."* No reformatting first.
+
+The plugin ships **three skills**, one per stage:
+
+| Skill | Use when |
+|---|---|
+| `wiki-to-graph` | you have a wiki — build it into a graph and view it |
+| `wiki-author` | you have source material and no wiki yet |
+| `wiki-graph-maintain` | you have a graph — ingest new sources, keep it healthy |
 
 ---
 
@@ -36,18 +73,32 @@ wiki-to-graph/                      ← plugin root (also a one-plugin marketpla
 │   ├── plugin.json                 ← plugin manifest
 │   └── marketplace.json            ← lets the repo be added as a marketplace
 ├── skills/
-│   └── wiki-to-graph/
-│       ├── SKILL.md                ← the skill (build/validate/analyze/query/update/view)
-│       ├── references/spec.md      ← full ontology + format spec
-│       └── scripts/
-│           ├── wiki_to_graph.py       ← the toolkit
-│           └── build_graph_viewer.py   ← HTML graph viewer generator
-├── examples/llm-wiki/              ← the runnable example wiki (source of build/)
-│   ├── wiki/                       ← 28 markdown pages (the LLM wiki)
-│   └── raw/                        ← 6 source papers the pages cite
+│   ├── wiki-to-graph/
+│   │   ├── SKILL.md                ← build/validate/analyze/query/update/view
+│   │   ├── references/spec.md      ← full ontology + format spec
+│   │   └── scripts/
+│   │       ├── wiki_to_graph.py        ← the toolkit
+│   │       ├── wiki_normalize.py       ← adapts any wiki shape to the page contract
+│   │       └── build_graph_viewer.py   ← HTML graph viewer generator
+│   ├── wiki-graph-maintain/
+│   │   └── SKILL.md                ← keeping a graph correct as it grows
+│   └── wiki-author/
+│       └── SKILL.md                ← writing a wiki that graphs cleanly
+├── examples/
+│   ├── llm-wiki/                   ← the runnable example wiki (source of build/)
+│   │   ├── wiki/                   ← 34 pages: 26 concepts, 6 sources, index, log
+│   │   └── raw/                    ← 6 source papers the pages cite
+│   └── vocab.custom.json           ← a custom kind/edge vocabulary for --vocab
+├── tests/                          ← proves any wiki shape builds the same graph
 ├── build/                          ← sample outputs, regenerated from examples/llm-wiki/wiki
-├── docs/outputs-and-workflows.md   ← what each build object is + example workflows
+├── docs/
+│   ├── outputs-and-workflows.md    ← what each build object is + example workflows
+│   ├── custom-vocabulary.md        ← --vocab format, and the orphan trap it avoids
+│   └── publishing.md               ← distribution + release steps
+├── pyproject.toml
 ├── assets/graph-viewer.png
+├── INSTALL.md                      ← install steps an agent can follow
+├── AGENTS.md                       ← pointers for agents working in this repo
 ├── LICENSE.md
 └── README.md
 ```
@@ -57,23 +108,13 @@ committed `build/` artifacts were generated from, so the whole pipeline runs
 from a fresh clone. New here? Start with
 [`docs/outputs-and-workflows.md`](docs/outputs-and-workflows.md).
 
-### Install
-
-- **As a plugin (Cowork):** open the delivered `wiki-to-graph.plugin` file and click install; or
-  Settings → Capabilities → add plugin.
-- **As a marketplace / skill repo:** push this folder to a git repo and add it as a plugin
-  marketplace (`.claude-plugin/marketplace.json` lists the plugin). Claude Code:
-  `/plugin marketplace add <repo-url>` then `/plugin install wiki-to-graph`.
-- **No install needed:** the scripts are plain Python — just run them (below).
-
-Requirements: Python 3 (standard library only). `networkx`/`scipy` are optional, for your own
-heavier analysis.
-
 ---
 
 ## Quick start
 
-Paths below are from the plugin root. (`SCR=skills/wiki-to-graph/scripts`)
+Paths below are from a clone of this repo (`SCR=skills/wiki-to-graph/scripts`). After a pip install, use
+`wiki-to-graph` in place of `python3 skills/wiki-to-graph/scripts/wiki_to_graph.py`, and
+`wiki-to-graph-viewer` in place of `build_graph_viewer.py`.
 
 ### 1 · Build the graph
 
@@ -83,7 +124,11 @@ python3 skills/wiki-to-graph/scripts/wiki_to_graph.py build examples/llm-wiki/wi
 ```
 
 Writes **`build/graph.json`** (canonical), plus `graph.db` (SQLite) and `graph.graphml` (Gephi/yEd).
-Add `--kspace` for a `domain.json` KST projection.
+Add `--kst` for a `domain.json` KST projection.
+
+`build` first normalizes a copy of the wiki and prints what it adapted on a `normalized:` line —
+for this example, nothing, because it is already in the page contract. `--emit-normalized DIR`
+keeps the normalized copy; `--no-normalize` parses the wiki exactly as written.
 
 ### 2 · Validate
 
@@ -92,6 +137,9 @@ python3 skills/wiki-to-graph/scripts/wiki_to_graph.py validate build/graph.json
 ```
 
 Broken links / orphans / self-loops fail (exit 1). Cross-reference cycles are informational.
+
+Optional: `wiki_to_graph.py lint <wiki>` lists what build will normalize plus content notes only an
+author can supply, such as a link given no reason. It never blocks a build.
 
 ### 3 · Analyze
 
@@ -110,6 +158,7 @@ python3 $SCR query build/graph.json node "RLHF"            # details + edges
 python3 $SCR query build/graph.json neighbors "GPT-3"      # outgoing
 python3 $SCR query build/graph.json backlinks "Transformer"# incoming
 python3 $SCR query build/graph.json contradicts            # all tension pairs
+python3 $SCR query build/graph.json unexplained            # typed links with no stated reason
 python3 $SCR query build/graph.json bfs "Transformer" --edges related
 python3 $SCR query build/graph.json dfs "GPT-3" --edges contradicts --undirected
 python3 $SCR query build/graph.json path "Positional Encoding" "RLHF"
@@ -131,10 +180,31 @@ python3 $SCR query build/graph.json path "Positional Encoding" "RLHF"
 The graph is derived; edit the source markdown and re-run `build`.
 
 ```bash
-python3 $SCR update examples/llm-wiki/wiki add-node --title "Mixture of Experts" --kind schema --summary "…"
-python3 $SCR update examples/llm-wiki/wiki add-edge --from "Mixture of Experts" --to "Transformer" --type related
-python3 $SCR update examples/llm-wiki/wiki set-kind --node "GPT-3" --kind schema
+W=examples/llm-wiki/wiki
+
+# add knowledge atoms and the artifacts they came from
+python3 $SCR update $W add-node   --title "Mixture of Experts" --kind schema --summary "…"
+python3 $SCR update $W add-source --title "Switch Transformer" --locator "arxiv:2101.03961"
+
+# link them (cites writes the target's locator, so it resolves onto the source page)
+python3 $SCR update $W add-edge   --from "Mixture of Experts" --to "Transformer" --type related
+python3 $SCR update $W add-edge   --from "Mixture of Experts" --to "Switch Transformer" --type cites
+
+# reshape (independent examples)
+python3 $SCR update $W set-kind    --node "GPT-3" --kind schema
+python3 $SCR update $W rename      --node "GPT-3" --title "GPT-3 (Brown et al., 2020)"
+python3 $SCR update $W remove-edge --from "Mixture of Experts" --to "Transformer" --type related
+python3 $SCR update $W remove-node --node "Mixture of Experts"
+
+# a page authored as a concept that is really an artifact: retype it
+# (set-type drops `kind`, since only concepts carry one)
+python3 $SCR update $W set-type    --node "Chinchilla" --type source
 ```
+
+`rename` rewrites inbound `[[links]]` across the wiki. `remove-node` names every page that will
+dangle as a result, with the command to fix each. Maintaining a graph over time — ingesting a new
+artifact, deduping against what already exists, health checks — is the **`wiki-graph-maintain`**
+skill.
 
 ### 6 · View in a browser
 
@@ -142,25 +212,75 @@ python3 $SCR update examples/llm-wiki/wiki set-kind --node "GPT-3" --kind schema
 python3 skills/wiki-to-graph/scripts/build_graph_viewer.py build/graph.json -o build/graph-viewer.html
 ```
 
-Double-click `build/graph-viewer.html` (offline, no dependencies).
+Double-click `build/graph-viewer.html` (offline, no dependencies). Scroll to zoom, drag the
+background to pan, drag a node to reposition it, `fit` to reframe. Click a node for its summary,
+full explanation, sources, and its outgoing edges and backlinks — **grouped by edge type, each
+showing the reason the link was made**, with `← back` to retrace. Add a node's title to the URL —
+`graph-viewer.html#Transformer` — to open with that node selected. Colours and toggles are derived from the graph, so a custom
+`--vocab` renders correctly without touching the viewer.
 
 ---
 
 ## The model in 30 seconds
 
-- **Nodes** have a structural `type` (`concept`, `source`, `index`, `log`); concepts also carry a
-  knowledge `kind`: **concept / schema / procedure / fact** (set per page via frontmatter `kind:`).
+- **Nodes** have a structural `type` (`concept`, `source`, `index`, `log`), set per page via
+  frontmatter `type:`. Concepts *also* carry a knowledge `kind` — **concept / schema / procedure /
+  fact** — via frontmatter `kind:`.
+- **The two axes are independent.** `type` is what a node *is*; `kind` is what a concept *knows*.
+  A paper is **not** a `fact` — it *contains* facts. It is a `source`, and the claims drawn from it
+  are `fact` atoms that `cites` it.
+- **A source is any ingested artifact**, not just a paper: give it a `locator` (a file path, a
+  URL, or a `doi:` / `arxiv:` / `isbn:` / `issn:` / `urn:` / `hdl:` identifier) and `medium` is
+  inferred — paper, web, book, slides, video, transcript, notebook, code, data, audio, note.
 - **Edges** are typed by their source section: `mentions`, `related`, `contradicts`, `cites`, plus
   `indexes` / `records` from the index/log hub pages.
 - Each node carries its own `edges` list, degrees, `word_count`, `n_sources`, `aliases`. Link text
   is stored as plain names — the relationship lives in the edge, not in `[[markup]]`.
+- **Every edge carries `context`** — the bullet or sentence the link was written in, which is where
+  the author said *why* the two are connected. An empty `context` means the link was never given a
+  reason: `query unexplained` lists those.
+- In a typed section, a bullet's **leading link is the relation**; links inside its prose are
+  evidence and become `mentions`. `- [[A]] — because [[P]] found X` does not mean this page
+  disagrees with P.
 
 Full details: `skills/wiki-to-graph/references/spec.md`.
 
 ## Use on your own wiki
 
-One concept per page, consistent `##` sections, `[[Page Title]]` links, optional `kind:`
-frontmatter. Different section names? Pass `--map map.json` to `build`.
+Point `build` at it. No reformatting first:
+
+```bash
+python3 skills/wiki-to-graph/scripts/wiki_to_graph.py build path/to/your/wiki -o build/graph.json
+python3 skills/wiki-to-graph/scripts/build_graph_viewer.py build/graph.json -o build/graph-viewer.html
+```
+
+What `build` adapts automatically:
+
+| Your wiki has | `build` does |
+|---|---|
+| `README.md` and no `index.md` | treats it as the index |
+| `**Type:** X` lines instead of frontmatter | derives each page's `kind` from them |
+| pages describing papers, books, videos, sites or decks | makes them `source` nodes, locator included |
+| no `## Sources` sections | lists the source pages each concept links to |
+| one contradictions page of `### item` / `- [[side]]: claim` | records each disagreement on the pages that disagree |
+| `## See also`, `## Tensions`, `## References` | reads them as Related, Contradictions, Sources |
+| `- [[A]] — because [[P]] found X` | a relation to A, with P as evidence rather than a second relation |
+| `None across the sources — see [[A]]` | no disagreement |
+
+**Different ontology?** `--vocab vocab.json` supplies your own `kinds` / `concept_edges` /
+`symmetric` / `hub_edges` — see [`docs/custom-vocabulary.md`](docs/custom-vocabulary.md). Unusual
+section names beyond the built-in synonyms: `--map map.json`. Use the two together: a custom
+`--map` without a matching `--vocab` builds a graph in which every node reports as an orphan.
+
+## Tests
+
+```bash
+python3 -m unittest discover tests
+```
+
+The suite renders the bundled example in other common wiki shapes — kebab-case files with a
+README hub and `**Type:**` lines, an Obsidian-style vault, and a single contradictions hub — and
+asserts every one builds the same nodes and typed edges as the original.
 
 ## License
 
@@ -177,7 +297,8 @@ Full terms in [`LICENSE.md`](LICENSE.md).
 
 Working end-to-end: build → validate → analyze → query → update → view. Deliberately simple and
 static — the graph is recomputed from the markdown on every `build` (no incremental updates). Edge
-`weight` is captured but inert (not used by metrics). Not yet aligned to any external ontology.
+`weight` is captured but inert (not used by metrics). No external ontology is imposed, but `--vocab`
+lets you supply one (`examples/vocab.custom.json` carries a Biolink-style relation hierarchy).
 
 ## Acknowledgements
 

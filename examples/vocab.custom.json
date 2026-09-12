@@ -1,0 +1,13 @@
+{
+  "_doc": "Example of a custom vocabulary — the nine knowledge primitives and the Biolink-style relation hierarchy from mangrove-one/jarvis. Pass with --vocab. See docs/custom-vocabulary.md.",
+  "kinds": ["object", "property", "concept", "fact", "experience", "procedure", "schema",
+            "context", "judgment", "atom"],
+  "concept_edges": ["associated-with", "is-a", "kind-of", "part-of", "instance-of", "causes",
+                    "enables", "prevents", "requires", "has-property", "has-state", "has-role",
+                    "similar-to", "contrasts-with", "derived-from", "uses", "preceded-by",
+                    "co-occurred-with", "led-to", "justified-by", "contradicts", "supersedes",
+                    "consolidates"],
+  "symmetric": ["contradicts", "co-occurred-with", "similar-to", "contrasts-with",
+                "associated-with"],
+  "hub_edges": ["indexes", "records"]
+}

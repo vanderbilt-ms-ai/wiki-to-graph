@@ -5,18 +5,31 @@ kind: schema
 # GPT-3
 
 ## Summary
-GPT-3 (*Language Models are Few-Shot Learners*, 2020) is a 175-billion-parameter **decoder-only** [[Autoregressive Language Model]]. Its central claim: scaling up language models yields strong task-agnostic [[Few-Shot Learning]] via [[In-Context Learning]], often without any fine-tuning.
+GPT-3 is a 175-billion-parameter **decoder-only** [[Autoregressive Language Model]]. Its central claim: scaling up language models yields strong task-agnostic [[Few-Shot Learning]] via [[In-Context Learning]], often without any fine-tuning.
 
 ## Explanation
-GPT-3 keeps only the decoder half of the [[Encoder-Decoder Architecture]], using masked [[Self-Attention]]. At 10x the size of any prior dense LM, it exhibits [[Emergent Capabilities]] — on-the-fly reasoning, arithmetic, word unscrambling — specified purely through the prompt. This shifts the paradigm from [[Pre-training and Fine-tuning]] toward pretrain-then-prompt. GPT-3 is a headline [[Foundation Models]], and its scale-centric framing is directly challenged by [[RLHF]].
+Introduced in [[Brown 2020]], GPT-3 keeps only the decoder half of the [[Encoder-Decoder Architecture]], using masked [[Self-Attention]]. At 10x the size of any prior dense LM, it exhibits [[Emergent Capabilities]] — on-the-fly reasoning, arithmetic, word unscrambling — specified purely through the prompt. This shifts the paradigm from [[Pre-training and Fine-tuning]] toward pretrain-then-prompt. GPT-3 is a headline example of [[Foundation Models]], and its scale-centric framing is directly challenged by [[RLHF]].
 
 ## Related
-[[Autoregressive Language Model]] · [[In-Context Learning]] · [[Few-Shot Learning]] · [[Scale and Scaling]] · [[Emergent Capabilities]] · [[Transformer]] · [[Encoder-Decoder Architecture]] · [[Self-Attention]] · [[Foundation Models]] · [[RLHF]] · [[BERT]] · [[Pre-training and Fine-tuning]] · [[Chinchilla]] · [[Compute-Optimal Scaling]]
+- [[Autoregressive Language Model]] — the modeling style it uses
+- [[In-Context Learning]] — how it adapts to tasks
+- [[Few-Shot Learning]] — the setting its results centre on
+- [[Scale and Scaling]] — the lever it argues drives capability
+- [[Emergent Capabilities]] — the behaviours it reports at 175B
+- [[Transformer]] — the architecture it is built on
+- [[Encoder-Decoder Architecture]] — it keeps only the decoder
+- [[Self-Attention]] — used in masked form
+- [[Foundation Models]] — a headline example of the paradigm
+- [[RLHF]] — the method that aligns it into InstructGPT
+- [[BERT]] — the encoder-only model it is contrasted with
+- [[Pre-training and Fine-tuning]] — the recipe it moves away from
+- [[Chinchilla]] — the smaller model that outperforms it
+- [[Compute-Optimal Scaling]] — the principle its training budget violates
 
 ## Contradictions / tensions
-- **vs [[BERT]]:** GPT-3 is unidirectional and forgoes [[Masked Language Modeling]] and per-task fine-tuning, contradicting BERT's premise that bidirectionality + fine-tuning are needed for strong understanding.
-- **vs [[RLHF]]:** GPT-3 implies "bigger is better." [[RLHF]] shows a 1.3B aligned model (InstructGPT) is preferred by humans over the 175B GPT-3 — scale alone does not guarantee usefulness or [[Alignment]].
-- **vs [[Chinchilla]]:** [[Compute-Optimal Scaling]] shows GPT-3 was **significantly undertrained** — at 175B parameters it had far too little training data for its size. A 70B compute-optimal model (Chinchilla) beats it. GPT-3's parameters-first scaling was compute-inefficient.
+- [[BERT]] — GPT-3 is unidirectional and forgoes masked language modeling and per-task fine-tuning, contradicting BERT's premise that both are needed for strong understanding.
+- [[RLHF]] — GPT-3 implies bigger is better, but a 1.3B aligned InstructGPT is preferred by humans over the 175B GPT-3.
+- [[Chinchilla]] — at 175B parameters GPT-3 had far too little training data for its size; a 70B compute-optimal model beats it.
 
 ## Sources
-- raw/03_gpt3.md (Brown et al., 2020)
+- raw/03_gpt3.md — Language Models are Few-Shot Learners

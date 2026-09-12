@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wiki-to-graph"
+version = "0.4.0"
+description = "Turn an LLM wiki in any common shape into a typed, queryable knowledge graph: normalize, build, validate, analyze, query, update, and view."
+readme = "README.md"
+requires-python = ">=3.8"
+license = "CC-BY-NC-SA-4.0"
+license-files = ["LICENSE.md"]
+authors = [{ name = "Tim Darrah", email = "tim.darrah@mangrove.ai" }]
+keywords = ["knowledge-graph", "llm-wiki", "markdown", "graph", "kst", "obsidian", "networkx"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+  "Topic :: Text Processing :: Markup :: Markdown",
+  "Operating System :: OS Independent",
+  "Environment :: Console",
+]
+
+[project.urls]
+Homepage = "https://github.com/MangroveTechnologies/wiki-to-graph"
+Repository = "https://github.com/MangroveTechnologies/wiki-to-graph"
+Issues = "https://github.com/MangroveTechnologies/wiki-to-graph/issues"
+
+# Free for personal/academic use under CC BY-NC-SA 4.0.
+# Commercial use requires a paid license — contact tim.darrah@mangrove.ai.
+[project.scripts]
+wiki-to-graph = "wiki_to_graph:main"
+wiki-to-graph-viewer = "build_graph_viewer:main"
+
+[tool.setuptools]
+py-modules = ["wiki_to_graph", "wiki_normalize", "build_graph_viewer"]
+
+[tool.setuptools.package-dir]
+"" = "skills/wiki-to-graph/scripts"

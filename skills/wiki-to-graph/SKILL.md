@@ -1,121 +1,159 @@
 ---
 name: wiki-to-graph
 description: >-
-  Translate an LLM wiki (a folder of markdown entity pages linked with
-  [[wiki-links]], in the Karpathy "LLM wiki" pattern) into a durable, typed,
-  executable knowledge graph that graph algorithms can traverse. Use whenever
-  the user wants to turn a wiki / vault / folder of interlinked markdown notes
-  into a graph data structure, knowledge graph, or knowledge space — phrases
-  like "turn this wiki into a graph", "make it queryable", "build a knowledge
-  graph from these notes", "export to networkx / GraphML / SQLite", "compute
-  centrality / find clusters / shortest path over my notes". Produces a
-  canonical graph.json (NetworkX-compatible) plus optional SQLite and GraphML,
-  and an optional KST domain.json projection.
+  Turn an LLM wiki (a folder of markdown pages linked with [[wiki-links]], in the
+  Karpathy "LLM wiki" pattern) into a typed, queryable knowledge graph and an
+  interactive browser view — whatever shape the wiki is in. Use whenever the user
+  wants to turn a wiki / vault / folder of interlinked markdown notes into a graph,
+  knowledge graph, or knowledge space: "turn my wiki into a graph", "build a
+  knowledge graph from these notes", "visualize my wiki", "make it queryable",
+  "export to networkx / GraphML / SQLite", "compute centrality / find clusters /
+  shortest path over my notes". Produces graph.json (NetworkX-compatible), optional
+  SQLite and GraphML, an optional KST domain.json, and an offline HTML viewer.
 ---
 
-# Wiki → Knowledge Space
+# Wiki → Knowledge Graph
 
-Turns the *implicit* graph in an LLM wiki (pages + `[[links]]`) into an
-*explicit*, typed property graph you can run algorithms on. The trick: every
-entity page uses the same sections, so **the section a link sits in determines
-the edge type** — a link under `## Related` is a `related` edge, a link under
-`## Contradictions / tensions` is a `contradicts` edge, and so on. The parse is
-therefore deterministic.
+**Turning a wiki into a graph is one step: build it, then show it.** Do not ask the
+user to reformat, fix, or tidy their wiki first. `build` normalizes a copy of the
+wiki before parsing it — the user's files are never modified — so a wiki written
+with a README for an index, `**Type:**` lines instead of frontmatter, papers written
+up as pages, every disagreement on one hub page, and no Sources sections builds the
+same graph as the same content written to the page contract.
 
-Full ontology and format rationale: **`references/spec.md`** (read it before
-extending the mapping). The "LLM wiki" pattern is due to Andrej Karpathy; see
-Data Science Dojo's tutorial: https://datasciencedojo.com/blog/llm-wiki-tutorial/
+The scripts are in `scripts/` inside this skill's base directory, however it was installed
+(plugin, skills folder, or a clone). After a pip install, use the `wiki-to-graph` and
+`wiki-to-graph-viewer` commands instead.
+
+```bash
+S="<this skill's base directory>/scripts"
+python3 $S/wiki_to_graph.py build <wiki_dir> -o build/graph.json --emit sqlite,graphml
+python3 $S/wiki_to_graph.py validate build/graph.json
+python3 $S/build_graph_viewer.py build/graph.json -o build/graph-viewer.html
+```
+
+Then open `build/graph-viewer.html` for the user, and report:
+
+- the node and edge counts by type, **quoted from the build output**,
+- the `normalized:` line verbatim, so they can see what was adapted,
+- `validate`'s `RESULT` line.
+
+That is the whole job. Everything below is reference.
+
+## What `build` normalizes automatically
+
+| The wiki has | `build` does |
+|---|---|
+| `README.md` and no `index.md` | treats it as the index hub |
+| a `**Type:** X` line, no frontmatter | derives `kind` (concept / schema / procedure / fact) from it |
+| a page describing a paper, book, video, site, deck… | makes it a `source` node, with its locator from a `**File:**`-style field |
+| a concept page with no Sources section | lists the source pages it links to as its Sources |
+| one contradictions page of `### item` + `- [[side]]: claim` bullets | records every opposing pair on both pages that disagree, lists the competing claims on each topic the item names, and makes the hub an index |
+| a page with no `# title` | takes the title from the filename |
+
+And the parser reads these as written:
+
+| Written like this | Read as |
+|---|---|
+| `## See also`, `## Tensions`, `## References` | Related, Contradictions, Sources |
+| `- [[A]] — because [[P]] found X` | one relation to A; P is mentioned as evidence |
+| `A contrasts with [[B]], unlike [[C]]` in a disagreement section | one disagreement with B; C is mentioned |
+| `- **vs [[A]]:** …` | one disagreement with A |
+| `None across the sources — see [[A]]` | no disagreement |
+| `raw/a.md (X); raw/b.md (Y)` on one line | two citations |
+
+The rules are in `scripts/wiki_normalize.py` and `references/spec.md`. `--emit-normalized
+DIR` keeps the normalized wiki so the user can see it; `--no-normalize` parses the
+wiki exactly as written.
 
 ## Ontology (one screen)
 
-- **Nodes:** `concept` (an entity page), `source` (a doc/citation in `## Sources`),
-  plus `index` and `log` hub nodes for the navigational files.
+- **Nodes:** `concept` (an entity page), `source` (an ingested artifact — a page with
+  `type: source`, or a citation in `## Sources`), plus `index` and `log` hub nodes.
+- **Two independent axes.** `type` is what a node *is*; `kind`
+  (`concept|schema|procedure|fact`) is what a concept *knows*, and applies to concepts
+  only. A paper is not a `fact` — it *contains* facts; it is a `source`, and the claims
+  drawn from it are atoms that `cites` it. A web page, book, deck, transcript or repo is
+  a `source` the same way.
 - **Edges:** `mentions` (body links), `related` (`## Related`), `contradicts`
-  (`## Contradictions / tensions`), `cites` (concept→source), and hub edges
-  `indexes` / `records` from index/log. `related` and `contradicts` are symmetric.
+  (`## Contradictions / tensions`), `cites` (concept → source), and hub edges
+  `indexes` / `records`. `related` and `contradicts` are symmetric. Every edge carries
+  `context` — the sentence the link was written in.
 
-## Output — decision
+## Output
 
 Canonical output is **`graph.json`** in node-link form: it loads straight into
-NetworkX / D3 / Cytoscape, is diffable in git, and mirrors the KST `domain.json`
-precedent. Parquet is deliberately **not** used (columnar, homogeneous,
-non-graph-native — wrong tool for a small heterogeneous graph). Optional views:
-`--emit sqlite` (SQL + recursive-CTE traversal) and `--emit graphml` (Gephi/yEd).
+NetworkX / D3 / Cytoscape and is diffable in git. Optional views: `--emit sqlite`
+(SQL + recursive-CTE traversal) and `--emit graphml` (Gephi / yEd); `--kst` writes a
+Knowledge Space Theory `domain.json`.
 
-## Usage — six subcommands
+## Subcommands
 
-Scripts live beside this file, in `scripts/` (i.e. `${CLAUDE_PLUGIN_ROOT}/skills/wiki-to-graph/scripts/`).
-All are stdlib-only — no numpy/scipy/networkx required.
+All stdlib-only — no numpy / scipy / networkx required.
 
 ```bash
-# 1) BUILD: parse a wiki folder into graph.json (+ optional views / KST projection)
-python3 scripts/wiki_to_graph.py build <wiki_dir> -o graph.json --emit sqlite,graphml --kspace
+# BUILD (normalizes a copy first), VALIDATE, VIEW
+python3 $S/wiki_to_graph.py build <wiki_dir> -o graph.json --emit sqlite,graphml --kst
+python3 $S/wiki_to_graph.py validate graph.json
+python3 $S/build_graph_viewer.py graph.json -o graph-viewer.html
 
-# 2) VALIDATE: structural check (exit 1 on defects). Dangling links, orphan concepts,
-#    and self-loops fail; DAG cycles over cross-references are informational.
-python3 scripts/wiki_to_graph.py validate graph.json
+# ANALYZE: PageRank, in-degree, contested nodes, components, communities, shortest path
+python3 $S/wiki_to_graph.py analyze graph.json --top 5 --path "GPT-3" "Layer Normalization"
 
-# 3) ANALYZE: PageRank, in-degree, contested nodes, components, communities, shortest path.
-python3 scripts/wiki_to_graph.py analyze graph.json --top 5 --path "GPT-3" "Layer Normalization"
+# QUERY: list | node | neighbors | backlinks | kind | edgetype | contradicts | unexplained | path | bfs | dfs
+python3 $S/wiki_to_graph.py query graph.json node "RLHF"
+python3 $S/wiki_to_graph.py query graph.json bfs "Transformer" --edges related
+python3 $S/wiki_to_graph.py query graph.json dfs "GPT-3" --edges contradicts --undirected
 
-# 4) QUERY: canned questions — no raw SQL/graph code. Verbs:
-#    list | node | neighbors | backlinks | kind | edgetype | contradicts | path | bfs | dfs
-python3 scripts/wiki_to_graph.py query graph.json node "RLHF"
-python3 scripts/wiki_to_graph.py query graph.json bfs "Transformer" --edges related
-python3 scripts/wiki_to_graph.py query graph.json dfs "GPT-3" --edges contradicts --undirected
-python3 scripts/wiki_to_graph.py query graph.json path "Positional Encoding" "RLHF"
+# LINT (optional): what build will normalize, plus content notes only an author can
+# supply, such as a link given no reason. Never a precondition for building.
+python3 $S/wiki_to_graph.py lint <wiki_dir>
 
-# 5) UPDATE: edit the SOURCE wiki markdown, then re-run build. Actions:
-python3 scripts/wiki_to_graph.py update <wiki_dir> add-node --title "Mixture of Experts" --kind schema --summary "..."
-python3 scripts/wiki_to_graph.py update <wiki_dir> add-edge --from "Mixture of Experts" --to "Transformer" --type related
-python3 scripts/wiki_to_graph.py update <wiki_dir> set-kind --node "GPT-3" --kind schema
-
-# 6) VIEW: render an interactive, offline HTML graph
-python3 scripts/build_graph_viewer.py graph.json -o graph-viewer.html
+# UPDATE: edit the source markdown, then rebuild
+python3 $S/wiki_to_graph.py update <wiki_dir> add-node    --title "Mixture of Experts" --kind schema --summary "..."
+python3 $S/wiki_to_graph.py update <wiki_dir> add-source  --title "Switch Transformer" --locator "arxiv:2101.03961"
+python3 $S/wiki_to_graph.py update <wiki_dir> add-edge    --from "Mixture of Experts" --to "Transformer" --type related
+python3 $S/wiki_to_graph.py update <wiki_dir> remove-edge --from "Mixture of Experts" --to "Transformer" --type related
+python3 $S/wiki_to_graph.py update <wiki_dir> remove-node --node "Mixture of Experts"
+python3 $S/wiki_to_graph.py update <wiki_dir> rename      --node "GPT-3" --title "GPT-3 (Brown et al., 2020)"
+python3 $S/wiki_to_graph.py update <wiki_dir> set-kind    --node "GPT-3" --kind schema
+python3 $S/wiki_to_graph.py update <wiki_dir> set-type    --node "GPT-3" --type source
 ```
+
+Keeping a graph healthy as it grows — ingesting new artifacts, deduping — is the
+**`wiki-graph-maintain`** skill. Writing a wiki from scratch is **`wiki-author`**.
 
 ### Search & traversal filters (query bfs/dfs/path/neighbors/backlinks)
 
-Filter on edge type, node type/kind, or any combination — include *or* exclude:
-
-- `--edges a,b` traverse ONLY these edge types · `--ignore-edges x,y` traverse all EXCEPT these
-- `--kind a,b` visit ONLY these node kinds · `--ignore-kind x,y` visit all EXCEPT these
+- `--edges a,b` traverse ONLY these edge types · `--ignore-edges x,y` all EXCEPT these
+- `--kind a,b` visit ONLY these node kinds · `--ignore-kind x,y` all EXCEPT these
 - `--node-type concept,source,index,log` (structural) · `--ignore-node-type x,y`
 - `--undirected` treat edges as undirected in bfs/dfs
-
-BFS/DFS are the classic traversals (`bfs_order`/`dfs_order`); `path` is BFS shortest path.
-For heavier algorithms, load `graph.json` into NetworkX (below).
-
-The script is **stdlib-only** (no pip installs) and prints node/edge counts, the
-dangling-link / orphan / self-loop report, and the DAG check. `index.md` and
-`log.md` are included as hub nodes by default — pass `--exclude index,log,readme`
-to drop them.
 
 ## Non-negotiable: compute, don't reason
 
 Never state node/edge counts, reachability, centrality, or acyclicity from
-inspection. Run the script and quote its printed output; re-run after any edit to
-the wiki. To go further (PageRank, communities, shortest paths), load the JSON:
+inspection. Run the script and quote its printed output; re-run after any edit.
+For heavier algorithms, load the JSON:
 
 ```python
 import json, networkx as nx
 from networkx.readwrite import json_graph
-# loads as a MultiDiGraph (multigraph:true preserves parallel typed edges)
-G = json_graph.node_link_graph(json.load(open("graph.json")), edges="links")
+G = json_graph.node_link_graph(json.load(open("graph.json")), edges="links")   # MultiDiGraph
 concepts = [n for n, d in G.nodes(data=True) if d.get("type") == "concept"]
-nx.pagerank(G.subgraph(concepts))                                # centrality, etc.
+nx.pagerank(G.subgraph(concepts))
 ```
 
-## Loading into the borrowed KST toolkit
+## KST projection
 
-`--kspace` emits a `domain.json` compatible with the course-development `kst.py`
-(`items` = concepts, `prerequisites` = the `--dag-edges` subset). Those
-prerequisites are **heuristic candidates** from body references — curate them
-before treating them as a true KST surmise relation.
+`--kst` emits a `domain.json` for the course-development `kst.py` (`items` = concepts,
+`prerequisites` = the `--dag-edges` subset). Those prerequisites are **heuristic
+candidates** from body references — curate them before treating them as a true KST
+surmise relation.
 
-## Extending to any wiki
+## Custom ontologies
 
-The section→edge map lives in `DEFAULT_MAP` in the script and is overridable with
-`--map map.json` (`{"substring": "edge_type", ...}`), so a wiki with different
-section names still parses. Keep pages single-concept and sections consistent and
-the graph stays clean.
+Section names beyond the built-in synonyms: `--map map.json` (`{"substring": "edge_type"}`).
+A different kind or edge vocabulary: `--vocab vocab.json` — see `docs/custom-vocabulary.md`.
+Use the two together: a custom `--map` without a matching `--vocab` builds a graph in
+which every node reports as an orphan.
