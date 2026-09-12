@@ -85,7 +85,7 @@ page; a locator that an authored source page declares; otherwise a generated stu
 One artifact is therefore always one node, however it is referenced.
 
 **`edges`** — every node carries its own outgoing edges as a list of
-`{target, type, via, weight}`. This is the canonical carrier: relationships live in the graph as
+`{target, type, via, weight, context}`. This is the canonical carrier: relationships live in the graph as
 structured typed edges, **not** as `[[markup]]` reproduced inside the prose. Accordingly, the
 `summary`/`explanation` text is stored with link markup stripped to plain names (`BERT`, not
 `[[BERT]]`) — the link itself is the corresponding edge.
@@ -138,7 +138,23 @@ from the DAG check, so the index pointing at every concept doesn't mask true orp
 false structure. A concept-level analysis simply filters edges to
 `{mentions, related, contradicts, cites}`.
 
-Edge properties: `type`, `via` (the section that produced it), `directed` (bool), `weight`.
+Edge properties: `type`, `via` (the section that produced it), `directed` (bool), `weight`,
+`context`.
+
+**`context` — the stated reason.** The bullet or paragraph the link sits in, markup stripped and
+capped at 400 characters. An edge without it records *that* two pages are related and discards the
+author's statement of *how*, which is usually the only part a reader wants:
+
+```
+- [[Zero-Shot Prompting]] — Brown 2020 makes demonstrations the flagship capability;
+  DeepSeek-R1 reports they "consistently degrade its performance".
+```
+
+Two things are deliberately excluded. A leading `[[X]] — ` is the bullet's subject and is already
+carried as the edge's target, so it is dropped. And a block that is only links
+(`[[a]] · [[b]] · [[c]]`) has no prose, so its edges get `context: ""` rather than a list of
+sibling names. An empty `context` is therefore a real signal: **that link was never given a
+reason.** When merging duplicate edges, the longest context wins.
 Symmetric edges are stored once with `directed: false`; consumers may add the reverse.
 
 **`weight` — meaning, determination, use, update.**
@@ -224,13 +240,16 @@ SQLite and GraphML are *views* of the same graph; `graph.json` is the source of 
      "sources": ["raw/03_gpt3.md (Brown et al., 2020)"],
      "file": "GPT-3.md", "in_degree": 7, "out_degree": 14,
      "edges": [
-       {"target": "autoregressive-language-model", "type": "mentions", "via": "Summary", "weight": 1},
-       {"target": "bert", "type": "contradicts", "via": "Contradictions / tensions", "weight": 1}
+       {"target": "autoregressive-language-model", "type": "mentions", "via": "Summary",
+        "weight": 1, "context": "Self-attention is the core computation of the Transformer…"},
+       {"target": "bert", "type": "contradicts", "via": "Contradictions / tensions",
+        "weight": 1, "context": "BERT uses bidirectional self-attention; GPT-3 uses masked…"}
      ]}
   ],
   "links": [
     {"source": "gpt-3", "target": "bert", "type": "contradicts",
-     "via": "Contradictions / tensions", "directed": false, "weight": 1}
+     "via": "Contradictions / tensions", "directed": false, "weight": 1,
+     "context": "BERT uses bidirectional self-attention; GPT-3 uses masked (left-to-right)…"}
   ]
 }
 ```

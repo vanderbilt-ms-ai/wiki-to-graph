@@ -193,6 +193,68 @@ def parse_page(path):
     return title, sections, meta
 
 
+BULLET_RE = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
+MAX_CONTEXT = 400
+
+
+def blocks_of(text):
+    """Split section text into logical blocks — each list item (with its wrapped
+    continuation lines) and each paragraph. The block a link sits in is where the
+    author wrote WHY the link is there, so it is the link's context."""
+    blocks, cur = [], []
+    for raw in text.split("\n"):
+        if not raw.strip():
+            if cur:
+                blocks.append("\n".join(cur)); cur = []
+            continue
+        if BULLET_RE.match(raw) and cur:
+            blocks.append("\n".join(cur)); cur = [raw]
+        else:
+            cur.append(raw)
+    if cur:
+        blocks.append("\n".join(cur))
+    return blocks
+
+
+def link_contexts(text):
+    """-> {target: {"count": int, "context": str}}.
+
+    `context` is the prose of the bullet or paragraph the link sits in. Without it
+    an edge records THAT two pages are related and discards the author's statement
+    of HOW, which is usually the only part a reader wants.
+
+    Two things are deliberately NOT context. A leading "[[X]] \u2014 " is the bullet's
+    subject and is already shown as the edge's label, so it is dropped. And a block
+    that is only links ("[[a]] \u00b7 [[b]] \u00b7 [[c]]") has no prose at all \u2014 storing the
+    sibling names would be noise, so such edges get an empty context.
+    """
+    out = {}
+    for block in blocks_of(CODE_RE.sub("", text)):
+        found = LINK_RE.findall(block)
+        if not found:
+            continue
+        body = BULLET_RE.sub("", block.strip())
+        lead = re.match(r"\s*\[\[[^\]]+\]\]\s*[\u2014\u2013:-]\s+", body)
+        if lead:
+            body = body[lead.end():]
+        bare = re.sub(r"[\s\u00b7*+:;,.|\u2014\u2013-]+", " ", LINK_RE.sub("", body)).strip()
+        if len(bare) < 12:
+            ctx = ""                                  # link list, no prose
+        else:
+            ctx = re.sub(r"\s+", " ", strip_links(body)).strip()
+            if len(ctx) > MAX_CONTEXT:
+                ctx = ctx[:MAX_CONTEXT].rsplit(" ", 1)[0] + "\u2026"
+        for t, _alias in found:
+            t = t.strip()
+            if not t or t.lower() == "wiki-links":
+                continue
+            e = out.setdefault(t, {"count": 0, "context": ""})
+            e["count"] += 1
+            if len(ctx) > len(e["context"]):
+                e["context"] = ctx
+    return out
+
+
 def links_in(text):
     """Yield (target, count) from text, ignoring inline-code spans."""
     clean = CODE_RE.sub("", text)
@@ -258,14 +320,16 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
                               "in_degree": 0, "out_degree": 0, "edges": []}
         return sid
 
-    def add_edge(s, t, et, via, w=1):
+    def add_edge(s, t, et, via, w=1, context=""):
         directed = et not in SYMMETRIC
         for e in edges:
             if e["source"] == s and e["target"] == t and e["type"] == et:
                 e["weight"] += w
+                if len(context) > len(e.get("context") or ""):
+                    e["context"] = context      # keep the most explanatory mention
                 return
-        edges.append({"source": s, "target": t, "type": et,
-                      "via": via, "directed": directed, "weight": w})
+        edges.append({"source": s, "target": t, "type": et, "via": via,
+                      "directed": directed, "weight": w, "context": context})
 
     for cid, p in pages.items():
         if cid in seen_ids:
@@ -280,13 +344,13 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
                           "summary": "", "explanation": "", "sources": [],
                           "file": p["file"], "in_degree": 0, "out_degree": 0, "edges": []}
             for sec, lines in p["sections"].items():
-                for tgt, cnt in links_in("\n".join(lines)).items():
+                for tgt, info in link_contexts("\n".join(lines)).items():
                     tid = alias.get(tgt.lower())
                     if tid is None:
                         warnings["dangling"].append([p["title"], tgt])
                         continue
                     if tid != cid:
-                        add_edge(cid, tid, met, sec, cnt)
+                        add_edge(cid, tid, met, sec, info["count"], info["context"])
             continue
 
         # link markup is stripped to plain text — the relationship is encoded as an
@@ -338,9 +402,10 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
                     source_strings.append(b)
                     sid = resolve_source(b)
                     if sid != cid:
-                        add_edge(cid, sid, "cites", sec)
+                        add_edge(cid, sid, "cites", sec, 1, re.sub(r"\s+", " ", b).strip())
                 continue
-            for tgt, cnt in links_in(text).items():
+            for tgt, info in link_contexts(text).items():
+                cnt = info["count"]
                 tid = alias.get(tgt.lower())
                 if tid is None:
                     warnings["dangling"].append([p["title"], tgt])
@@ -355,7 +420,7 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
                 if tid == cid:
                     warnings["self_loops"].append([cid, sec])
                     continue
-                add_edge(cid, tid, et, sec, cnt)
+                add_edge(cid, tid, et, sec, cnt, info["context"])
 
     nodes.update(src_nodes)
 
@@ -399,7 +464,8 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
     for e in edges:
         if e["source"] in nodes:
             nodes[e["source"]]["edges"].append(
-                {"target": e["target"], "type": e["type"], "via": e["via"], "weight": e["weight"]})
+                {"target": e["target"], "type": e["type"], "via": e["via"],
+                 "weight": e["weight"], "context": e.get("context", "")})
 
     return nodes, edges, warnings
 

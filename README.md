@@ -178,7 +178,8 @@ python3 skills/wiki-to-graph/scripts/build_graph_viewer.py build/graph.json -o b
 
 Double-click `build/graph-viewer.html` (offline, no dependencies). Scroll to zoom, drag the
 background to pan, drag a node to reposition it, `fit` to reframe. Click a node for its summary,
-typed outgoing edges and backlinks. Colours and toggles are derived from the graph, so a custom
+full explanation, sources, and its outgoing edges and backlinks — **grouped by edge type, each
+showing the reason the link was made**, with `← back` to retrace. Colours and toggles are derived from the graph, so a custom
 `--vocab` renders correctly without touching the viewer.
 
 ---
@@ -198,6 +199,9 @@ typed outgoing edges and backlinks. Colours and toggles are derived from the gra
   `indexes` / `records` from the index/log hub pages.
 - Each node carries its own `edges` list, degrees, `word_count`, `n_sources`, `aliases`. Link text
   is stored as plain names — the relationship lives in the edge, not in `[[markup]]`.
+- **Every edge carries `context`** — the bullet or sentence the link was written in, which is where
+  the author said *why* the two are connected. An empty `context` means the link was never given a
+  reason, which is worth knowing.
 
 Full details: `skills/wiki-to-graph/references/spec.md`.
 

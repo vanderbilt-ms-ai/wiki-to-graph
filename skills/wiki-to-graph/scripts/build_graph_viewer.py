@@ -37,9 +37,24 @@ TEMPLATE = r"""<!DOCTYPE html>
   #side .deg code{font-size:11px;background:#0e1226;padding:1px 4px;border-radius:4px}
   #side p{font-size:13px;line-height:1.5}
   #side h3{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:14px 0 6px}
-  #side .e{font-size:12px;padding:3px 0;border-bottom:1px solid #232842;cursor:pointer}
-  #side .e:hover{color:#fff}
+  #side .e{font-size:12px;padding:6px 0;border-bottom:1px solid #232842;cursor:pointer}
+  #side .e:hover{background:#1e2442}
+  #side .e .tgt{color:var(--ink);font-weight:500}
+  #side .e .why{display:block;color:var(--muted);font-size:11px;line-height:1.45;margin-top:3px}
+  #side .e .why.none{opacity:.45;font-style:italic}
   #side .et{font-size:9px;padding:1px 5px;border-radius:8px;color:#fff;margin-right:6px}
+  #side .grp{display:flex;align-items:center;gap:6px;margin:16px 0 4px}
+  #side .grp .nm{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:#fff;
+       padding:2px 7px;border-radius:9px}
+  #side .grp .ct{font-size:11px;color:var(--muted)}
+  #side .body{font-size:12.5px;line-height:1.6;color:#cfd3e4}
+  #side .body p{margin:0 0 9px}
+  #side details.expl{margin:10px 0 4px}
+  #side details.expl summary{font-size:11px;text-transform:uppercase;letter-spacing:.6px;
+       color:var(--muted);cursor:pointer;user-select:none;margin-bottom:8px}
+  #side .srcs{font-size:11px;color:var(--muted);line-height:1.5;margin:2px 0 0;padding-left:15px}
+  #side .back{font-size:11px;color:#7f9cff;cursor:pointer;display:inline-block;margin-bottom:8px}
+  #side .back:hover{text-decoration:underline}
   .legend{font-size:11px;color:var(--muted)}
   .legend b{color:var(--ink);font-weight:600}
   .legend .row{margin:3px 0;display:flex;align-items:center;gap:2px}
@@ -120,7 +135,8 @@ Object.keys(EDGE).forEach(t=>{
   const c=allEdges.filter(e=>e.type===t).length; if(!c) return;
   const lab=document.createElement('label'); lab.className='chip';
   lab.innerHTML=`<input type="checkbox" ${enabled[t]?'checked':''}> <span class="dot" style="background:${EDGE[t]}"></span>${t} (${c})`;
-  lab.querySelector('input').onchange=e=>{enabled[t]=e.target.checked; sim(); draw();};
+  lab.querySelector('input').onchange=e=>{enabled[t]=e.target.checked; sim(); draw();
+    if(selected) select(selected,true);};
   tog.appendChild(lab);
 });
 
@@ -187,26 +203,61 @@ function draw(){
     viewG.appendChild(g);}
   applyView();
 }
-function select(id){
-  selected=id;const n=byId[id];const s=document.getElementById('detail');
-  const col=nodeColor(n);
+function esc(t){return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function md(t){return esc(t)
+  .replace(/`([^`]+)`/g,'<code>$1</code>')
+  .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');}
+function paras(t){return (t||'').split(/\n{2,}/).filter(x=>x.trim())
+  .map(p=>'<p>'+md(p.trim().replace(/\n/g,' '))+'</p>').join('');}
+
+// Edges grouped by type, each showing the author's stated reason. A flat list of
+// link names answers "what is connected" and never "why", which is the question.
+function edgeGroups(list, dir){
+  const byType={};
+  list.forEach(e=>{(byType[e.type]=byType[e.type]||[]).push(e);});
+  return Object.keys(EDGE).filter(t=>byType[t]&&byType[t].length).map(t=>{
+    const rows=byType[t].map(e=>{
+      const other = dir==='out' ? e.target : e.source;
+      const nd = byId[other];
+      const why = e.context
+        ? '<span class="why">'+md(e.context)+'</span>'
+        : '<span class="why none">no reason stated on the page</span>';
+      return '<div class="e" data-go="'+other+'"><span class="tgt">'+esc(nd?nd.title:other)+'</span>'+
+             (e.weight>1?' <span style="opacity:.5">×'+e.weight+'</span>':'')+why+'</div>';
+    }).join('');
+    return '<div class="grp"><span class="nm" style="background:'+EDGE[t]+'">'+t+'</span>'+
+           '<span class="ct">'+byType[t].length+(EDGE_DESC[t]?' · '+EDGE_DESC[t]:'')+'</span></div>'+rows;
+  }).join('') || '<p style="color:var(--muted);font-size:12px">none with the current edge filters</p>';
+}
+
+let hist=[];
+function select(id, viaHistory){
+  if(selected && selected!==id && !viaHistory) hist.push(selected);
+  selected=id;
+  const n=byId[id], s=document.getElementById('detail'), col=nodeColor(n);
   const outs=(n.edges||[]).filter(e=>enabled[e.type]);
-  s.innerHTML=`<h2>${n.title}</h2>`+
-    (n.kind?`<span class="k" style="background:${col}">${n.kind}</span>`:`<span class="k" style="background:${col}">${n.type}</span>`)+
-    `<div class="deg">in-degree ${n.in_degree||0} · out-degree ${n.out_degree||0}`+
-      (n.n_sources!=null?` · ${n.n_sources} source(s)`:'')+`</div>`+
+  const backs=allEdges.filter(e=>e.target===id&&enabled[e.type]);
+  s.innerHTML=
+    (hist.length?'<span class="back" id="back">← back</span>':'')+
+    '<h2>'+esc(n.title)+'</h2>'+
+    '<span class="k" style="background:'+col+'">'+esc(n.kind||n.type)+'</span>'+
+    '<div class="deg">in-degree '+(n.in_degree||0)+' · out-degree '+(n.out_degree||0)+
+      (n.n_sources!=null?' · '+n.n_sources+' source(s)':'')+
+      (n.word_count?' · '+n.word_count+' words':'')+'</div>'+
     (n.type==='source'&&(n.medium||n.locator)
-      ? `<div class="deg">${n.medium?`<b style="color:var(--ink)">${n.medium}</b>`:''}`+
-        `${n.medium&&n.locator?' · ':''}${n.locator?`<code>${n.locator}</code>`:''}</div>` : '')+
-    (n.summary?`<p>${n.summary}</p>`:'')+
-    `<h3>Outgoing edges (${outs.length})</h3>`+
-    outs.map(e=>{const tg=byId[e.target];return `<div class="e" data-go="${e.target}">`+
-      `<span class="et" style="background:${EDGE[e.type]||'#555'}">${e.type}</span>`+
-      `${tg?tg.title:e.target}${e.weight>1?' ×'+e.weight:''}</div>`;}).join('')+
-    `<h3>Backlinks</h3>`+
-    (allEdges.filter(e=>e.target===id&&enabled[e.type]).map(e=>{const sr=byId[e.source];
-      return `<div class="e" data-go="${e.source}"><span class="et" style="background:${EDGE[e.type]||'#555'}">${e.type}</span>${sr?sr.title:e.source}</div>`;}).join('')||'<p style="color:var(--muted);font-size:12px">none (with current filters)</p>');
+      ? '<div class="deg">'+(n.medium?'<b style="color:var(--ink)">'+esc(n.medium)+'</b>':'')+
+        (n.medium&&n.locator?' · ':'')+(n.locator?'<code>'+esc(n.locator)+'</code>':'')+'</div>' : '')+
+    (n.summary?'<div class="body">'+paras(n.summary)+'</div>':'')+
+    (n.explanation?'<details class="expl"><summary>Explanation</summary>'+
+        '<div class="body">'+paras(n.explanation)+'</div></details>':'')+
+    ((n.sources&&n.sources.length)
+      ? '<h3>Sources</h3><ul class="srcs">'+n.sources.map(x=>'<li>'+md(x)+'</li>').join('')+'</ul>' : '')+
+    '<h3>Outgoing — what this page says about others ('+outs.length+')</h3>'+edgeGroups(outs,'out')+
+    '<h3>Backlinks — what others say about this ('+backs.length+')</h3>'+edgeGroups(backs,'in');
   s.querySelectorAll('.e').forEach(el=>el.onclick=()=>select(el.dataset.go));
+  const b=document.getElementById('back');
+  if(b) b.onclick=()=>{const p=hist.pop(); if(p) select(p,true);};
+  s.scrollTop=0;
   draw();
 }
 document.getElementById('search').oninput=e=>{
