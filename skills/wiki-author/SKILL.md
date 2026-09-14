@@ -31,8 +31,12 @@ unit of knowledge — it *contains* units of knowledge.
 
 ```
 python3 $SCRIPT update <wiki> add-source --title "<short name>" \
-  --locator <path|URL|doi:…|isbn:…> [--medium …] [--author …] [--date …]
+  --locator <path|URL|doi:…|isbn:…> [--medium …] [--author …] \
+  --date <YYYY[-MM]> --topics "<Field / Topic>, …"
 ```
+
+Date and topics are what let a reader ask what came when and what belongs to which
+subject. Concept pages inherit both from the sources they cite.
 
 Do this for every artifact before writing a single concept page. It gives you the
 citation targets the concept pages need, and it forces the inventory to be explicit.
@@ -60,6 +64,7 @@ Assign each candidate a `kind`:
 ```markdown
 ---
 kind: concept | schema | procedure | fact
+topics: Field / Topic        # optional; inherited from cited sources when omitted
 ---
 
 # Title

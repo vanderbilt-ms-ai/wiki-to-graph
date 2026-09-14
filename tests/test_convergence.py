@@ -22,6 +22,7 @@ sys.path.insert(0, HERE)
 import formats                                                     # noqa: E402
 from wiki_normalize import (classify_type, hub_items, normalize_texts,  # noqa: E402
                             read_wiki, section_kind)
+from wiki_to_graph import parse_topics, topic_matches, year_of    # noqa: E402
 
 HUBS = ("index", "log")
 
@@ -186,6 +187,101 @@ class QueryByName(unittest.TestCase):
             proc = subprocess.run(cli + ["analyze", out, "--top", "1", "--path", "Positional Encoding", "RLHF"],
                                   capture_output=True, text=True)
             self.assertIn("Positional Encoding \u2192", proc.stdout)
+
+
+class TopicsAndYears(unittest.TestCase):
+    """Pages are placed in time and subject; concepts inherit both from what they cite."""
+
+    PAGES = {
+        "paper-a.md": "---\ntype: source\nlocator: doi:10.1/a\ndate: 2019-05\ntopics: Field A / One\n---\n\n"
+                      "# Paper A\n\n## Summary\nA paper.\n",
+        "paper-b.md": "---\ntype: source\nlocator: doi:10.1/b\ntopics: Field A / Two, Field A / One\n---\n\n"
+                      "# Paper B (Smith et al., 2021)\n\n## Summary\nAnother paper.\n",
+        "paper-c.md": "---\ntype: source\nlocator: doi:10.1/c\ntopics: Field B / Three\n---\n\n"
+                      "# 2024-T3 Plate Study\n\n## Summary\nNo date anywhere.\n",
+        "idea.md": "---\nkind: concept\n---\n\n# Idea\n\n## Summary\nAn idea.\n\n"
+                   "## Related\n- [[Other]] — the one link between the two fields\n\n"
+                   "## Sources\n- [[paper-a]] — first\n- [[paper-b]] — second\n",
+        "other.md": "---\nkind: fact\ntopics: Field B / Three\n---\n\n# Other\n\n## Summary\nA finding.\n\n"
+                    "## Related\n- [[Idea]] — the one link between the two fields\n\n"
+                    "## Sources\n- [[paper-c]] — only\n",
+    }
+
+    def test_year_sources(self):
+        self.assertEqual(year_of({"date": "2026-07"}), (2026, "date"))
+        self.assertEqual(year_of({}, "Attention Is All You Need (Vaswani et al., 2017)"), (2017, "title"))
+        self.assertEqual(year_of({}, "BERT (Devlin et al., 2018/2019)"), (2019, "title"))
+        self.assertEqual(year_of({}, "", "vaswani-2017-attention"), (2017, "filename"))
+        self.assertEqual(year_of({}, "2024-T3 plate under impact"), (None, None))
+
+    def test_topic_parsing(self):
+        self.assertEqual(parse_topics("[Field/Topic, Other; Field / Topic]"), ["Field / Topic", "Other"])
+        self.assertTrue(topic_matches(["Materials / Ballistic impact"], ["materials"]))
+        self.assertFalse(topic_matches(["Materials / Ballistic impact"], ["mat"]))
+
+    def cli(self, *args):
+        proc = subprocess.run([sys.executable, os.path.join(SCRIPTS, "wiki_to_graph.py")] + list(args),
+                              capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        return proc.stdout
+
+    def test_build_query_and_update(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            wiki, out = os.path.join(tmp, "wiki"), os.path.join(tmp, "graph.json")
+            os.makedirs(wiki)
+            for fn, text in self.PAGES.items():
+                with open(os.path.join(wiki, fn), "w", encoding="utf-8") as fh:
+                    fh.write(text)
+            self.cli("build", wiki, "-o", out)
+            with open(out, encoding="utf-8") as fh:
+                n = {x["id"]: x for x in json.load(fh)["nodes"]}
+            self.assertEqual((n["paper-a"]["year"], n["paper-b-smith-et-al-2021"]["year"]), (2019, 2021))
+            self.assertNotIn("year", n["2024-t3-plate-study"])
+            self.assertEqual(n["idea"]["topics"], ["Field A / One"], "inherit the shared topic, not the union")
+            self.assertEqual((n["idea"]["year"], n["idea"]["year_basis"]), (2019, "earliest cited source"))
+            self.assertNotIn("topics_basis", n["other"])
+
+            listed = self.cli("query", out, "list", "--topic", "Field A")
+            self.assertEqual(sorted(l.split()[0] for l in listed.splitlines()),
+                             ["idea", "paper-a", "paper-b-smith-et-al-2021"])
+            self.assertEqual(self.cli("query", out, "list", "--years", "2020-").split()[0], "paper-b-smith-et-al-2021")
+            self.assertIn("1 link(s) between pages that share no topic; 1 of them join different fields",
+                          self.cli("query", out, "bridges"))
+
+            self.cli("update", wiki, "set-topics", "--node", "Idea", "--topics", "Field C / Four")
+            self.cli("build", wiki, "-o", out)
+            with open(out, encoding="utf-8") as fh:
+                idea = {x["id"]: x for x in json.load(fh)["nodes"]}["idea"]
+            self.assertEqual((idea["topics"], idea.get("topics_basis")), (["Field C / Four"], None))
+
+
+class Lineage(unittest.TestCase):
+    """Citation chains run between source pages, in the direction of citation."""
+
+    def page(self, name, cites=()):
+        refs = "".join("- [[%s]] — cited for its method\n" % c for c in cites)
+        return ("---\ntype: source\nlocator: doi:10.1/%s\n---\n\n# %s\n\n## Summary\nA paper.\n\n"
+                "## Related\n- [[Idea]] — what the paper is about\n\n## References\n%s" % (name, name, refs))
+
+    def test_chains_follow_citations(self):
+        pages = {"leaf.md": self.page("leaf", ["mid", "root"]), "mid.md": self.page("mid", ["root"]),
+                 "root.md": self.page("root"),
+                 "idea.md": "---\nkind: concept\n---\n\n# Idea\n\n## Summary\nShared by all three.\n\n"
+                            "## Sources\n- [[leaf]] — a\n- [[root]] — b\n"}
+        with tempfile.TemporaryDirectory() as tmp:
+            wiki, out = os.path.join(tmp, "wiki"), os.path.join(tmp, "graph.json")
+            os.makedirs(wiki)
+            for fn, text in pages.items():
+                with open(os.path.join(wiki, fn), "w", encoding="utf-8") as fh:
+                    fh.write(text)
+            cli = [sys.executable, os.path.join(SCRIPTS, "wiki_to_graph.py")]
+            subprocess.run(cli + ["build", wiki, "-o", out], check=True, capture_output=True)
+            got = subprocess.run(cli + ["query", out, "lineage", "leaf", "root"], capture_output=True, text=True).stdout
+            self.assertIn("2 citation chain(s) from leaf back to root", got)
+            self.assertIn("leaf  →  mid  →  root", got)
+            back = subprocess.run(cli + ["query", out, "lineage", "root", "leaf"], capture_output=True, text=True).stdout
+            self.assertIn("no citation chain", back)
+            self.assertIn("run the other way", back)
 
 
 class Parsing(unittest.TestCase):

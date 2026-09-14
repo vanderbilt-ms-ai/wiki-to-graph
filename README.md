@@ -167,6 +167,10 @@ python3 $SCR query build/graph.json unexplained            # typed links with no
 python3 $SCR query build/graph.json bfs "Transformer" --edges related
 python3 $SCR query build/graph.json dfs "GPT-3" --edges contradicts --undirected
 python3 $SCR query build/graph.json path "Positional Encoding" "RLHF"
+python3 $SCR query build/graph.json topics                 # topics, with source/concept counts and years
+python3 $SCR query build/graph.json timeline --node-type source
+python3 $SCR query build/graph.json bridges                # links between pages sharing no topic
+python3 $SCR query build/graph.json lineage "A" "B"        # citation chains: A cites … cites B
 ```
 
 **Filter any traversal** on edge type, node type/kind, or a combination — include or exclude:
@@ -178,6 +182,8 @@ python3 $SCR query build/graph.json path "Positional Encoding" "RLHF"
 | `--kind a,b` | visit ONLY these node kinds (`concept/schema/procedure/fact`) |
 | `--ignore-kind x,y` | all kinds EXCEPT these |
 | `--node-type …` / `--ignore-node-type …` | filter structural type (`concept/source/index/log`) |
+| `--topic "Field / Topic"` | ONLY pages in these topics; a field matches every topic under it |
+| `--years 2020-2023` | ONLY pages dated in range (`2020`, `2020-`, `-2020` also work) |
 | `--undirected` | treat edges as undirected in bfs/dfs |
 
 ### 5 · Update the wiki, then rebuild
@@ -189,7 +195,9 @@ W=examples/llm-wiki/wiki
 
 # add knowledge atoms and the artifacts they came from
 python3 $SCR update $W add-node   --title "Mixture of Experts" --kind schema --summary "…"
-python3 $SCR update $W add-source --title "Switch Transformer" --locator "arxiv:2101.03961"
+python3 $SCR update $W add-source --title "Switch Transformer" --locator "arxiv:2101.03961" \
+                                  --date 2021-01 --topics "Language models / Scaling"
+python3 $SCR update $W set-topics --node "GPT-3" --topics "Language models / Scaling"
 
 # link them (cites writes the target's locator, so it resolves onto the source page)
 python3 $SCR update $W add-edge   --from "Mixture of Experts" --to "Transformer" --type related
@@ -222,7 +230,9 @@ background to pan, drag a node to reposition it, `fit` to reframe. Click a node 
 full explanation, sources, and its outgoing edges and backlinks — **grouped by edge type, each
 showing the reason the link was made**, with `← back` to retrace. Add a node's title to the URL —
 `graph-viewer.html#Transformer` — to open with that node selected. Colours and toggles are derived from the graph, so a custom
-`--vocab` renders correctly without touching the viewer.
+`--vocab` renders correctly without touching the viewer. When pages carry years or topics, a second
+bar colours nodes by topic, field or year, filters by topic and year range, and switches to a
+**timeline** layout that places each page at its year.
 
 ---
 
@@ -239,6 +249,10 @@ showing the reason the link was made**, with `← back` to retrace. Add a node's
   inferred — paper, web, book, slides, video, transcript, notebook, code, data, audio, note.
 - **Edges** are typed by their source section: `mentions`, `related`, `contradicts`, `cites`, plus
   `indexes` / `records` from the index/log hub pages.
+- **Years and topics** place pages in time and subject. A source's `year` comes from `date:`, a title
+  ending "(Author, 2017)", or a filename like `smith-2017-x`; `topics:` ("Field / Topic", comma
+  separated) can go on any page. Concepts that state neither inherit their cited sources' most
+  shared topic and earliest year, marked as derived.
 - Each node carries its own `edges` list, degrees, `word_count`, `n_sources`, `aliases`. Link text
   is stored as plain names — the relationship lives in the edge, not in `[[markup]]`.
 - **Every edge carries `context`** — the bullet or sentence the link was written in, which is where
