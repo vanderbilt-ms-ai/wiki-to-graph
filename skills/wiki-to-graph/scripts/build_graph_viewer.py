@@ -236,14 +236,14 @@ TEMPLATE = r"""<!DOCTYPE html>
 <script id="data" type="application/json">__DATA__</script>
 <script>
 const G = JSON.parse(document.getElementById('data').textContent);
-const KIND = Object.assign({concept:'#3D6FB6',schema:'#7A4E9C',procedure:'#2E8B72',fact:'#B8862E'},
+const KIND = Object.assign(Object.create(null), {concept:'#3D6FB6',schema:'#7A4E9C',procedure:'#2E8B72',fact:'#B8862E'},
   // Any kind the graph actually contains that we have no colour for gets one from the palette, so a
   // custom vocabulary is legible instead of uniformly grey.
   Object.fromEntries([...new Set(G.nodes.map(n=>n.kind).filter(k=>k &&
       !['concept','schema','procedure','fact'].includes(k)))]
     .map((k,i)=>[k, ['#00b3a4','#e5484d','#d4a72c','#7aa2ff','#b07aa1','#59a14f','#ff9da7','#9c755f'][i%8]])));
 const TYPEN = {source:'#8A949E',index:'#9A6F1F',log:'#6B7580'};
-const EDGE = Object.assign({mentions:'#9AA5AF',related:'#3D6FB6',contradicts:'#B5473A',
+const EDGE = Object.assign(Object.create(null), {mentions:'#9AA5AF',related:'#3D6FB6',contradicts:'#B5473A',
               cites:'#B8862E',indexes:'#9AA5AF',records:'#9AA5AF'},
   Object.fromEntries([...new Set(G.links.map(e=>e.type))]
     .filter(t=>!['mentions','related','contradicts','cites','indexes','records'].includes(t))
@@ -261,7 +261,7 @@ const TEMPER=[[201,163,78],[176,118,58],[123,79,157],[47,95,168]];
 const yearCol=y=>{const t=Math.pow(Y1>Y0?(y-Y0)/(Y1-Y0):1,2),s=t*(TEMPER.length-1),i=Math.min(TEMPER.length-2,Math.floor(s)),f=s-i;
   return 'rgb('+TEMPER[i].map((c,k)=>Math.round(c+(TEMPER[i+1][k]-c)*f)).join(',')+')';};
 let colorBy='kind', layout='force', topicSel='', yFrom=null, yTo=null;
-const kindColor = n => KIND[n.kind] || TYPEN[n.type] || '#8a8f9a';
+const kindColor = n => KIND[n.kind] || (Object.hasOwn(TYPEN,n.type) ? TYPEN[n.type] : '#8a8f9a');
 const nodeColor = n =>
   colorBy==='topic' ? ((n.topics||[]).length?TOPIC_COL[n.topics[0]]:NONE_COL) :
   colorBy==='field' ? ((n.topics||[]).length?FIELD_COL[FIELD(n.topics[0])]:NONE_COL) :
@@ -311,7 +311,7 @@ const tog=document.getElementById('edgeToggles');
 Object.keys(EDGE).forEach(t=>{
   const c=allEdges.filter(e=>e.type===t).length; if(!c) return;
   const lab=document.createElement('label'); lab.className='chip';
-  lab.innerHTML=`<input type="checkbox" ${enabled[t]?'checked':''}> <span class="dot" style="background:${EDGE[t]}"></span>${t} (${c})`;
+  lab.innerHTML=`<input type="checkbox" ${enabled[t]?'checked':''}> <span class="dot" style="background:${EDGE[t]}"></span>${esc(t)} (${c})`;
   lab.querySelector('input').onchange=e=>{enabled[t]=e.target.checked; sim(); draw();
     if(selected) select(selected,true);};
   tog.appendChild(lab);
@@ -339,16 +339,16 @@ function nodeLegend(){
     dotRows([],'undated');
   return '<b>Node kind</b> <span style="opacity:.65">— what the node knows</span>'+
   Object.entries(KIND).map(([k,c])=>
-    `<div class="row"><span class="dot" style="background:${c}"></span>${k}${KIND_DESC[k]?` <span style="opacity:.65">— ${KIND_DESC[k]}</span>`:''}</div>`).join('')+
+    `<div class="row"><span class="dot" style="background:${c}"></span>${esc(k)}${Object.hasOwn(KIND_DESC,k)?` <span style="opacity:.65">— ${esc(KIND_DESC[k])}</span>`:''}</div>`).join('')+
   '<div style="height:8px"></div><b>Node type</b> <span style="opacity:.65">— what the node is</span>'+
   Object.entries(TYPEN).map(([k,c])=>
-    `<div class="row"><span class="dot" style="background:${c}"></span>${k}${TYPE_DESC[k]?` <span style="opacity:.65">— ${TYPE_DESC[k]}</span>`:''}</div>`).join('');
+    `<div class="row"><span class="dot" style="background:${c}"></span>${esc(k)}${Object.hasOwn(TYPE_DESC,k)?` <span style="opacity:.65">— ${esc(TYPE_DESC[k])}</span>`:''}</div>`).join('');
 }
 function renderLegend(){
 document.getElementById('legend').innerHTML = nodeLegend()+
   '<div style="height:8px"></div><b>Edge type</b> <span style="opacity:.65">— toggle in top bar</span>'+
   Object.keys(EDGE).filter(present).map(t=>
-    `<div class="row"><span class="swatch" style="border-top-color:${EDGE[t]}${t==='cites'?';border-top-style:dashed':''}"></span>${t}${EDGE_DESC[t]?` <span style="opacity:.65">— ${EDGE_DESC[t]}</span>`:''}</div>`).join('')+
+    `<div class="row"><span class="swatch" style="border-top-color:${EDGE[t]}${t==='cites'?';border-top-style:dashed':''}"></span>${esc(t)}${Object.hasOwn(EDGE_DESC,t)?` <span style="opacity:.65">— ${esc(EDGE_DESC[t])}</span>`:''}</div>`).join('')+
   '<div style="height:8px"></div><div class="row">'+(PAPER_CITES
       ? 'Paper size = papers here that cite it \u00b7 idea size = links pointing at it'
       : 'Node size = links pointing at it')+' \u00b7 line width = times the link is written</div>'+
@@ -479,7 +479,7 @@ function draw(){
     viewG.appendChild(g);}
   applyView();
 }
-function esc(t){return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function esc(t){return String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function inl(t){return esc(t)
   .replace(/`([^`]+)`/g,'<code>$1</code>')
   .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
@@ -525,6 +525,7 @@ function renderMd(src){
     const buf=[];
     while(i<L.length && L[i].trim() && !BLOCKSTART.test(L[i]) && !UL.test(L[i]) && !OL.test(L[i]))
       buf.push(L[i++].trim());
+    if(!buf.length) buf.push(L[i++]); // Unmatched block prefixes must still advance.
     out.push('<p>'+inl(buf.join(' '))+'</p>');
   }
   return out.join('');
@@ -553,10 +554,10 @@ function relRows(list,id){
   return Object.keys(EDGE).filter(t=>byType[t]&&byType[t].length).map(t=>{
     const rows=byType[t].map(e=>{
       const nd=byId[e.other];
-      return '<div class="e" data-go="'+e.other+'"><span class="tgt">'+esc(nd?nd.title:e.other)+'</span>'+
-             (e.weight>1?' <span style="opacity:.5">×'+e.weight+'</span>':'')+reasonFor(e,id)+'</div>';
+      return '<div class="e" data-go="'+esc(e.other)+'"><span class="tgt">'+esc(nd?nd.title:e.other)+'</span>'+
+             (e.weight>1?' <span style="opacity:.5">×'+esc(e.weight)+'</span>':'')+reasonFor(e,id)+'</div>';
     }).join('');
-    return '<div class="grp"><span class="nm" style="background:'+EDGE[t]+'">'+t+'</span>'+
+    return '<div class="grp"><span class="nm" style="background:'+EDGE[t]+'">'+esc(t)+'</span>'+
            '<span class="ct">'+byType[t].length+(EDGE_DESC[t]?' · '+EDGE_DESC[t]:'')+'</span></div>'+rows;
   }).join('');
 }
@@ -585,10 +586,10 @@ function select(id, viaHistory){
     '<h2>'+esc(n.title)+'</h2>'+
     '<span class="k" style="background:'+col+'">'+esc(n.kind||n.type)+'</span>'+
     '<div class="deg">'+(n.type==='source'&&PAPER_CITES?'cited by '+(citedBy[n.id]||0)+' paper(s) here · ':'')+
-      'in-degree '+(n.in_degree||0)+' · out-degree '+(n.out_degree||0)+
-      (n.n_sources!=null?' · '+n.n_sources+' source(s)':'')+
-      (n.word_count?' · '+n.word_count+' words':'')+'</div>'+
-    (n.year?'<div class="deg"><b style="color:var(--ink)">'+n.year+'</b>'+
+      'in-degree '+esc(n.in_degree||0)+' · out-degree '+esc(n.out_degree||0)+
+      (n.n_sources!=null?' · '+esc(n.n_sources)+' source(s)':'')+
+      (n.word_count?' · '+esc(n.word_count)+' words':'')+'</div>'+
+    (n.year?'<div class="deg"><b style="color:var(--ink)">'+esc(n.year)+'</b>'+
       (n.year_basis==='earliest cited source'?' <span style="opacity:.7">— earliest cited source</span>':'')+'</div>':'')+
     ((n.topics||[]).length?'<div>'+n.topics.map(t=>'<span class="tp" style="background:'+TOPIC_COL[t]+'">'+esc(t)+'</span>').join('')+
       (n.topics_basis?'<span style="font-size:10px;color:var(--muted)">from '+esc(n.topics_basis)+'</span>':'')+'</div>':'')+
@@ -634,13 +635,17 @@ function selectEdge(i){
       row(rev?'Reason on '+esc(shortName(a)):'Reason',why(e.context))+
       (rev?row('Reason on '+esc(shortName(b)),why(rev.context)):'')+
       row('Written in','“'+esc(e.via||'')+'” on '+go(a)+(rev?'; “'+esc(rev.via||'')+'” on '+go(b):''))+
-      row('Weight',String(e.weight||1)+((e.weight||1)>1?' — written that many times':''))+
+      row('Weight',esc(e.weight||1)+((e.weight||1)>1?' — written that many times':''))+
     '</dl>';
   s.querySelectorAll('.go').forEach(el=>el.onclick=()=>select(el.dataset.go));
   const bk=document.getElementById('back');
   if(bk) bk.onclick=()=>{const p=hist.pop(); if(p) select(p,true);};
   s.scrollTop=0; draw();
 }
+window.addEventListener('message',event=>{
+  if(event.source!==parent || event.origin!==location.origin || event.data?.type!=='research:select') return;
+  if(typeof event.data.id==='string' && Object.hasOwn(byId,event.data.id)) select(event.data.id);
+});
 document.getElementById('search').oninput=e=>{
   const q=e.target.value.toLowerCase().trim();if(!q)return;
   const hit=nodes.find(n=>n.title.toLowerCase().includes(q));if(hit)select(hit.id);
@@ -800,7 +805,7 @@ def main():
     a = ap.parse_args()
     data = open(a.graph, encoding="utf-8").read()
     json.loads(data)  # validate
-    open(a.out, "w", encoding="utf-8").write(TEMPLATE.replace("__DATA__", data))
+    open(a.out, "w", encoding="utf-8").write(TEMPLATE.replace("__DATA__", data.replace("<", "\\u003c")))
     print("wrote", a.out)
 
 if __name__ == "__main__":
