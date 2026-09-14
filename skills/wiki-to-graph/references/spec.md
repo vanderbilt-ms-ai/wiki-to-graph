@@ -42,7 +42,7 @@ text (→ `mentions`).
 | Type | One per… | Key properties |
 |------|----------|----------------|
 | `concept` | entity page | `id` (slug of title), `kind`, `title`, `summary`, `explanation`, `sources[]`, `file`, `in_degree`, `out_degree`, `edges[]` |
-| `source`  | an ingested artifact — authored as a page with `type: source`, or generated from a `## Sources` bullet | `id` (slug), `locator`, `medium`, `title`, plus `summary`/`explanation`/`file` when authored, `ref` when generated, `edges[]` |
+| `source`  | an ingested artifact — authored as a page with `type: source`, or generated from a `## Sources` bullet | `id` (slug), `locator`, `medium`, `title`, `year`, `topics[]`, plus `summary`/`explanation`/`file` when authored, `ref` when generated, `edges[]` |
 | `index`   | the `index.md` hub (0–1) | `id`, `title`, `file`, `edges[]` |
 | `log`     | the `log.md` provenance file (0–1) | `id`, `title`, `file`, `edges[]` |
 
@@ -73,6 +73,7 @@ medium: paper          # paper|web|book|slides|video|transcript|notebook|code|da
 locator: raw/attention.pdf
 author: Vaswani et al.
 date: 2017
+topics: Language models / Architecture
 ---
 ```
 
@@ -101,9 +102,28 @@ structured typed edges, **not** as `[[markup]]` reproduced inside the prose. Acc
 - `n_sources` — number of citations in `## Sources`.
 - `aliases` — the strings that resolve to this node (title + filename stem).
 
+**Years and topics** (any node that has them):
+
+- `year` — an integer. For a source: frontmatter `date:` (or `year:`); else a title that ends in
+  a citation, "Attention Is All You Need (Vaswani et al., 2017)", taking the last year inside the
+  parentheses; else a filename such as `vaswani-2017-attention`. A year elsewhere in a title is
+  not trusted ("2024-T3" is an alloy). A citation stub takes it from the bullet the same way.
+  For a concept: frontmatter `date:` if given, else the **earliest** year among the sources it
+  `cites` — when this collection first records the idea.
+- `year_basis` — `date`, `title`, `filename`, or `earliest cited source`.
+- `topics` — from frontmatter `topics:` (comma or `;` separated, `[a, b]` accepted). A topic is a
+  coarse grouping of pages, not a knowledge atom; `Field / Topic` nests a topic under a field,
+  and filters on a field match every topic under it. A concept without authored topics inherits
+  the topic(s) held by the most of its cited sources (ties kept), not their union.
+- `topics_basis` — `cited sources` when inherited; absent when authored.
+
+`meta.topics` counts pages per topic and `meta.years` gives `{min, max}`. `query topics`,
+`query timeline` and `query bridges` (links between pages that share no topic), and the
+`--topic` / `--years` filters, read these fields.
+
 Candidate fields worth adding later (not yet emitted): computed centrality (PageRank/
-betweenness — done on load, not baked in to avoid staleness), a stable UUID, `created`/`updated`
-timestamps, and a `domain`/cluster label once communities are detected.
+betweenness — done on load, not baked in to avoid staleness), a stable UUID, and
+`created`/`updated` timestamps.
 
 ## 3.1a `kind` classification of this reference wiki
 

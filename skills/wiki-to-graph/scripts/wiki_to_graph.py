@@ -69,6 +69,50 @@ def strip_links(text):
     return LINK_RE.sub(lambda m: (m.group(2) or m.group(1)).strip(), text)
 
 
+YEAR_RE = re.compile(r"(?<!\d)(1[5-9]\d\d|20\d\d|21\d\d)(?!\d)")
+CITED_YEAR_RE = re.compile(r"\(([^()]*)\)\s*$")
+
+
+def year_of(meta, title="", stem=""):
+    """-> (year, basis), or (None, None).
+
+    A declared `date:` (or `year:`) wins. For a source, a title ending in a citation,
+    "Attention Is All You Need (Vaswani et al., 2017)", or a filename such as
+    vaswani-2017-attention is the fallback. A year anywhere else in a title is not
+    trusted: in "2024-T3 plate", 2024 is an aluminium alloy, not a date."""
+    d = YEAR_RE.search(str(meta.get("date") or meta.get("year") or ""))
+    if d:
+        return int(d.group(1)), "date"
+    m = CITED_YEAR_RE.search(title or "")
+    years = YEAR_RE.findall(m.group(1)) if m else []
+    if years:
+        return int(years[-1]), "title"
+    m = re.search(r"(?:^|[-_ ])(1[5-9]\d\d|20\d\d|21\d\d)(?=[-_ ]|$)", stem or "")
+    if m:
+        return int(m.group(1)), "filename"
+    return None, None
+
+
+def parse_topics(value):
+    """`topics: Field / Topic, Other` or `[a, b]` -> ["Field / Topic", "Other"].
+
+    A topic is a coarse grouping of pages (a field, a subject area), not an atom of
+    knowledge: atoms are concept pages. "Field / Topic" nests a topic under a field so
+    a filter can select either level."""
+    out = []
+    for t in re.split(r"[,;]", (value or "").strip().strip("[]")):
+        t = re.sub(r"\s*/\s*", " / ", t.strip().strip("\"'"))
+        if t and t not in out:
+            out.append(t)
+    return out
+
+
+def topic_matches(topics, wanted):
+    """True if any topic equals a wanted name or sits under it ("Field" matches "Field / X")."""
+    low = [t.lower() for t in topics or []]
+    return any(t == w or t.startswith(w + " / ") for t in low for w in wanted)
+
+
 # knowledge-node taxonomy (the `kind` property). Structural `type` stays concept/
 # source/index/log; `kind` classifies the knowledge a concept node holds.
 #
@@ -322,6 +366,9 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
                               "ref": bullet, "title": bullet,
                               "locator": loc, "path": loc, "medium": medium_for(loc),
                               "in_degree": 0, "out_degree": 0, "edges": []}
+            yr, basis = year_of({}, bullet)
+            if yr:
+                src_nodes[sid].update(year=yr, year_basis=basis)
         return sid
 
     def add_edge(s, t, et, via, w=1, context=""):
@@ -393,6 +440,14 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
             for _k in ("author", "date", "publisher", "accessed"):
                 if p["meta"].get(_k):
                     node[_k] = p["meta"][_k]
+        is_src = p["ntype"] == "source"
+        yr, basis = year_of(p["meta"], p["title"] if is_src else "",
+                            os.path.splitext(p["file"])[0] if is_src else "")
+        if yr:
+            node["year"], node["year_basis"] = yr, basis
+        topics = parse_topics(p["meta"].get("topics") or p["meta"].get("topic"))
+        if topics:
+            node["topics"] = topics
         nodes[cid] = node
 
         for sec, lines in p["sections"].items():
@@ -412,7 +467,8 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
                         source_strings.append(part)
                         sid = resolve_source(part)
                         if sid != cid:
-                            add_edge(cid, sid, "cites", sec, 1, re.sub(r"\s+", " ", part).strip())
+                            add_edge(cid, sid, "cites", sec, 1,
+                                     re.sub(r"\s+", " ", strip_links(part)).strip())
                 continue
             for tgt, info in link_contexts(text, subject_rule=(et == "contradicts")).items():
                 cnt = info["count"]
@@ -465,6 +521,33 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
     for nid, n in nodes.items():
         if n["type"] == "concept" and cdeg[nid] == 0:
             warnings["orphans"].append(nid)
+
+    # A concept rarely states a year or topic, but the sources it cites do. It inherits the
+    # topic(s) most of its sources share (ties kept), not their union, which would tag a
+    # page citing five papers with every topic any of them touches. It takes the earliest
+    # of their years: when this collection first records the idea. Both say they were
+    # derived, so a reader can tell an authored value from an inherited one.
+    cited = {}
+    for e in edges:
+        if e["type"] == "cites":
+            cited.setdefault(e["source"], []).append(e["target"])
+    for nid, n in nodes.items():
+        if n["type"] != "concept":
+            continue
+        srcs = [nodes.get(s) or src_nodes.get(s) for s in cited.get(nid, [])]
+        srcs = [s for s in srcs if s]
+        if not n.get("topics"):
+            tally = {}
+            for s in srcs:
+                for t in s.get("topics", []):
+                    tally[t] = tally.get(t, 0) + 1
+            if tally:
+                top = max(tally.values())
+                n["topics"] = sorted(t for t, c in tally.items() if c == top)
+                n["topics_basis"] = "cited sources"
+        years = [s["year"] for s in srcs if s.get("year")]
+        if years and not n.get("year"):
+            n["year"], n["year_basis"] = min(years), "earliest cited source"
 
     # extra per-node metadata
     for n in nodes.values():
@@ -523,7 +606,8 @@ def dag_report(nodes, edges, dag_edges):
 def write_graphml(nodes, edges, path):
     def esc(x): return sx.escape(str(x)) if x is not None else ""
     keys = [("d_type","type","node","string"),("d_kind","kind","node","string"),
-            ("d_title","title","node","string"),
+            ("d_title","title","node","string"),("d_year","year","node","int"),
+            ("d_topics","topics","node","string"),
             ("e_type","type","edge","string"),("e_via","via","edge","string"),
             ("e_w","weight","edge","int")]
     with open(path,"w",encoding="utf-8") as fh:
@@ -535,7 +619,10 @@ def write_graphml(nodes, edges, path):
         for nid,n in nodes.items():
             fh.write(f'<node id="{esc(nid)}"><data key="d_type">{esc(n["type"])}</data>'
                      f'<data key="d_kind">{esc(n.get("kind"))}</data>'
-                     f'<data key="d_title">{esc(n.get("title"))}</data></node>\n')
+                     f'<data key="d_title">{esc(n.get("title"))}</data>'
+                     + (f'<data key="d_year">{n["year"]}</data>' if n.get("year") else '')
+                     + (f'<data key="d_topics">{esc("; ".join(n["topics"]))}</data>' if n.get("topics") else '')
+                     + '</node>\n')
         for i,e in enumerate(edges):
             fh.write(f'<edge id="e{i}" source="{esc(e["source"])}" target="{esc(e["target"])}">'
                      f'<data key="e_type">{esc(e["type"])}</data>'
@@ -553,14 +640,15 @@ def write_sqlite(nodes, edges, path):
     con=sqlite3.connect(tmp); c=con.cursor()
     c.execute("""CREATE TABLE nodes(id TEXT PRIMARY KEY,type TEXT,kind TEXT,title TEXT,summary TEXT,
                  explanation TEXT,sources TEXT,file TEXT,word_count INT,n_sources INT,
-                 in_degree INT,out_degree INT)""")
+                 in_degree INT,out_degree INT,year INT,topics TEXT)""")
     c.execute("""CREATE TABLE edges(src TEXT,dst TEXT,type TEXT,via TEXT,directed INT,weight INT)""")
     for n in nodes.values():
-        c.execute("INSERT INTO nodes VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+        c.execute("INSERT INTO nodes VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                   (n["id"],n["type"],n.get("kind"),n.get("title"),n.get("summary",""),
                    n.get("explanation",""),json.dumps(n.get("sources",[])),n.get("file"),
                    n.get("word_count",0),n.get("n_sources",0),
-                   n.get("in_degree",0),n.get("out_degree",0)))
+                   n.get("in_degree",0),n.get("out_degree",0),
+                   n.get("year"),json.dumps(n.get("topics",[]))))
     for e in edges:
         c.execute("INSERT INTO edges VALUES(?,?,?,?,?,?)",
                   (e["source"],e["target"],e["type"],e["via"],int(e["directed"]),e["weight"]))
@@ -609,6 +697,12 @@ def cmd_build(args):
     ncount={}
     for n in nodes.values(): ncount[n["type"]]=ncount.get(n["type"],0)+1
     dag=dag_report(nodes,edges,{x.strip() for x in args.dag_edges.split(",") if x.strip()})
+    topic_counts={}
+    for n in nodes.values():
+        for t in n.get("topics") or []:
+            topic_counts[t]=topic_counts.get(t,0)+1
+    years=sorted(n["year"] for n in nodes.values() if n.get("year"))
+    year_span={"min":years[0],"max":years[-1]} if years else None
 
     # multigraph=True: two nodes may be joined by several *typed* edges
     # (e.g. both `related` and `mentions`); a simple DiGraph would collapse them.
@@ -617,7 +711,8 @@ def cmd_build(args):
                    "generated":datetime.datetime.now().isoformat(timespec="seconds"),
                    "source_dir":os.path.normpath(args.wiki_dir),
                    "counts":{**ncount,"edges":ecount},
-                   "dag_check":dag,"warnings":warnings,"normalization":norm},
+                   "dag_check":dag,"warnings":warnings,"normalization":norm,
+                   "topics":dict(sorted(topic_counts.items())),"years":year_span},
            "nodes":list(nodes.values()),
            "links":edges}
     open(args.out,"w",encoding="utf-8").write(json.dumps(graph,indent=2,ensure_ascii=False))
@@ -634,6 +729,9 @@ def cmd_build(args):
           f"self-loops: {len(warnings['self_loops'])}")
     print(f"DAG check over {dag['edge_types']}: "
           f"{'acyclic' if dag['acyclic'] else 'CYCLES: '+str(dag['cyclic_components'])}")
+    if topic_counts or year_span:
+        print(f"topics: {len(topic_counts)}  years: "
+              + (f"{year_span['min']}–{year_span['max']}" if year_span else "none"))
     if norm is not None:
         done = report_lines(norm)
         print("normalized: " + ("; ".join(done) if done else "already in the page contract, nothing changed"))
@@ -882,6 +980,10 @@ def cmd_validate(args):
     print(f"  [info] links with no stated reason: {len(unex)}"
           + (f"  (e.g. {unex[0][0]} -{unex[0][2]}-> {unex[0][1]})" if unex else "")
           + "  \u2014 see `query <graph> unexplained`")
+    nsrc = [nd for nd in nodes.values() if nd.get("type") == "source"]
+    topics = {t for nd in nodes.values() for t in nd.get("topics") or []}
+    print(f"  [info] sources with a year: {sum(1 for nd in nsrc if nd.get('year'))}/{len(nsrc)}"
+          f"  · topics: {len(topics)}  — see `query <graph> timeline` and `topics`")
     print(f"  [info] DAG over {sorted(dedges)}: "
           f"{'acyclic' if dag['acyclic'] else 'has cycles (expected for cross-references)'}")
     print(f"  RESULT: {'PASS' if problems == 0 else str(problems)+' issue group(s)'}")
@@ -905,7 +1007,27 @@ def resolve_node(nodes, name):
     for n in nodes.values():
         if any(a.lower() == low or slug(a) == s for a in (n.get("aliases") or [])):
             return n["id"]
-    return None
+    # A source is also named by its citation, "Cao et al., 2026" or "Cao 2026", taken from
+    # the parenthetical that ends its title. Only an unambiguous match resolves.
+    hits = citation_matches(nodes, name)
+    return hits[0] if len(hits) == 1 else None
+
+
+def citation_key(text):
+    return " ".join(w for w in re.findall(r"[a-z0-9]+", text.lower()) if w not in ("et", "al", "and"))
+
+
+def citation_matches(nodes, name):
+    """Node ids whose title ends in a citation matching `name` ("Johnson and Cook, 1983")."""
+    want = citation_key(name)
+    if not want or not re.search(r"\d{4}", want):
+        return []
+    out = []
+    for n in nodes.values():
+        m = re.search(r"\(([^()]*\d{4}[^()]*)\)\s*$", n.get("title") or "")
+        if m and (citation_key(m.group(1)) == want or citation_key(m.group(1)).split()[:1] + re.findall(r"\d{4}", m.group(1))[-1:] == want.split()):
+            out.append(n["id"])
+    return sorted(out)
 
 
 def cmd_analyze(args):
@@ -977,6 +1099,18 @@ def _csv(s):
     return {x.strip() for x in s.split(",") if x.strip()} if s else None
 
 
+def _years(s):
+    """'2014-2020' | '2020' | '2020-' | '-2020' -> (from, to), either end None if open."""
+    if not s:
+        return None, None
+    m = re.fullmatch(r"\s*(\d{4})?\s*([-–:])?\s*(\d{4})?\s*", s)
+    if not m or not (m.group(1) or m.group(3)):
+        print("--years takes YYYY, YYYY-YYYY, YYYY- or -YYYY"); sys.exit(1)
+    a = int(m.group(1)) if m.group(1) else None
+    b = int(m.group(3)) if m.group(3) else None
+    return (a, a) if not m.group(2) else (a, b)
+
+
 def cmd_query(args):
     """Canned graph questions — callers never write raw SQL or graph code.
 
@@ -994,6 +1128,8 @@ def cmd_query(args):
     inc_e, exc_e = _csv(args.edges), _csv(args.ignore_edges) or set()
     inc_k, exc_k = _csv(args.kind), _csv(args.ignore_kind) or set()
     inc_t, exc_t = _csv(args.node_type), _csv(args.ignore_node_type) or set()
+    inc_topic = [t.lower() for t in parse_topics(args.topic)] if args.topic else None
+    y_from, y_to = _years(args.years)
 
     def edge_types(default):
         base = inc_e if inc_e is not None else set(default)
@@ -1005,13 +1141,79 @@ def cmd_query(args):
         if k in exc_k: return False
         if inc_t is not None and t not in inc_t: return False
         if t in exc_t: return False
+        if inc_topic is not None and not topic_matches(nd.get("topics"), inc_topic): return False
+        if (y_from is not None or y_to is not None) and not nd.get("year"): return False
+        if y_from is not None and nd["year"] < y_from: return False
+        if y_to is not None and nd["year"] > y_to: return False
         return True
 
     q = args.question
 
     if q == "list":
         for n in sorted((x for x in nodes.values() if node_ok(x["id"])), key=lambda x: x["id"]):
-            print(f'{n["id"]:34} {str(n.get("kind")):9} {n["type"]:8} in={n.get("in_degree",0):<3} out={n.get("out_degree",0)}')
+            extra = "  ".join(x for x in (str(n.get("year") or ""), ", ".join(n.get("topics") or [])) if x)
+            print(f'{n["id"]:34} {str(n.get("kind")):9} {n["type"]:8} in={n.get("in_degree",0):<3} '
+                  f'out={n.get("out_degree",0):<3}' + (f'  {extra}' if extra else ''))
+        return
+    if q == "topics":
+        rows = {}
+        for n in nodes.values():
+            if not node_ok(n["id"]):
+                continue
+            for t in n.get("topics") or []:
+                r = rows.setdefault(t, {"source": 0, "concept": 0, "years": []})
+                if n["type"] in ("source", "concept"):
+                    r[n["type"]] += 1
+                if n["type"] == "source" and n.get("year"):
+                    r["years"].append(n["year"])
+        for t in sorted(rows):
+            r = rows[t]
+            span = (f'{min(r["years"])}–{max(r["years"])}' if r["years"] else "undated")
+            print(f'{t:58} sources={r["source"]:<3} concepts={r["concept"]:<3} {span}')
+        untagged = sum(1 for n in nodes.values() if n["type"] in ("source", "concept")
+                       and node_ok(n["id"]) and not n.get("topics"))
+        print(f"\n  {len(rows)} topic(s); {untagged} source/concept page(s) with no topic")
+        return
+    if q == "timeline":
+        dated = sorted((n for n in nodes.values() if n.get("year") and node_ok(n["id"])),
+                       key=lambda n: (n["year"], n["type"] != "source", n["title"]))
+        cur = None
+        for n in dated:
+            if n["year"] != cur:
+                cur = n["year"]; print(cur)
+            tag = n.get("kind") or n["type"]
+            derived = "  (earliest cited source)" if n.get("year_basis") == "earliest cited source" else ""
+            print(f'  [{tag}] {n["title"]}{derived}'
+                  + (f'  — {", ".join(n["topics"])}' if n.get("topics") else ""))
+        undated = sum(1 for n in nodes.values() if not n.get("year") and node_ok(n["id"]))
+        print(f"\n  {len(dated)} dated node(s); {undated} undated")
+        return
+    if q == "bridges":
+        # Links between pages that share no topic: where one subject reaches into another.
+        types = edge_types(["related", "contradicts", "mentions", "cites"])
+        field = lambda ts: {t.split(" / ")[0] for t in ts}
+        seen, crossings = set(), 0
+        count = 0
+        for e in edges:
+            a, b = nodes.get(e["source"]), nodes.get(e["target"])
+            if e["type"] not in types or not a or not b or not (node_ok(a["id"]) and node_ok(b["id"])):
+                continue
+            ta, tb = a.get("topics") or [], b.get("topics") or []
+            if not ta or not tb or set(ta) & set(tb):
+                continue
+            key = (e["type"],) + (tuple(sorted((a["id"], b["id"]))) if e["type"] in SYMMETRIC
+                                  else (a["id"], b["id"]))
+            if key in seen:
+                continue
+            seen.add(key); count += 1
+            other_field = not (field(ta) & field(tb))
+            crossings += other_field
+            print(f'  {a["title"]} [{ta[0]}]  -{e["type"]}->  {b["title"]} [{tb[0]}]'
+                  + ("  (across fields)" if other_field else ""))
+            if e.get("context"):
+                print(f'      {e["context"]}')
+        print(f"\n  {count} link(s) between pages that share no topic; "
+              f"{crossings} of them join different fields")
         return
     if q == "unexplained":
         rows = unexplained_edges(nodes, edges)
@@ -1055,6 +1257,79 @@ def cmd_query(args):
         print(" → ".join(title(x) for x in p) if p else "no path (with current filters)")
         return
 
+    if q == "lineage":
+        # Chains of citation between SOURCE pages: FROM cites X cites ... cites TO. `path`
+        # is undirected and happily routes through a shared concept page, which says two
+        # papers are about the same thing, not that one builds on the other.
+        if len(args.terms) < 2:
+            print("usage: query <graph> lineage FROM TO   (FROM cites … cites TO)"); sys.exit(1)
+        a, b = resolve(args.terms[0]), resolve(args.terms[1])
+        for t, i in zip(args.terms, (a, b)):
+            several = [] if i else citation_matches(nodes, t)
+            if len(several) > 1:
+                print("'%s' matches %d pages; name one:\n  %s" % (t, len(several), "\n  ".join(several)))
+                sys.exit(1)
+        missing = [t for t, i in zip(args.terms, (a, b)) if not i]
+        if missing:
+            print("no node matching " + ", ".join("'%s'" % t for t in missing)); sys.exit(1)
+        adj = {}
+        for e in edges:
+            s, t = nodes.get(e["source"], {}), nodes.get(e["target"], {})
+            if e["type"] == "cites" and s.get("type") == "source" and t.get("type") == "source":
+                adj.setdefault(e["source"], set()).add(e["target"])
+
+        def cite_label(i):
+            m = re.search(r"\(([^()]*\d{4}[^()]*)\)\s*$", title(i))
+            return m.group(1) if m else None
+        seen_labels = {}
+        for i in nodes:
+            if cite_label(i):
+                seen_labels[cite_label(i)] = seen_labels.get(cite_label(i), 0) + 1
+
+        def label(i):
+            t, c = title(i), cite_label(i)
+            if c and seen_labels[c] == 1:
+                return c
+            if c:   # two "Cao et al., 2026": add the start of each title so the chain is readable
+                return "%s [%s…]" % (c, " ".join(t.split()[:4]))
+            return t if len(t) <= 60 else t[:59] + "…"
+
+        def chains(start, goal):
+            found = []
+            def walk(v, path):
+                if v == goal:
+                    found.append(path); return
+                if len(path) - 1 >= args.max_depth:
+                    return
+                for w in sorted(adj.get(v, ())):
+                    if w not in path and (w == goal or node_ok(w)):
+                        walk(w, path + [w])
+            walk(start, [start])
+            return sorted(found, key=lambda p: (len(p), [label(x) for x in p]))
+
+        paths = chains(a, b)
+        if not paths:
+            back = chains(b, a)
+            print(f"no citation chain from {label(a)} back to {label(b)} within {args.max_depth} step(s)"
+                  + (f"; {len(back)} run the other way — try `lineage \"{args.terms[1]}\" \"{args.terms[0]}\"`"
+                     if back else ""))
+            return
+        print(f"{len(paths)} citation chain(s) from {label(a)} back to {label(b)} "
+              f"(≤{args.max_depth} steps; shortest {len(paths[0]) - 1})")
+        for p in paths[:50]:
+            print("  " + "  →  ".join(label(x) for x in p))
+        if len(paths) > 50:
+            print(f"  … and {len(paths) - 50} more")
+        through = {}
+        for p in paths:
+            for x in p[1:-1]:
+                through[x] = through.get(x, 0) + 1
+        if through:
+            print("\n  papers the chains pass through most:")
+            for x, c in sorted(through.items(), key=lambda kv: (-kv[1], label(kv[0])))[:10]:
+                print(f"    {c:>3}  {label(x)}")
+        return
+
     # node-scoped questions
     if not args.terms:
         print(f"'{q}' needs a node name"); sys.exit(1)
@@ -1076,6 +1351,11 @@ def cmd_query(args):
         n = nodes[nid]; keep = edge_types(ALL_EDGE_TYPES)
         print(f'{n["title"]}  [{n.get("kind") or n["type"]}]  in={n.get("in_degree",0)} out={n.get("out_degree",0)}'
               + (f'  {n.get("n_sources")} source(s)' if n.get("n_sources") is not None else ''))
+        if n.get("year"):
+            print(f'year: {n["year"]}  ({n.get("year_basis")})')
+        if n.get("topics"):
+            print(f'topics: {", ".join(n["topics"])}'
+                  + (f'  ({n["topics_basis"]})' if n.get("topics_basis") else ""))
         if n.get("summary"): print(n["summary"])
         print("outgoing:")
         for e in n.get("edges", []):
@@ -1166,7 +1446,9 @@ def cmd_update(args):
             for k in ("author", "date"):
                 if getattr(args, k, None):
                     fm[k] = getattr(args, k)
-            order = ["type", "medium", "locator", "author", "date"]
+            if args.topics:
+                fm["topics"] = ", ".join(parse_topics(args.topics))
+            order = ["type", "medium", "locator", "author", "date", "topics"]
             body = ("# %s\n\n## Summary\n%s\n\n## Explanation\n%s\n\n## Related\n\n"
                     % (args.title, args.summary or "", args.explanation or ""))
             open(path, "w", encoding="utf-8").write(join_frontmatter(fm, order, body))
@@ -1175,11 +1457,13 @@ def cmd_update(args):
             kind = (args.kind or "concept").lower()
             if kind not in KINDS:
                 print("--kind must be one of:", ", ".join(sorted(KINDS))); sys.exit(1)
+            topics_line = ("topics: %s\n" % ", ".join(parse_topics(args.topics))
+                           if args.topics else "")
             open(path, "w", encoding="utf-8").write(
-                "---\nkind: %s\n---\n\n# %s\n\n## Summary\n%s\n\n"
+                "---\nkind: %s\n%s---\n\n# %s\n\n## Summary\n%s\n\n"
                 "## Explanation\n%s\n\n## Related\n\n"
                 "## Contradictions / tensions\n\n## Sources\n"
-                % (kind, args.title, args.summary or "", args.explanation or ""))
+                % (kind, topics_line, args.title, args.summary or "", args.explanation or ""))
             print("created", path)
 
     elif act == "add-edge":
@@ -1295,6 +1579,21 @@ def cmd_update(args):
         print("renamed to '%s' (%s); rewrote links in %d page(s)"
               % (args.title, os.path.basename(newp), touched))
 
+    elif act == "set-topics":
+        p = find_page(wd, args.node or "")
+        if not p:
+            print("no page for --node", args.node); sys.exit(1)
+        fm, order, body = split_frontmatter(open(p, encoding="utf-8").read())
+        topics = parse_topics(args.topics)
+        if topics:
+            fm["topics"] = ", ".join(topics)
+            if "topics" not in order:
+                order.append("topics")
+        else:                                   # --topics "" clears them
+            fm.pop("topics", None); order = [k for k in order if k != "topics"]
+        open(p, "w", encoding="utf-8").write(join_frontmatter(fm, order, body))
+        print("set topics=%s on %s" % (", ".join(topics) or "(none)", os.path.basename(p)))
+
     elif act in ("set-kind", "set-type"):
         p = find_page(wd, args.node or "")
         if not p:
@@ -1363,7 +1662,8 @@ def main():
     q.add_argument("graph")
     q.add_argument("question",
                    choices=["list", "node", "neighbors", "backlinks", "kind", "edgetype",
-                            "contradicts", "unexplained", "path", "bfs", "dfs"])
+                            "contradicts", "unexplained", "path", "bfs", "dfs",
+                            "topics", "timeline", "bridges", "lineage"])
     q.add_argument("terms", nargs="*", help="node name(s), or a kind/edge-type argument")
     # filters — any combination:
     q.add_argument("--edges", default=None, help="ONLY traverse/show these edge types (comma list)")
@@ -1372,7 +1672,11 @@ def main():
     q.add_argument("--ignore-kind", default=None, help="visit all kinds EXCEPT these")
     q.add_argument("--node-type", default=None, help="ONLY visit these structural types (concept,source,index,log)")
     q.add_argument("--ignore-node-type", default=None, help="visit all node types EXCEPT these")
+    q.add_argument("--topic", default=None,
+                   help="ONLY visit nodes in these topics (comma list; a field matches every topic under it)")
+    q.add_argument("--years", default=None, help="ONLY visit nodes dated YYYY, YYYY-YYYY, YYYY- or -YYYY")
     q.add_argument("--undirected", action="store_true", help="treat edges as undirected in bfs/dfs")
+    q.add_argument("--max-depth", type=int, default=4, help="lineage: longest citation chain to follow")
     q.add_argument("--vocab", default=None,
                    help="JSON file overriding the kind/edge vocabulary")
     q.set_defaults(func=cmd_query)
@@ -1386,7 +1690,8 @@ def main():
     u = sub.add_parser("update", help="edit the source wiki markdown, then re-run build")
     u.add_argument("wiki_dir")
     u.add_argument("action", choices=["add-node", "add-source", "add-edge", "remove-edge",
-                                      "remove-node", "rename", "set-kind", "set-type"])
+                                      "remove-node", "rename", "set-kind", "set-type",
+                                      "set-topics"])
     u.add_argument("--title", help="new node title; with `rename`, the new title")
     u.add_argument("--kind", help="concept|schema|procedure|fact (concept nodes only)")
     u.add_argument("--summary"); u.add_argument("--explanation")
@@ -1396,6 +1701,8 @@ def main():
     u.add_argument("--locator", help="add-source: path, URL, or doi:/arxiv:/isbn: identifier")
     u.add_argument("--medium", help="add-source: paper|web|book|slides|video|transcript|code|…")
     u.add_argument("--author"); u.add_argument("--date")
+    u.add_argument("--topics", help="add-node/add-source/set-topics: comma list, e.g. "
+                                    "\"Materials engineering / Ballistic impact\"")
     u.set_defaults(func=cmd_update)
 
     args = ap.parse_args()

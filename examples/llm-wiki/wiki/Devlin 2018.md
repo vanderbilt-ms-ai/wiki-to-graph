@@ -4,6 +4,7 @@ medium: paper
 locator: raw/02_bert.md
 author: Devlin, Chang, Lee, Toutanova
 date: 2018
+topics: Language models / Pretraining
 ---
 
 # BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding

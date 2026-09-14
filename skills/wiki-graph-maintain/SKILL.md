@@ -41,12 +41,24 @@ node, never a concept.
 
 ```
 python3 $SCRIPT update <wiki> add-source --title "<short name>" \
-  --locator <path|URL|doi:…|isbn:…> [--medium …] [--author …] [--date …]
+  --locator <path|URL|doi:…|isbn:…> [--medium …] [--author …] \
+  --date <YYYY[-MM]> --topics "<Field / Topic>, …"
 ```
 
 `medium` is inferred from the locator when omitted (a URL gives `web`, `.pptx`
 gives `slides`, `.vtt` gives `transcript`, `doi:` gives `paper`). Set it
 explicitly when the inference would be wrong.
+
+Give every source a date and topics. They drive `query timeline`, `--topic` and `--years`
+filters, `query bridges`, and the viewer's colour-by and timeline layout. Reuse the
+wiki's existing topic names (`query <graph> topics`) before inventing new ones; a new
+subject gets a new field ("Materials engineering / Ballistic impact"). Concepts inherit
+both from the sources they cite, so set them on a concept only when the inherited value
+is wrong.
+
+When a new source cites sources already in the wiki, give its page a `## References`
+section with one bullet per cited source page — `- [[other-source]] — what it is cited
+for` — so `query lineage` can follow citation chains between papers.
 
 ### 2. Propose atoms, and show the list first
 
@@ -154,6 +166,7 @@ python3 $SCRIPT validate build/graph.json          # dangling / orphans / self-l
 python3 $SCRIPT analyze  build/graph.json --top 10 # PageRank, in-degree, contested, communities
 python3 $SCRIPT query    build/graph.json contradicts
 python3 $SCRIPT query    build/graph.json unexplained
+python3 $SCRIPT query    build/graph.json bridges       # links between pages that share no topic
 ```
 
 What to look for:
@@ -163,7 +176,12 @@ What to look for:
   the reason or remove the link; do not invent one.
 - **Orphans** — a concept nothing links to. Either link it or remove it.
 - **A community that is one artifact's vocabulary** — a paper was ingested
-  without connecting its atoms to what was already there. Add the cross-links.
+  without connecting its atoms to what was already there. Add the cross-links
+  the sources support.
+- **A subject that bridges nothing** — `query bridges` lists links between pages
+  sharing no topic. When a new artifact is from an unrelated field, zero is the
+  correct answer: report it, and do not invent a link to make the graph look
+  connected.
 - **`contradicts` concentrated on a hub page** — disagreements were recorded in
   one central page instead of on the pages that actually disagree. Push each one
   onto both sides; the hub keeps the narrative.

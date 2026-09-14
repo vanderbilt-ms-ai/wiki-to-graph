@@ -56,6 +56,10 @@ Many users never see a command line; the conversation is their only interface to
 | "most central", "most contested", "main themes" | `analyze graph.json --top 10` | PageRank, in-degree, contested nodes, communities — quoted |
 | "list every procedure" (or fact, schema, concept) | `query graph.json list --kind procedure` | the pages |
 | "which links have no reason" | `query graph.json unexplained` | the pairs |
+| "what came when" / "what is from 2020–2023" | `query graph.json timeline` (add `--years 2020-2023`, `--node-type source`) | pages by year; say when a concept's year is its earliest cited source |
+| "what topics are in here" / "everything on X" | `query graph.json topics`, then `list --topic "X"` | topics with source and concept counts; a field name matches every topic under it |
+| "does this connect to anything else" | `query graph.json bridges` | links between pages that share no topic; zero is a real answer — say so, never invent a link |
+| "how does paper A build on paper B" / "trace A back to B" | `query graph.json lineage "A" "B"` | every chain of citations between source pages, shortest first, and the papers most chains pass through; `path` is not a lineage — it walks through shared concept pages |
 | "open the viewer on X" | open `graph-viewer.html#X` | — |
 | "add this paper / page / link", rename, remove | `update …`, or the `wiki-graph-maintain` skill for new sources | rebuild, then report what changed |
 
@@ -103,6 +107,12 @@ wiki exactly as written.
   (`## Contradictions / tensions`), `cites` (concept → source), and hub edges
   `indexes` / `records`. `related` and `contradicts` are symmetric. Every edge carries
   `context` — the sentence the link was written in.
+- **Years and topics.** A source's `year` comes from frontmatter `date:`, else a title
+  ending in a citation — "(Vaswani et al., 2017)" — else a filename like
+  `vaswani-2017-attention`. `topics:` is a comma list on any page; "Field / Topic" nests a
+  topic under a field. A concept that states neither inherits the topic its cited sources
+  most share and the earliest of their years, and `year_basis` / `topics_basis` record
+  that it was derived. Topics group pages; they are not knowledge atoms.
 
 ## Output
 
@@ -125,7 +135,11 @@ python3 $S/build_graph_viewer.py graph.json -o graph-viewer.html
 python3 $S/wiki_to_graph.py analyze graph.json --top 5 --path "GPT-3" "Layer Normalization"
 
 # QUERY: list | node | neighbors | backlinks | kind | edgetype | contradicts | unexplained | path | bfs | dfs
+#        | topics | timeline | bridges | lineage
+python3 $S/wiki_to_graph.py query graph.json lineage "Cao 2026" "Johnson 1983" --max-depth 4
 python3 $S/wiki_to_graph.py query graph.json node "RLHF"
+python3 $S/wiki_to_graph.py query graph.json timeline --topic "Language models" --node-type source
+python3 $S/wiki_to_graph.py query graph.json bridges
 python3 $S/wiki_to_graph.py query graph.json bfs "Transformer" --edges related
 python3 $S/wiki_to_graph.py query graph.json dfs "GPT-3" --edges contradicts --undirected
 
@@ -135,7 +149,9 @@ python3 $S/wiki_to_graph.py lint <wiki_dir>
 
 # UPDATE: edit the source markdown, then rebuild
 python3 $S/wiki_to_graph.py update <wiki_dir> add-node    --title "Mixture of Experts" --kind schema --summary "..."
-python3 $S/wiki_to_graph.py update <wiki_dir> add-source  --title "Switch Transformer" --locator "arxiv:2101.03961"
+python3 $S/wiki_to_graph.py update <wiki_dir> add-source  --title "Switch Transformer" --locator "arxiv:2101.03961" \
+                                                           --date 2021-01 --topics "Language models / Scaling"
+python3 $S/wiki_to_graph.py update <wiki_dir> set-topics  --node "GPT-3" --topics "Language models / Scaling, Language models / Prompting"
 python3 $S/wiki_to_graph.py update <wiki_dir> add-edge    --from "Mixture of Experts" --to "Transformer" --type related
 python3 $S/wiki_to_graph.py update <wiki_dir> remove-edge --from "Mixture of Experts" --to "Transformer" --type related
 python3 $S/wiki_to_graph.py update <wiki_dir> remove-node --node "Mixture of Experts"
@@ -152,7 +168,13 @@ Keeping a graph healthy as it grows — ingesting new artifacts, deduping — is
 - `--edges a,b` traverse ONLY these edge types · `--ignore-edges x,y` all EXCEPT these
 - `--kind a,b` visit ONLY these node kinds · `--ignore-kind x,y` all EXCEPT these
 - `--node-type concept,source,index,log` (structural) · `--ignore-node-type x,y`
+- `--topic "Field / Topic"` visit ONLY pages in these topics; a field matches every topic under it
+- `--years 2020-2023` visit ONLY pages dated in range (also `2020`, `2020-`, `-2020`); undated pages drop out
 - `--undirected` treat edges as undirected in bfs/dfs
+
+The viewer gains a second bar when the graph has topics or years: colour by kind, topic,
+field or year; filter by topic and year range; and a **timeline** layout that places each
+page at its year.
 
 ## Non-negotiable: compute, don't reason
 

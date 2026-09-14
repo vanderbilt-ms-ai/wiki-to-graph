@@ -4,6 +4,7 @@ medium: paper
 locator: raw/05_rlhf_instructgpt.md
 author: Ouyang, Wu, Jiang, Almeida, et al.
 date: 2022
+topics: Language models / Alignment
 ---
 
 # Training Language Models to Follow Instructions with Human Feedback

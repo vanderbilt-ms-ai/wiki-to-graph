@@ -27,10 +27,15 @@ lines instead of frontmatter, papers written up as pages, every disagreement on 
 Sources sections — `build` normalizes a copy before parsing, so the same content produces the same
 graph however it was written. Your files are never modified.
 
-![The interactive graph viewer, with the Transformer node selected](assets/graph-viewer.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/graph-viewer-dark.png">
+  <img alt="The graph viewer with the Transformer page selected: nodes coloured by kind, edges by type, and the page's summary and relationships in the side panel" src="assets/graph-viewer-light.png">
+</picture>
 
-*The included viewer, opened at `graph-viewer.html#Transformer`: nodes colored by kind and edges by
-type, with the selected node's summary, sources, and relations — each showing the reason it was made.*
+*The included viewer, opened at `graph-viewer.html#Transformer`, in light or dark to match your system.
+Nodes are coloured by kind and edges by type; the side panel shows the selected page's summary, sources
+and relationships, each with the reason it was made. **About this graph** explains all of it using the
+graph's own counts.*
 
 **Working with the graph through Claude rather than code?** Read the
 [**User Guide**](docs/user-guide.md): what is in the graph, how to read the viewer, what to ask, and
@@ -101,7 +106,7 @@ wiki-to-graph/                      ← plugin root (also a one-plugin marketpla
 │   ├── custom-vocabulary.md        ← --vocab format, and the orphan trap it avoids
 │   └── publishing.md               ← distribution + release steps
 ├── pyproject.toml
-├── assets/graph-viewer.png
+├── assets/graph-viewer-*.png
 ├── INSTALL.md                      ← install steps an agent can follow
 ├── AGENTS.md                       ← pointers for agents working in this repo
 ├── LICENSE.md
@@ -167,6 +172,10 @@ python3 $SCR query build/graph.json unexplained            # typed links with no
 python3 $SCR query build/graph.json bfs "Transformer" --edges related
 python3 $SCR query build/graph.json dfs "GPT-3" --edges contradicts --undirected
 python3 $SCR query build/graph.json path "Positional Encoding" "RLHF"
+python3 $SCR query build/graph.json topics                 # topics, with source/concept counts and years
+python3 $SCR query build/graph.json timeline --node-type source
+python3 $SCR query build/graph.json bridges                # links between pages sharing no topic
+python3 $SCR query build/graph.json lineage "A" "B"        # citation chains: A cites … cites B
 ```
 
 **Filter any traversal** on edge type, node type/kind, or a combination — include or exclude:
@@ -178,6 +187,8 @@ python3 $SCR query build/graph.json path "Positional Encoding" "RLHF"
 | `--kind a,b` | visit ONLY these node kinds (`concept/schema/procedure/fact`) |
 | `--ignore-kind x,y` | all kinds EXCEPT these |
 | `--node-type …` / `--ignore-node-type …` | filter structural type (`concept/source/index/log`) |
+| `--topic "Field / Topic"` | ONLY pages in these topics; a field matches every topic under it |
+| `--years 2020-2023` | ONLY pages dated in range (`2020`, `2020-`, `-2020` also work) |
 | `--undirected` | treat edges as undirected in bfs/dfs |
 
 ### 5 · Update the wiki, then rebuild
@@ -189,7 +200,9 @@ W=examples/llm-wiki/wiki
 
 # add knowledge atoms and the artifacts they came from
 python3 $SCR update $W add-node   --title "Mixture of Experts" --kind schema --summary "…"
-python3 $SCR update $W add-source --title "Switch Transformer" --locator "arxiv:2101.03961"
+python3 $SCR update $W add-source --title "Switch Transformer" --locator "arxiv:2101.03961" \
+                                  --date 2021-01 --topics "Language models / Scaling"
+python3 $SCR update $W set-topics --node "GPT-3" --topics "Language models / Scaling"
 
 # link them (cites writes the target's locator, so it resolves onto the source page)
 python3 $SCR update $W add-edge   --from "Mixture of Experts" --to "Transformer" --type related
@@ -217,12 +230,32 @@ skill.
 python3 skills/wiki-to-graph/scripts/build_graph_viewer.py build/graph.json -o build/graph-viewer.html
 ```
 
-Double-click `build/graph-viewer.html` (offline, no dependencies). Scroll to zoom, drag the
-background to pan, drag a node to reposition it, `fit` to reframe. Click a node for its summary,
-full explanation, sources, and its outgoing edges and backlinks — **grouped by edge type, each
-showing the reason the link was made**, with `← back` to retrace. Add a node's title to the URL —
-`graph-viewer.html#Transformer` — to open with that node selected. Colours and toggles are derived from the graph, so a custom
-`--vocab` renders correctly without touching the viewer.
+Double-click `build/graph-viewer.html`. It is one self-contained file: the fonts are embedded and it
+makes no network requests. It follows your system's light or dark setting, and on first visit
+**About this graph** explains nodes, edges, sizes, topics and years using this graph's own counts.
+
+Scroll to zoom, drag the background to pan, drag a node to reposition it, `fit` to reframe. Click a node
+for its summary, full explanation, sources, and its outgoing edges and backlinks — **grouped by edge
+type, each showing the reason the link was made**, with `← back` to retrace. Click an edge for its
+type, its direction and the reason written for it. Add a node's title to the URL —
+`graph-viewer.html#Transformer` — to open with that node selected. Colours and toggles are derived
+from the graph, so a custom `--vocab` renders correctly without touching the viewer. When pages carry
+years or topics, a second bar colours nodes by topic, field or year, filters by topic and year range,
+and switches to a **timeline** layout that places each page at its year.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/graph-viewer-timeline-dark.png">
+  <img alt="The timeline layout: pages placed left to right by year and coloured by year" src="assets/graph-viewer-timeline-light.png">
+</picture>
+
+*Timeline layout, coloured by year: each page sits at its year, and a link reaching left points back in time.*
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/graph-viewer-edge-dark.png">
+  <img alt="An edge selected: the side panel shows its type, direction and the reason written for it" src="assets/graph-viewer-edge-light.png">
+</picture>
+
+*A selected edge: its type, its direction, and the reason written for it on the page that makes it.*
 
 ---
 
@@ -239,6 +272,10 @@ showing the reason the link was made**, with `← back` to retrace. Add a node's
   inferred — paper, web, book, slides, video, transcript, notebook, code, data, audio, note.
 - **Edges** are typed by their source section: `mentions`, `related`, `contradicts`, `cites`, plus
   `indexes` / `records` from the index/log hub pages.
+- **Years and topics** place pages in time and subject. A source's `year` comes from `date:`, a title
+  ending "(Author, 2017)", or a filename like `smith-2017-x`; `topics:` ("Field / Topic", comma
+  separated) can go on any page. Concepts that state neither inherit their cited sources' most
+  shared topic and earliest year, marked as derived.
 - Each node carries its own `edges` list, degrees, `word_count`, `n_sources`, `aliases`. Link text
   is stored as plain names — the relationship lives in the edge, not in `[[markup]]`.
 - **Every edge carries `context`** — the bullet or sentence the link was written in, which is where

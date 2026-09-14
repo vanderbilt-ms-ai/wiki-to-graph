@@ -95,6 +95,19 @@ the two pages connect. When you ask Claude how two things are related, or click 
 the viewer, that sentence is what you see. If a link was written with no explanation, the graph
 says so rather than inventing one.
 
+### Years and topics: when, and about what
+
+Pages can also carry **a year** and **topics**, so you can ask what came when and what belongs to
+which subject.
+
+- **Year.** A source's year comes from its date, or from a title such as *"… (Vaswani et al.,
+  2017)"*. An idea page usually has no date of its own; it takes **the earliest year of the
+  sources it cites** — when your collection first records the idea — and the graph says so.
+- **Topics.** A topic groups pages by subject, for example *Language models / Prompting*. The
+  part before the slash is the **field**, so one wiki can hold unrelated fields side by side. A
+  topic is a label for a group of pages, not a piece of knowledge. An idea page without topics
+  takes the topic most of its sources share.
+
 One sentence records one relationship. If the GPT-3 page's disagreements included
 *"[[Chinchilla]] — [[Compute-Optimal Scaling]] shows GPT-3 was undertrained"*, the disagreement is
 with **Chinchilla**, the page the sentence leads with. *Compute-Optimal Scaling* is cited as
@@ -104,22 +117,36 @@ evidence, so it counts as a *mention*, not as a second disagreement.
 
 ## Reading the viewer
 
-Claude opens the viewer for you. It is a single file that works offline in any browser.
+Claude opens the viewer for you. It is a single file that works offline in any browser, in light or
+dark to match your system. The first time you open it, **About this graph** explains what the nodes,
+edges, sizes, topics and years mean, using this graph's own numbers; reopen it from the top bar.
 
 ### Top bar
 
+- **About this graph** — the explanation above.
 - **Counts** of pages and relationships.
 - **Search** — type part of a page's name to jump to it.
 - **Relationship toggles** — show or hide each relationship type. *cites* and *indexes* start
   hidden to keep the picture readable; turn them on to see sources and the index.
 
+When pages have years or topics, a **second bar** appears:
+
+- **colour by** — kind (the default), topic, field or year. The legend changes to match.
+- **layout** — *timeline* lines pages up left to right by year, with undated pages in a strip on
+  the left. A link that reaches far left points back in time.
+- **topic** — show only one field or topic. Everything else is hidden and the map re-forms
+  around what is left.
+- **years** — show only pages from a range of years.
+
 ### The map
 
 - **Colour** shows the kind (or type, for sources and hubs) — see the legend.
-- **Size** shows how many pages point at a node: bigger means more depended-upon.
+- **Size**: when sources cite each other, a source is sized by how many other sources in the graph cite
+  it; every other node by how many pages point at it. Bigger means more depended-upon.
 - **Line colour** shows the relationship type; red lines are disagreements, dashed lines are citations.
 - **Scroll** to zoom, **drag the background** to pan, **drag a node** to move it, **fit** to reframe.
 - **Click a node** to select it: its neighbours stay bright and everything else fades.
+- **Click an edge** to see its type, its direction, and the reason written for it.
 
 ### The side panel
 
@@ -170,6 +197,19 @@ are examples, not commands to memorise.
 - *"What points at GPT-3?"*
 - *"Starting from Transformer, what can I reach through related pages only?"*
 
+### Time and topics
+
+- *"What topics are in my wiki?"*
+- *"Show me everything from 2020 to 2022, in order."*
+- *"Which ideas first appear in 2025?"*
+- *"Does the materials engineering material connect to anything else?"* — Claude lists the links
+  between pages that share no topic. *None* is a real answer: two unrelated fields can sit in one
+  wiki without touching.
+- *"Open the viewer as a timeline, coloured by field."*
+- *"Trace Cao 2026 back to Johnson and Cook 1983."* — Claude lists the chains of papers citing
+  papers between the two, and which papers most chains pass through. This follows citations
+  only; two papers about the same idea are not a chain.
+
 ### Disagreements
 
 - *"What are all the contradictions in my wiki?"*
@@ -205,6 +245,7 @@ the edit and rebuilds. You can ask for any of these in plain language:
 | rename a page | *"Rename GPT-3 to GPT-3 (Brown et al., 2020)."* — links across the wiki are updated |
 | remove something | *"Remove the link between X and Y"* or *"Delete the page Z."* |
 | reclassify | *"Make Chinchilla a fact"* or *"This page is really a source, not a concept."* |
+| set topics | *"Tag the GPT-3 paper with Language models / Scaling."* |
 
 **Adding something you read** follows a careful routine: Claude makes a source page for it,
 proposes the ideas worth their own pages and **shows you that list before writing anything**,
@@ -256,6 +297,9 @@ before.
 | **kind** | what a concept knows: concept, schema, procedure or fact |
 | **source** | something that was read — paper, web page, book, deck, transcript, code |
 | **reason** (context) | the sentence a relationship was written in |
+| **topic** | a label grouping pages by subject, written *Field / Topic* |
+| **field** | the part of a topic before the slash; the broadest grouping |
+| **year** | a source's date; for an idea page, the earliest year among the sources it cites |
 | **mutual** | a relationship that holds both ways: related, contradicts |
 | **normalized** | the builder read a copy of your wiki in a standard form; your files are untouched |
 | **central** | depended on by many other pages |

@@ -4,6 +4,7 @@ medium: paper
 locator: raw/01_attention_is_all_you_need.md
 author: Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, Polosukhin
 date: 2017
+topics: Language models / Architecture
 ---
 
 # Attention Is All You Need
