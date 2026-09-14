@@ -4,6 +4,7 @@ medium: paper
 locator: raw/03_gpt3.md
 author: Brown, Mann, Ryder, Subbiah, Kaplan, et al.
 date: 2020
+topics: Language models / Scaling
 ---
 
 # Language Models are Few-Shot Learners

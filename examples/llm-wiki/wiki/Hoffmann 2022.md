@@ -4,6 +4,7 @@ medium: paper
 locator: raw/06_chinchilla.md
 author: Hoffmann, Borgeaud, Mensch, et al.
 date: 2022
+topics: Language models / Scaling
 ---
 
 # Training Compute-Optimal Large Language Models

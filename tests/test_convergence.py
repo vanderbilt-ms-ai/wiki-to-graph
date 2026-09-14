@@ -318,5 +318,25 @@ class Parsing(unittest.TestCase):
         self.assertEqual(items[2][1], [])
 
 
+class Viewer(unittest.TestCase):
+    """The viewer is one offline file: nothing it needs may come from the network."""
+
+    def test_viewer_is_self_contained_and_explains_itself(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            graph, page = os.path.join(tmp, "graph.json"), os.path.join(tmp, "viewer.html")
+            subprocess.run([sys.executable, os.path.join(SCRIPTS, "wiki_to_graph.py"), "build", EXAMPLE, "-o", graph],
+                           check=True, capture_output=True)
+            subprocess.run([sys.executable, os.path.join(SCRIPTS, "build_graph_viewer.py"), graph, "-o", page],
+                           check=True, capture_output=True)
+            with open(page, encoding="utf-8") as fh:
+                html = fh.read()
+        head = html[:html.index('<script id="data"')]
+        for remote in ("<link", "@import", 'src="http', "url(http"):
+            self.assertNotIn(remote, head)
+        self.assertIn("@font-face", head)
+        self.assertIn("prefers-color-scheme: dark", head)
+        self.assertIn('id="aboutBtn"', html)
+
+
 if __name__ == "__main__":
     unittest.main()

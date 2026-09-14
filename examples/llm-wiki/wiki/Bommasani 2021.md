@@ -4,6 +4,7 @@ medium: paper
 locator: raw/04_foundation_models.md
 author: Bommasani, Hudson, Liang, et al.
 date: 2021
+topics: Language models / Foundation models
 ---
 
 # On the Opportunities and Risks of Foundation Models

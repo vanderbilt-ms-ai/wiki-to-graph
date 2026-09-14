@@ -117,10 +117,13 @@ evidence, so it counts as a *mention*, not as a second disagreement.
 
 ## Reading the viewer
 
-Claude opens the viewer for you. It is a single file that works offline in any browser.
+Claude opens the viewer for you. It is a single file that works offline in any browser, in light or
+dark to match your system. The first time you open it, **About this graph** explains what the nodes,
+edges, sizes, topics and years mean, using this graph's own numbers; reopen it from the top bar.
 
 ### Top bar
 
+- **About this graph** — the explanation above.
 - **Counts** of pages and relationships.
 - **Search** — type part of a page's name to jump to it.
 - **Relationship toggles** — show or hide each relationship type. *cites* and *indexes* start
@@ -138,10 +141,12 @@ When pages have years or topics, a **second bar** appears:
 ### The map
 
 - **Colour** shows the kind (or type, for sources and hubs) — see the legend.
-- **Size** shows how many pages point at a node: bigger means more depended-upon.
+- **Size**: when sources cite each other, a source is sized by how many other sources in the graph cite
+  it; every other node by how many pages point at it. Bigger means more depended-upon.
 - **Line colour** shows the relationship type; red lines are disagreements, dashed lines are citations.
 - **Scroll** to zoom, **drag the background** to pan, **drag a node** to move it, **fit** to reframe.
 - **Click a node** to select it: its neighbours stay bright and everything else fades.
+- **Click an edge** to see its type, its direction, and the reason written for it.
 
 ### The side panel
 
