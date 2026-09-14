@@ -178,6 +178,12 @@ TEMPLATE = r"""<!DOCTYPE html>
   #about .secondary{font-family:var(--ui);font-weight:600;font-size:14px;color:var(--accent);background:transparent;
        border:1px solid var(--edge);border-radius:4px;padding:8px 14px;cursor:pointer}
   @media (max-width:760px){#about .key{grid-template-columns:1fr}#about .key dt{white-space:normal}}
+  /* Narrow screens: the map takes the full width and the side panel sits below it. */
+  @media (max-width: 720px){
+    #bar2{height:auto;flex-wrap:wrap;row-gap:6px;padding:6px 14px}
+    #stage{right:0;bottom:40vh}
+    #side{top:auto!important;left:0;width:auto;height:40vh;border-left:0;border-top:1px solid var(--edge)}
+  }
 </style>
 </head>
 <body>

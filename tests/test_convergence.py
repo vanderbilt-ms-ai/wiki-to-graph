@@ -335,6 +335,8 @@ class Viewer(unittest.TestCase):
             self.assertNotIn(remote, head)
         self.assertIn("@font-face", head)
         self.assertIn("prefers-color-scheme: dark", head)
+        # On a phone the side panel sits under the map instead of covering it.
+        self.assertIn("@media (max-width: 720px)", head)
         self.assertIn('id="aboutBtn"', html)
 
 
