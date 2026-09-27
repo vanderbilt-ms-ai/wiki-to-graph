@@ -54,7 +54,7 @@ checks that it worked. Or install it yourself:
 
 | Method | Commands | You get |
 |---|---|---|
-| **Claude Code plugin** | `claude plugin marketplace add vanderbilt-ms-ai/wiki-to-graph`<br>`claude plugin install wiki-to-graph@wiki-to-graph` | the three skills, loaded in your next session. Inside a session, use `/plugin marketplace add …` and `/plugin install …` |
+| **Claude Code plugin** | `claude plugin marketplace add vanderbilt-ms-ai/wiki-to-graph`<br>`claude plugin install wiki-to-graph@wiki-to-graph` | the four skills, loaded in your next session. Inside a session, use `/plugin marketplace add …` and `/plugin install …` |
 | **Clone** | `git clone https://github.com/vanderbilt-ms-ai/wiki-to-graph.git` | everything: scripts, skills, example, tests. Nothing to install |
 | **pip** | `pip install wiki-to-graph` | the `wiki-to-graph` and `wiki-to-graph-viewer` commands |
 
@@ -64,13 +64,14 @@ heavier analysis. For changes newer than the latest release:
 
 Once installed, tell your agent: *"Turn my wiki at `<path>` into a graph."* No reformatting first.
 
-The plugin ships **three skills**, one per stage:
+The plugin ships **four skills**, one per stage:
 
 | Skill | Use when |
 |---|---|
 | `wiki-to-graph` | you have a wiki — build it into a graph and view it |
 | `wiki-author` | you have source material and no wiki yet |
 | `wiki-graph-maintain` | you have a graph — ingest new sources, keep it healthy |
+| `wiki-graph-view` | you have a graph - open the current viewer, at a given page |
 
 ---
 
@@ -91,6 +92,8 @@ wiki-to-graph/                      ← plugin root (also a one-plugin marketpla
 │   │       └── build_graph_viewer.py   ← HTML graph viewer generator
 │   ├── wiki-graph-maintain/
 │   │   └── SKILL.md                ← keeping a graph correct as it grows
+│   ├── wiki-graph-view/
+│   │   └── SKILL.md                ← opening the viewer on a current graph
 │   └── wiki-author/
 │       └── SKILL.md                ← writing a wiki that graphs cleanly
 ├── examples/
