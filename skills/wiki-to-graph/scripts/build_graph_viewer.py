@@ -325,7 +325,16 @@ const TYPE_DESC = {source:'an ingested artifact (paper, page, book, deck…)',
 const EDGE_DESC = {mentions:'reference in body prose',related:'explicit association',
                    contradicts:'documented disagreement',cites:'provenance \u2192 source',
                    indexes:'hub listing',records:'log entry'};
+// meanings of added kinds / edge types, from the vocabulary's "descriptions"
+Object.entries((G.meta||{}).descriptions||{}).forEach(([k,d])=>{
+  if(k in KIND) KIND_DESC[k]=KIND_DESC[k]||d;
+  if(k in EDGE) EDGE_DESC[k]=EDGE_DESC[k]||d;
+  if(k in TYPEN) TYPE_DESC[k]=TYPE_DESC[k]||d;
+});
 const present = t => allEdges.some(e=>e.type===t);
+// the legend lists only what this graph contains
+const kindPresent = k => nodes.some(n=>n.type==='concept' && (n.kind||'concept')===k);
+const typePresent = t => nodes.some(n=>n.type===t);
 const dotRows=(pairs,none)=>pairs.map(([k,c])=>
     `<div class="row"><span class="dot" style="background:${c}"></span>${esc(k)}</div>`).join('')+
   (none?`<div class="row"><span class="dot" style="background:${NONE_COL}"></span><span style="opacity:.65">${none}</span></div>`:'');
@@ -338,10 +347,10 @@ function nodeLegend(){
     `<div class="row">${Y0}<span class="ramp" style="background:linear-gradient(90deg,${yearCol(Y0)},${yearCol((Y0+Y1)/2)},${yearCol(Y1)})"></span>${Y1}</div>`+
     dotRows([],'undated');
   return '<b>Node kind</b> <span style="opacity:.65">— what the node knows</span>'+
-  Object.entries(KIND).map(([k,c])=>
+  Object.entries(KIND).filter(([k])=>kindPresent(k)).map(([k,c])=>
     `<div class="row"><span class="dot" style="background:${c}"></span>${k}${KIND_DESC[k]?` <span style="opacity:.65">— ${KIND_DESC[k]}</span>`:''}</div>`).join('')+
   '<div style="height:8px"></div><b>Node type</b> <span style="opacity:.65">— what the node is</span>'+
-  Object.entries(TYPEN).map(([k,c])=>
+  Object.entries(TYPEN).filter(([k])=>typePresent(k)).map(([k,c])=>
     `<div class="row"><span class="dot" style="background:${c}"></span>${k}${TYPE_DESC[k]?` <span style="opacity:.65">— ${TYPE_DESC[k]}</span>`:''}</div>`).join('');
 }
 function renderLegend(){
@@ -350,7 +359,7 @@ document.getElementById('legend').innerHTML = nodeLegend()+
   Object.keys(EDGE).filter(present).map(t=>
     `<div class="row"><span class="swatch" style="border-top-color:${EDGE[t]}${t==='cites'?';border-top-style:dashed':''}"></span>${t}${EDGE_DESC[t]?` <span style="opacity:.65">— ${EDGE_DESC[t]}</span>`:''}</div>`).join('')+
   '<div style="height:8px"></div><div class="row">'+(PAPER_CITES
-      ? 'Paper size = papers here that cite it \u00b7 idea size = links pointing at it'
+      ? 'Source size = sources here that cite it \u00b7 other node size = links pointing at it'
       : 'Node size = links pointing at it')+' \u00b7 line width = times the link is written</div>'+
   '<div class="row">Scroll to zoom \u00b7 drag background to pan \u00b7 drag a node to move it \u00b7 click a line to see the link</div>';
 }

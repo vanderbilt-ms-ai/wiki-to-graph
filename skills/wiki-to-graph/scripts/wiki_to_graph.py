@@ -126,6 +126,8 @@ def topic_matches(topics, wanted):
 KINDS = {"concept", "fact", "schema", "procedure"}
 
 
+DESCRIPTIONS = {}
+
 DEFAULT_VOCAB = {
     "kinds": sorted(KINDS),
     "concept_edges": sorted(CONCEPT_EDGE_TYPES),
@@ -142,13 +144,14 @@ def load_vocab(path):
         {"kinds":         ["object", "concept", "fact", "experience", …],
          "concept_edges": ["part-of", "uses", "derived-from", …],
          "symmetric":     ["contradicts", "co-occurred-with"],
-         "hub_edges":     ["indexes", "records"]}
+         "hub_edges":     ["indexes", "records"],
+         "descriptions":  {"experience": "something that happened to someone", "part-of": "..."}}
 
     `concept_edges` is the one people miss. It drives in/out degree at build time AND the analysis
     graph, so a custom section->edge map without a matching vocabulary yields a graph where every
     node looks like an orphan and `analyze` considers zero edges.
     """
-    global KINDS, CONCEPT_EDGE_TYPES, CONCEPT_EDGE, ALL_EDGE_TYPES, SYMMETRIC
+    global KINDS, CONCEPT_EDGE_TYPES, CONCEPT_EDGE, ALL_EDGE_TYPES, SYMMETRIC, DESCRIPTIONS
     v = dict(DEFAULT_VOCAB)
     if path:
         with open(path, encoding="utf-8") as fh:
@@ -158,6 +161,8 @@ def load_vocab(path):
     CONCEPT_EDGE = set(v["concept_edges"])
     SYMMETRIC = set(v["symmetric"])
     ALL_EDGE_TYPES = list(v["concept_edges"]) + list(v["hub_edges"])
+    # one-line meanings for added kinds / edge types; the viewer shows them in its legend
+    DESCRIPTIONS = {str(k): str(d) for k, d in (v.get("descriptions") or {}).items()}
     return v
 
 
@@ -712,7 +717,8 @@ def cmd_build(args):
                    "source_dir":os.path.normpath(args.wiki_dir),
                    "counts":{**ncount,"edges":ecount},
                    "dag_check":dag,"warnings":warnings,"normalization":norm,
-                   "topics":dict(sorted(topic_counts.items())),"years":year_span},
+                   "topics":dict(sorted(topic_counts.items())),"years":year_span,
+                   "descriptions":DESCRIPTIONS},
            "nodes":list(nodes.values()),
            "links":edges}
     open(args.out,"w",encoding="utf-8").write(json.dumps(graph,indent=2,ensure_ascii=False))

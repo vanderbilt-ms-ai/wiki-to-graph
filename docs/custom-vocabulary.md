@@ -80,6 +80,10 @@ Every key is optional; omitted keys keep the default.
   analysis, and traversal.
 - **`symmetric`** — edge types stored with `directed: false`. No edges are duplicated.
 - **`hub_edges`** — excluded from degree so `index.md` pointing at everything does not inflate it.
+- **`descriptions`** - one line per added kind or edge type, `{"judgment": "a standing rule",
+  "supersedes": "a newer version replaces an older one"}`. The build copies it into the
+  graph's `meta`, and the viewer shows it in its legend and side panel; without it an added
+  type appears there as a bare word. The "Before you extend it" reason belongs here too.
 
 Pass it to `build`, `validate`, `analyze`, and `query`. `analyze --edges` now defaults to the active
 `concept_edges` rather than a hardcoded trio, so it needs no separate flag.
