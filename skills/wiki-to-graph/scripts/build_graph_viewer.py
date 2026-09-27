@@ -268,12 +268,28 @@ const nodeColor = n =>
   colorBy==='year'  ? (n.year?yearCol(n.year):NONE_COL) : kindColor(n);
 // Topic and year filters hide pages rather than dim them, so the layout re-forms around
 // what is left and the links between two subjects stand out.
-function shown(n){
+function passesFilters(n){
   if(!n) return false;
   if(topicSel && !(n.topics||[]).some(t=>t===topicSel||FIELD(t)===topicSel)) return false;
   if(yFrom!=null && !(n.year>=yFrom)) return false;
   if(yTo!=null && !(n.year<=yTo)) return false;
   return true;
+}
+// A node is drawn only when an edge type that is switched on connects it to another drawn
+// node. With cites and indexes off by default, source pages and the index hub otherwise
+// float as hundreds of unconnected dots; switching cites on brings the sources back.
+let linked=null;
+function computeLinked(){
+  linked=new Set();
+  allEdges.forEach(e=>{
+    if(!enabled[e.type] || e.source===e.target) return;
+    if(passesFilters(byId[e.source]) && passesFilters(byId[e.target])){ linked.add(e.source); linked.add(e.target); }
+  });
+}
+function shown(n){
+  if(!passesFilters(n)) return false;
+  if(!linked) computeLinked();
+  return linked.has(n.id);
 }
 
 // default-visible edge types (hub edges off to reduce clutter)
@@ -395,8 +411,11 @@ if(TOPICS.length||YEARS.length){
 let tl={W:0,H:0};
 const tlX=y=>90+(tl.W-180)*(Y1>Y0?(y-Y0)/(Y1-Y0):.5);
 function sim(){
+  computeLinked();
   const W=svg.clientWidth||900,H=svg.clientHeight||650, E=visibleEdges();
   const V=nodes.filter(shown);
+  const sc=document.getElementById('shownCount');
+  if(sc) sc.textContent = V.length<nodes.length ? V.length+' of '+nodes.length+' nodes shown' : '';
   if(layout==='timeline'&&YEARS.length>0) return timeline(V,E,W,H);
   // Lay out on an area sized to the node count, not only to the window: in a small window,
   // repulsion otherwise pushes the outer nodes against the edges in straight lines. fit() frames it.
