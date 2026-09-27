@@ -71,6 +71,12 @@ Read the artifact. Draft a list of candidate atoms with a `kind` each:
 | `procedure` | a process, method or technique |
 | `fact` | an empirical finding or result |
 
+Use the kinds and edge types the graph already has. An ingest never adds a kind or edge
+type: a new category of thing is a topic, a new kind of connection is the reason text on
+a `related` link. If the graph truly needs a new type, stop and propose it to the user
+with the query it enables ([`docs/custom-vocabulary.md`](../../docs/custom-vocabulary.md),
+"Before you extend it").
+
 **Show the user the candidate list and the count before writing anything.** An
 agent that writes 40 pages and then asks for review has already spent the
 review. State the threshold you used for "this earns a page" — otherwise you

@@ -59,6 +59,12 @@ Assign each candidate a `kind`:
 | `procedure` | a process, method or technique |
 | `fact` | an empirical finding or result |
 
+These four are the vocabulary. What a thing *is* (a company, a person, a contract) is a
+`topics:` value, not a new kind; how two things connect is a `related` link whose reason
+says it. Do not invent kinds or edge types while authoring. If a real need cannot be met
+that way, propose the addition to the user first, with the query it enables
+([`docs/custom-vocabulary.md`](../../docs/custom-vocabulary.md), "Before you extend it").
+
 ## 3. The page contract
 
 ```markdown
