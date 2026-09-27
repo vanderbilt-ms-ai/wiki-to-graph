@@ -26,7 +26,7 @@ Inside an interactive Claude Code session the equivalent is
 claude plugin details wiki-to-graph@wiki-to-graph
 ```
 
-It must list `Skills (3)  wiki-author, wiki-graph-maintain, wiki-to-graph`. Skills load
+It must list `Skills (4)  wiki-author, wiki-graph-maintain, wiki-graph-view, wiki-to-graph`. Skills load
 when a session starts, so tell the user to **start a new session** before using it.
 
 ## B · Any agent with a shell — clone it
@@ -43,11 +43,11 @@ python3 -m unittest discover tests
 `skills/wiki-to-graph/scripts/wiki_to_graph.py` and
 `skills/wiki-to-graph/scripts/build_graph_viewer.py`.
 
-To also load the skills into Claude Code without the plugin system, copy all three skill
-folders together (two of them use scripts in the `wiki-to-graph` folder beside them):
+To also load the skills into Claude Code without the plugin system, copy all four skill
+folders together (three of them use scripts in the `wiki-to-graph` folder beside them):
 
 ```bash
-mkdir -p ~/.claude/skills && cp -R skills/wiki-to-graph skills/wiki-author skills/wiki-graph-maintain ~/.claude/skills/
+mkdir -p ~/.claude/skills && cp -R skills/wiki-to-graph skills/wiki-author skills/wiki-graph-maintain skills/wiki-graph-view ~/.claude/skills/
 ```
 
 ## C · Command-line tools only — pip
