@@ -37,6 +37,31 @@ orphans: 40                       # <- the genuinely unconnected ones
 so PageRank is uniform, every node is its own component, and community detection returns one
 community per node.
 
+## Before you extend it: a few types, each with a reason
+
+`--vocab` makes adding types cheap, and that is the risk. The usual failure is not one bad
+type but dozens: every entity category becomes a kind (`organization`, `person`,
+`contract`, `metric`...) and every verb becomes an edge type (`works-at`, `party-to`,
+`invests-in`...). The graph then has one type per handful of nodes, queries have to know
+twenty names, and the kinds stop meaning what a concept *knows*.
+
+Most of that is already expressible without new types:
+
+| You want | Use instead of a new type |
+|---|---|
+| to say what a thing is (a company, a person, a contract) | `topics:` - "Relationships / Organizations"; filter with `--topic` |
+| to say how two things are connected (works at, party to, invests in) | a `related` link whose reason says it: `- [[Acme]] - Jane works at Acme as CFO` |
+| to find those connections | the reason text: every edge carries it as `context` |
+| a version or replacement chain | this one does need a directed type; see below |
+
+Add a kind or edge type only when you can name the query or behavior that needs it and
+that topics plus a reasoned `related` link cannot give. A directed relation a tool
+traverses (a `supersedes` chain that decides which file is current), or a node class a
+tool treats differently (a to-do list it prints, rules it applies), qualifies. A label for
+a category does not. Keep additions to a few. Write the reason for each in the
+vocabulary's `_doc` field. **Propose them to the user before building with them.** An
+agent must not grow the vocabulary on its own during authoring or ingest.
+
 ## Format
 
 Every key is optional; omitted keys keep the default.
