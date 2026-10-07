@@ -1693,6 +1693,7 @@ def main():
     li.add_argument("wiki_dir")
     li.add_argument("--strict", action="store_true", help="exit non-zero on warnings too")
     li.add_argument("--limit", type=int, default=3, help="examples to print per issue class")
+    li.add_argument("--vocab", default=None, help="custom vocabulary JSON, so its kinds are not flagged")
     li.set_defaults(func=cmd_lint)
 
     u = sub.add_parser("update", help="edit the source wiki markdown, then re-run build")
