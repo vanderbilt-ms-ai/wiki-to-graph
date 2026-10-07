@@ -432,6 +432,11 @@ def build_graph(wiki_dir, exclude, mapping, stubs):
                 "summary": summary, "explanation": expl,
                 "sources": source_strings, "file": p["file"],
                 "in_degree": 0, "out_degree": 0, "edges": []}
+        # Carry the page's remaining frontmatter (status, stage, as_of, asset_class, ...)
+        # so application metadata is queryable without a second parser.
+        extra = {k: v for k, v in p["meta"].items() if k not in ("type", "kind")}
+        if extra:
+            node["meta"] = extra
         if p["ntype"] == "source":
             loc = p["meta"].get("locator")
             node["locator"] = loc
@@ -640,18 +645,19 @@ def write_sqlite(nodes, edges, path):
     con=sqlite3.connect(tmp); c=con.cursor()
     c.execute("""CREATE TABLE nodes(id TEXT PRIMARY KEY,type TEXT,kind TEXT,title TEXT,summary TEXT,
                  explanation TEXT,sources TEXT,file TEXT,word_count INT,n_sources INT,
-                 in_degree INT,out_degree INT,year INT,topics TEXT)""")
-    c.execute("""CREATE TABLE edges(src TEXT,dst TEXT,type TEXT,via TEXT,directed INT,weight INT)""")
+                 in_degree INT,out_degree INT,year INT,topics TEXT,meta TEXT)""")
+    c.execute("""CREATE TABLE edges(src TEXT,dst TEXT,type TEXT,via TEXT,directed INT,weight INT,context TEXT)""")
     for n in nodes.values():
-        c.execute("INSERT INTO nodes VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        c.execute("INSERT INTO nodes VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                   (n["id"],n["type"],n.get("kind"),n.get("title"),n.get("summary",""),
                    n.get("explanation",""),json.dumps(n.get("sources",[])),n.get("file"),
                    n.get("word_count",0),n.get("n_sources",0),
                    n.get("in_degree",0),n.get("out_degree",0),
-                   n.get("year"),json.dumps(n.get("topics",[]))))
+                   n.get("year"),json.dumps(n.get("topics",[])),json.dumps(n.get("meta",{}))))
     for e in edges:
-        c.execute("INSERT INTO edges VALUES(?,?,?,?,?,?)",
-                  (e["source"],e["target"],e["type"],e["via"],int(e["directed"]),e["weight"]))
+        c.execute("INSERT INTO edges VALUES(?,?,?,?,?,?,?)",
+                  (e["source"],e["target"],e["type"],e["via"],int(e["directed"]),e["weight"],
+                   e.get("context","")))
     con.commit(); con.close()
     shutil.copyfile(tmp, path)
 
@@ -959,6 +965,8 @@ def cmd_validate(args):
     g, nodes, edges = load_graph(args.graph)
     ids = set(nodes)
     dangling = [[e["source"], e["target"]] for e in edges if e["target"] not in ids or e["source"] not in ids]
+    # links that never became edges: build drops unresolved [[links]] and records them in meta
+    dangling += [list(x) for x in (g.get("meta", {}).get("warnings", {}).get("dangling") or [])]
     selfl = [[e["source"], e["type"]] for e in edges if e["source"] == e["target"]]
     cdeg = {n: 0 for n in nodes}
     for e in edges:
