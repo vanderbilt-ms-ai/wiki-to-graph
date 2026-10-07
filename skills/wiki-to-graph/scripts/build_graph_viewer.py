@@ -125,6 +125,9 @@ TEMPLATE = r"""<!DOCTYPE html>
   .axis text{fill:var(--muted);font-size:11px}
   #side .tp{display:inline-block;font-size:10px;padding:1px 7px;border-radius:8px;margin:0 4px 4px 0;color:#fff}
   .legend .ramp{height:8px;border-radius:4px;flex:1;margin:0 6px}
+  #clearSelection{font:inherit;font-size:13px;color:var(--accent);background:transparent;
+    border:1px solid var(--accent);border-radius:4px;padding:3px 10px;cursor:pointer}
+  #clearSelection:hover{background:var(--hover)}
 </style>
 <style>
   body{background:var(--bg)}
@@ -190,7 +193,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 <div id="bar">
   <h1>Knowledge Graph</h1><button id="aboutBtn" type="button">About this graph</button><span class="count" id="count"></span>
   <input type="search" id="search" placeholder="find a node…" autocomplete="off">
-  <span id="edgeToggles"></span>
+  <button id="clearSelection" type="button" title="Clear selection (Esc)">Clear selection</button><span id="edgeToggles"></span>
 </div>
 <div id="bar2" hidden>
   <label>colour by <select id="colorBy"><option value="kind">kind</option></select></label>
@@ -217,7 +220,7 @@ TEMPLATE = r"""<!DOCTYPE html>
   <ul>
     <li><b>Click a node</b> to read its summary, sources and relationships. Its neighbours stay bright.</li>
     <li><b>Search</b> finds a page by name, and the checkboxes in the top bar show or hide each edge type.</li>
-    <li><b>Scroll</b> to zoom, drag the background to pan, drag a node to move it, and use <b>fit</b> to frame everything again.</li>
+    <li>Use <b>Clear selection</b>, press <b>Esc</b>, or click empty graph space to deselect.</li><li><b>Scroll</b> to zoom, drag the background to pan, drag a node to move it, and use <b>fit</b> to frame everything again.</li>
   </ul>
   <div class="actions"><button class="primary" id="explore" type="button">Explore the graph</button><button class="secondary" id="showTimeline" type="button" hidden>Show the timeline</button></div>
 </div></aside>
@@ -532,7 +535,7 @@ function renderMd(src){
 
 // `related` and `contradicts` are symmetric: the same pair appears once as an
 // outgoing edge and once as a backlink. Listing both is the same fact twice.
-const SYMM={related:1,contradicts:1};
+const SYMM=Object.fromEntries(allEdges.filter(e=>e.directed===false).map(e=>[e.type,1]));
 
 // A link with no stated reason still often has one — written in the body of either
 // page. Fall back to that, and say where it came from rather than inventing it.
@@ -563,6 +566,20 @@ function relRows(list,id){
 const NONE='<p style="color:var(--muted);font-size:12px">none with the current edge filters</p>';
 
 let hist=[];
+// Deselect: the button, Esc, a click on empty graph space, or clearing the search box.
+const emptyDetail=document.getElementById('detail').innerHTML;
+function clearSelection(){
+  selected=null; selectedEdge=null; selectedEnds=null; hist=[];
+  document.getElementById('search').value='';
+  document.getElementById('detail').innerHTML=emptyDetail;
+  document.getElementById('side').scrollTop=0;
+  if(location.hash) history.replaceState(null,'',location.pathname+location.search);
+  draw();
+}
+document.getElementById('clearSelection').onclick=clearSelection;
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape' && document.getElementById('about').hidden){ e.preventDefault(); clearSelection(); }
+});
 function select(id, viaHistory){
   if(selected && selected!==id && !viaHistory) hist.push(selected);
   selected=id; selectedEdge=null; selectedEnds=null;
@@ -642,7 +659,7 @@ function selectEdge(i){
   s.scrollTop=0; draw();
 }
 document.getElementById('search').oninput=e=>{
-  const q=e.target.value.toLowerCase().trim();if(!q)return;
+  const q=e.target.value.toLowerCase().trim();if(!q){clearSelection();return;}
   const hit=nodes.find(n=>n.title.toLowerCase().includes(q));if(hit)select(hit.id);
 };
 function fit(){
@@ -698,7 +715,7 @@ window.addEventListener('mousemove',ev=>{
   }
 });
 window.addEventListener('mouseup',()=>{svg.classList.remove('panning');
-  if(drag&&drag.mode==='pan'&&drag.edge!=null&&!drag.moved) selectEdge(drag.edge);   // a click, not a pan
+  if(drag&&drag.mode==='pan'&&!drag.moved){if(drag.edge!=null) selectEdge(drag.edge);else clearSelection();}   // a click, not a pan
   drag=null;});
 document.getElementById('zin').onclick=()=>zoomAt(svg.clientWidth/2,svg.clientHeight/2,1.3);
 document.getElementById('zout').onclick=()=>zoomAt(svg.clientWidth/2,svg.clientHeight/2,1/1.3);
@@ -757,14 +774,14 @@ openFromHash();
   const row=(mark,name,text,n)=>'<dt>'+mark+esc(name)+'</dt><dd>'+esc(text)+' ('+n+')</dd>';
   const dot=c=>'<span class="sw" style="background:'+c+'"></span>';
   document.getElementById('aboutNodes').innerHTML=
-    Object.keys(kinds).sort().map(k=>row(dot(KIND[k]||NONE_COL),k,KIND_TEXT[k]||'an idea page of this kind',kinds[k])).join('')+
+    Object.keys(kinds).sort().map(k=>row(dot(KIND[k]||NONE_COL),k,KIND_DESC[k]||KIND_TEXT[k]||'an idea page of this kind',kinds[k])).join('')+
     Object.keys(types).filter(t=>t!=='concept').sort().map(t=>row(dot(TYPEN[t]||NONE_COL),t,TYPE_TEXT[t]||'a page of this type',types[t])).join('');
   document.getElementById('aboutSize').textContent=PAPER_CITES
     ? 'A source is sized by how many other sources in this graph cite it; every other node by how many links point at it.'
     : 'A node is sized by how many links point at it: bigger means more depended upon.';
   document.getElementById('aboutEdges').innerHTML=Object.keys(edges).sort().map(t=>
     row('<span class="ln" style="border-color:'+(EDGE[t]||NONE_COL)+(t==='cites'?';border-top-style:dashed':'')+'"></span>',
-        t,EDGE_TEXT[t]||'a link from a section mapped to this type',edges[t])).join('');
+        t,EDGE_DESC[t]||EDGE_TEXT[t]||'a link from a section mapped to this type',edges[t])).join('');
   const time=document.getElementById('aboutTime');
   if(TOPICS.length||YEARS.length){
     const parts=[];
