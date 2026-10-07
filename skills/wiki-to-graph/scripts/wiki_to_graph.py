@@ -656,6 +656,13 @@ def write_sqlite(nodes, edges, path):
     shutil.copyfile(tmp, path)
 
 
+def kst_path(out):
+    # domain.json sits next to the graph file: "graph" -> "domain" in the file name only,
+    # never in the directories (e.g. a wiki-to-graph/ checkout), and never the graph file itself
+    d,f=os.path.split(os.path.splitext(out)[0])
+    f=f.replace("graph","domain") if "graph" in f else f+"-domain"
+    return os.path.join(d,f+".json")
+
 def write_kst(nodes, edges, path, dag_edges):
     items=[{"id":n["id"],"name":n["title"],"description":n.get("summary","")}
            for n in nodes.values() if n["type"]=="concept"]
@@ -721,7 +728,7 @@ def cmd_build(args):
     emits={x.strip().lower() for x in args.emit.split(",") if x.strip()}
     if "sqlite" in emits: write_sqlite(nodes,edges,base+".db")
     if "graphml" in emits: write_graphml(nodes,edges,base+".graphml")
-    if args.kst: write_kst(nodes,edges,base.replace("graph","domain")+".json",
+    if args.kst: write_kst(nodes,edges,kst_path(args.out),
                                  {x.strip() for x in args.dag_edges.split(",")})
 
     print(f"nodes: {ncount}  edges: {ecount}")
