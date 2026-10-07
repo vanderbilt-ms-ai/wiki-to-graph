@@ -1711,6 +1711,8 @@ def main():
     u.add_argument("--author"); u.add_argument("--date")
     u.add_argument("--topics", help="add-node/add-source/set-topics: comma list, e.g. "
                                     "\"Materials engineering / Ballistic impact\"")
+    u.add_argument("--vocab", default=None,
+                   help="custom vocabulary JSON, so add-node/set-kind accept its kinds")
     u.set_defaults(func=cmd_update)
 
     args = ap.parse_args()
